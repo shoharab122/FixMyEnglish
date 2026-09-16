@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import jwt, { type SignOptions } from 'jsonwebtoken';
 import crypto from 'crypto';
 import { env } from '../config/env.js';
 
@@ -9,10 +9,11 @@ export interface AccessPayload {
 }
 
 export function signAccessToken(user: { id: string; name: string; tier: string }): string {
+  const options: SignOptions = { expiresIn: env.accessTtl as any };
   return jwt.sign(
     { id: user.id, name: user.name, tier: user.tier },
     env.accessSecret,
-    { expiresIn: env.accessTtl }
+    options
   );
 }
 
@@ -21,9 +22,8 @@ export function verifyAccessToken(token: string): AccessPayload {
 }
 
 export function signRefreshToken(userId: string): string {
-  return jwt.sign({ id: userId, jti: crypto.randomUUID() }, env.refreshSecret, {
-    expiresIn: `${env.refreshTtlDays}d`,
-  });
+  const options: SignOptions = { expiresIn: `${env.refreshTtlDays}d` as any };
+  return jwt.sign({ id: userId, jti: crypto.randomUUID() }, env.refreshSecret, options);
 }
 
 export function verifyRefreshToken(token: string): { id: string; jti: string } {
