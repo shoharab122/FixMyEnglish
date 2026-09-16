@@ -1,0 +1,458 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Tier {
+  guest
+  free
+  premium
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String?  @unique
+  passwordHash String?
+  name         String
+  avatarUrl    String?
+  tier         Tier     @default(free)
+  isGuest      Boolean  @default(false)
+  xp           Int      @default(0)
+  rank         Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  refreshTokens   RefreshToken[]
+  vocabProgress   VocabProgress[]
+  grammarAttempts GrammarAttempt[]
+  examSessions    ExamSession[]
+  speakingAtt     SpeakingAttempt[]
+  convSessions    ConvSession[]
+  dailyStats      UserStatsDaily[]
+  achievements    UserAchievement[]
+  streak          Streak?
+  countdown       ExamCountdown[]
+  purchases       Purchase[]
+  threads         PeerThread[]
+  replies         PeerReply[]
+  challengesFrom  FriendChallenge[] @relation("ChallengeFrom")
+  challengesTo    FriendChallenge[] @relation("ChallengeTo")
+}
+
+model RefreshToken {
+  id         String   @id @default(cuid())
+  userId     String
+  tokenHash  String
+  deviceInfo String?
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenHash])
+}
+
+model VocabWord {
+  id           String   @id @default(cuid())
+  word         String   @unique
+  meaningEn    String
+  meaningBn    String?
+  example      String?
+  pos          String?
+  synonyms     String[]
+  textbookUnit Int?
+  difficulty   Int      @default(1)
+
+  progress  VocabProgress[]
+  wordOfDay WordOfDay[]
+}
+
+model VocabProgress {
+  id           String   @id @default(cuid())
+  userId       String
+  wordId       String
+  srsStage     Int      @default(0)
+  nextReviewAt DateTime @default(now())
+  correctCount Int      @default(0)
+  wrongCount   Int      @default(0)
+  updatedAt    DateTime @updatedAt
+
+  user User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  word VocabWord @relation(fields: [wordId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, wordId])
+}
+
+model WordOfDay {
+  id     String    @id @default(cuid())
+  date   DateTime  @unique @db.Date
+  wordId String
+  word   VocabWord @relation(fields: [wordId], references: [id], onDelete: Cascade)
+}
+
+model GrammarTopic {
+  id       String @id @default(cuid())
+  slug     String @unique
+  name     String
+  category String @default("general")
+  order    Int    @default(0)
+
+  questions GrammarQuestion[]
+}
+
+model GrammarQuestion {
+  id            String   @id @default(cuid())
+  topicId       String
+  type          String   @default("mcq")
+  prompt        String
+  options       String[]
+  correctAnswer String
+  explanation   String?
+  banglaExplain String?
+
+  topic    GrammarTopic     @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  attempts GrammarAttempt[]
+
+  @@index([topicId])
+}
+
+model GrammarAttempt {
+  id          String   @id @default(cuid())
+  userId      String
+  questionId  String
+  isCorrect   Boolean
+  answer      String
+  attemptedAt DateTime @default(now())
+
+  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question GrammarQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([userId, questionId])
+}
+
+model CurriculumContent {
+  id            String  @id @default(cuid())
+  classLevel    String
+  paper         String
+  board         String?
+  topic         String
+  tag           String
+  type          String
+  body          String?
+  modelAnswer   String?
+  banglaExplain String?
+}
+
+model ExamTrack {
+  id   String @id @default(cuid())
+  slug String @unique
+  name String
+  icon String @default("flag")
+
+  sets       ExamSet[]
+  countdowns ExamCountdown[]
+}
+
+model ExamSet {
+  id              String  @id @default(cuid())
+  trackId         String
+  title           String
+  section         String
+  durationMinutes Int     @default(60)
+  isPremium       Boolean @default(false)
+  isMock          Boolean @default(true)
+
+  track     ExamTrack      @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  questions ExamQuestion[]
+  sessions  ExamSession[]
+}
+
+model ExamQuestion {
+  id            String   @id @default(cuid())
+  examSetId     String
+  orderIndex    Int
+  type          String   @default("mcq")
+  prompt        String
+  mediaUrl      String?
+  options       String[]
+  correctAnswer String
+  points        Int      @default(1)
+
+  examSet ExamSet @relation(fields: [examSetId], references: [id], onDelete: Cascade)
+
+  @@index([examSetId])
+}
+
+model ExamSession {
+  id          String    @id @default(cuid())
+  userId      String?
+  examSetId   String
+  status      String    @default("in_progress")
+  autoScore   Int?
+  finalScore  Int?
+  startedAt   DateTime  @default(now())
+  submittedAt DateTime?
+
+  user    User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  examSet ExamSet      @relation(fields: [examSetId], references: [id])
+  answers ExamAnswer[]
+}
+
+model ExamAnswer {
+  id            String  @id @default(cuid())
+  sessionId     String
+  questionId    String
+  answer        String
+  isCorrect     Boolean
+  pointsAwarded Int     @default(0)
+
+  session ExamSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+}
+
+model ExamCountdown {
+  id             String   @id @default(cuid())
+  userId         String
+  trackId        String
+  targetExamDate DateTime
+  dailyPlanJson  Json?
+
+  user  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  track ExamTrack @relation(fields: [trackId], references: [id])
+
+  @@unique([userId, trackId])
+}
+
+model SpeakingPrompt {
+  id              String @id @default(cuid())
+  trackSlug       String @default("general")
+  category        String @default("general")
+  promptText      String
+  prepSeconds     Int    @default(0)
+  responseSeconds Int    @default(60)
+
+  attempts SpeakingAttempt[]
+}
+
+model SpeakingAttempt {
+  id                 String   @id @default(cuid())
+  userId             String
+  promptId           String?
+  promptText         String
+  audioUrl           String?
+  transcript         String?
+  durationSeconds    Int?
+  fluencyScore       Int?
+  pronunciationScore Int?
+  grammarScore       Int?
+  vocabularyScore    Int?
+  overallBand        Float?
+  feedback           String?
+  providerUsed       String?
+  createdAt          DateTime @default(now())
+
+  user   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  prompt SpeakingPrompt? @relation(fields: [promptId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+}
+
+model ConvSession {
+  id             String    @id @default(cuid())
+  userId         String
+  scenario       String    @default("general")
+  transcriptJson Json?
+  startedAt      DateTime  @default(now())
+  endedAt        DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UserStatsDaily {
+  id                String   @id @default(cuid())
+  userId            String
+  date              DateTime @db.Date
+  xpEarned          Int      @default(0)
+  questionsAnswered Int      @default(0)
+  minutesActive     Int      @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+}
+
+model Streak {
+  userId          String    @id
+  currentStreak   Int       @default(0)
+  longestStreak   Int       @default(0)
+  freezeAvailable Boolean   @default(true)
+  lastActiveDate  DateTime? @db.Date
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Achievement {
+  id           String  @id @default(cuid())
+  code         String  @unique
+  title        String
+  description  String?
+  icon         String  @default("★")
+  criteriaJson Json?
+
+  users UserAchievement[]
+}
+
+model UserAchievement {
+  id            String   @id @default(cuid())
+  userId        String
+  achievementId String
+  unlockedAt    DateTime @default(now())
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+}
+
+model ChatRoom {
+  id        String  @id @default(cuid())
+  slug      String  @unique
+  name      String
+  minRank   String  @default("Bronze")
+  topic     String?
+  liveCount Int     @default(0)
+  isLocked  Boolean @default(false)
+}
+
+model PeerThread {
+  id        String   @id @default(cuid())
+  roomSlug  String   @default("beginner-lounge")
+  userId    String
+  title     String
+  body      String?
+  status    String   @default("open")
+  createdAt DateTime @default(now())
+
+  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  replies PeerReply[]
+}
+
+model PeerReply {
+  id        String   @id @default(cuid())
+  threadId  String
+  userId    String
+  body      String
+  isAdmin   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  thread PeerThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model StudyGroup {
+  id             String  @id @default(cuid())
+  name           String
+  crest          String  @default("S")
+  ownerId        String?
+  groupXpGoal    Int     @default(3000)
+  groupXpCurrent Int     @default(0)
+  memberCount    Int     @default(0)
+}
+
+model FriendChallenge {
+  id         String   @id @default(cuid())
+  fromUserId String
+  toUserId   String
+  quizRef    String?
+  status     String   @default("pending")
+  resultJson Json?
+  createdAt  DateTime @default(now())
+
+  fromUser User @relation("ChallengeFrom", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser   User @relation("ChallengeTo", fields: [toUserId], references: [id], onDelete: Cascade)
+}
+
+model LiveRoom {
+  id           String    @id @default(cuid())
+  title        String
+  trackSlug    String    @default("general")
+  examSetId    String?
+  scheduledAt  DateTime?
+  maxSeats     Int       @default(100)
+  status       String    @default("scheduled")
+  level        String    @default("General")
+  durationMins Int       @default(60)
+
+  participants LiveRoomParticipant[]
+  results      LiveRoomResult[]
+}
+
+model LiveRoomParticipant {
+  id                String   @id @default(cuid())
+  roomId            String
+  userId            String?
+  guestName         String?
+  guestEmail        String?
+  joinedAt          DateTime @default(now())
+  questionOrderSeed Int      @default(0)
+  tabSwitchCount    Int      @default(0)
+
+  room   LiveRoom        @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  result LiveRoomResult?
+}
+
+model LiveRoomResult {
+  id            String    @id @default(cuid())
+  roomId        String
+  participantId String    @unique
+  score         Int       @default(0)
+  rankInRoom    Int       @default(0)
+  revealedAt    DateTime?
+
+  room        LiveRoom            @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  participant LiveRoomParticipant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+}
+
+model Product {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+  tagline   String?
+  type      String
+  priceBdt  Int
+  period    String   @default("one-time")
+  strikeBdt Int?
+  features  String[]
+  icon      String   @default("flag")
+  featured  Boolean  @default(false)
+
+  purchases Purchase[]
+}
+
+model Purchase {
+  id           String    @id @default(cuid())
+  userId       String
+  productId    String
+  amountBdt    Int
+  method       String
+  status       String    @default("pending")
+  gatewayTxnId String?
+  purchasedAt  DateTime  @default(now())
+  expiresAt    DateTime?
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model Coupon {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  discountPct Int
+  validFrom   DateTime  @default(now())
+  validTo     DateTime?
+  maxUses     Int       @default(100)
+  usedCount   Int       @default(0)
+}
