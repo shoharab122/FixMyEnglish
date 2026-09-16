@@ -1,0 +1,15 @@
+export const VOCAB_SEED = [
+  { word: 'affection',  meaningEn: 'a gentle feeling of liking or love', example: 'She has great affection for her grandmother.', pos: 'noun', synonyms: ['love', 'fondness'], textbookUnit: 1 },
+  { word: 'bond',       meaningEn: 'a close connection between people', example: 'The bond between the two sisters is unbreakable.', pos: 'noun', synonyms: ['tie', 'connection'], textbookUnit: 1 },
+  { word: 'cherish',    meaningEn: 'to love and care for something deeply', example: 'I cherish the memories of my childhood.', pos: 'verb', synonyms: ['treasure', 'prize'], textbookUnit: 1 },
+  { word: 'diligent',   meaningEn: 'working hard and carefully', example: 'She is a diligent student.', pos: 'adjective', synonyms: ['hardworking'], textbookUnit: 2 },
+  { word: 'abundant',   meaningEn: 'existing in large quantities', example: 'Fish are abundant in this river.', pos: 'adjective', synonyms: ['plentiful'], textbookUnit: 3 },
+  { word: 'balanced',   meaningEn: 'having the right amounts', example: 'Eat a balanced diet.', pos: 'adjective', synonyms: ['proportionate'], textbookUnit: 4 },
+  { word: 'adventure',  meaningEn: 'an exciting experience', example: 'The trip was a real adventure.', pos: 'noun', synonyms: ['exploit'], textbookUnit: 5 },
+  { word: 'algorithm',  meaningEn: 'a set of steps for solving a problem', example: 'The algorithm sorts data quickly.', pos: 'noun', synonyms: ['procedure'], textbookUnit: 6 },
+  { word: 'athlete',    meaningEn: 'a person who plays sports', example: 'The athlete won gold.', pos: 'noun', synonyms: ['sportsperson'], textbookUnit: 7 },
+  { word: 'appetite',   meaningEn: 'the desire to eat', example: 'Exercise increases appetite.', pos: 'noun', synonyms: ['hunger'], textbookUnit: 8 },
+  { word: 'ambition',   meaningEn: 'a strong desire to succeed', example: 'Her ambition is to be a doctor.', pos: 'noun', synonyms: ['aspiration'], textbookUnit: 9 },
+  { word: 'bravery',    meaningEn: 'courageous behaviour', example: 'The soldiers showed bravery.', pos: 'noun', synonyms: ['courage'], textbookUnit: 10 },
+  { word: 'resilience', meaningEn: 'the ability to recover quickly from difficulties', example: 'The resilience of the people is remarkable.', pos: 'noun', synonyms: ['toughness'], textbookUnit: null },
+];
