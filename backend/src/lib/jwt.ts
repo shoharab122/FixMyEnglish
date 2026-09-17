@@ -6,12 +6,13 @@ export interface AccessPayload {
   id: string;
   name: string;
   tier: 'guest' | 'free' | 'premium';
+  role: 'user' | 'admin' | 'superadmin';
 }
 
-export function signAccessToken(user: { id: string; name: string; tier: string }): string {
+export function signAccessToken(user: { id: string; name: string; tier: string; role?: string }): string {
   const options: SignOptions = { expiresIn: env.accessTtl as any };
   return jwt.sign(
-    { id: user.id, name: user.name, tier: user.tier },
+    { id: user.id, name: user.name, tier: user.tier, role: user.role ?? 'user' },
     env.accessSecret,
     options
   );

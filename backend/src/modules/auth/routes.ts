@@ -31,7 +31,7 @@ function setRefreshCookie(res: any, token: string) {
 }
 
 function shapeUser(u: any) {
-  return { id: u.id, name: u.name, email: u.email, tier: u.tier, avatarUrl: u.avatarUrl, xp: u.xp };
+  return { id: u.id, name: u.name, email: u.email, tier: u.tier, role: u.role, avatarUrl: u.avatarUrl, xp: u.xp };
 }
 
 router.post('/register', authLimiter, validateBody(registerSchema), async (req, res, next) => {

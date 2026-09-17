@@ -13,6 +13,12 @@ enum Tier {
   premium
 }
 
+enum Role {
+  user
+  admin
+  superadmin
+}
+
 model User {
   id           String   @id @default(cuid())
   email        String?  @unique
@@ -20,6 +26,7 @@ model User {
   name         String
   avatarUrl    String?
   tier         Tier     @default(free)
+  role         Role     @default(user)
   isGuest      Boolean  @default(false)
   xp           Int      @default(0)
   rank         Int      @default(0)
@@ -455,4 +462,36 @@ model Coupon {
   validTo     DateTime?
   maxUses     Int       @default(100)
   usedCount   Int       @default(0)
+}
+
+model Announcement {
+  id           String    @id @default(cuid())
+  title        String
+  body         String
+  audienceTier String    @default("all")
+  active       Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  expiresAt    DateTime?
+}
+
+model FeatureFlag {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  enabled   Boolean  @default(false)
+  tierScope String   @default("all")
+  updatedAt DateTime @updatedAt
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actorName  String?
+  action     String
+  targetType String?
+  targetId   String?
+  metaJson   Json?
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([actorId])
 }

@@ -179,14 +179,16 @@ async function main() {
 
   /* ---------- Demo users ---------- */
   const demo = [
-    { email: 'demo@coach.bd', password: 'demo1234', name: 'Rina Akter',   tier: 'premium' as const },
-    { email: 'free@coach.bd', password: 'free1234', name: 'Arif Hossain', tier: 'free' as const },
+    { email: 'demo@coach.bd',        password: 'demo1234',  name: 'Rina Akter',    tier: 'premium' as const, role: 'user' as const },
+    { email: 'free@coach.bd',        password: 'free1234',  name: 'Arif Hossain',  tier: 'free' as const,    role: 'user' as const },
+    { email: 'admin@coach.bd',       password: 'admin1234', name: 'Admin User',    tier: 'premium' as const, role: 'admin' as const },
+    { email: 'superadmin@coach.bd',  password: 'super1234', name: 'Super Admin',   tier: 'premium' as const, role: 'superadmin' as const },
   ];
   for (const d of demo) {
     const existing = await prisma.user.findUnique({ where: { email: d.email } });
     if (existing) continue;
     const u = await prisma.user.create({
-      data: { email: d.email, passwordHash: await bcrypt.hash(d.password, 10), name: d.name, tier: d.tier },
+      data: { email: d.email, passwordHash: await bcrypt.hash(d.password, 10), name: d.name, tier: d.tier, role: (d as any).role ?? 'user' },
     });
     await prisma.streak.create({ data: { userId: u.id, currentStreak: 7, longestStreak: 12 } });
   }
