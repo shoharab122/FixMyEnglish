@@ -5,7 +5,12 @@ import { Unauthorized } from '../lib/errors.js';
 declare global {
   namespace Express {
     interface Request {
-      user?: { id: string; name: string; tier: 'guest' | 'free' | 'premium' };
+      user?: {
+        id: string;
+        name: string;
+        tier: 'guest' | 'free' | 'premium';
+        role: 'user' | 'admin' | 'superadmin';
+      };
     }
   }
 }

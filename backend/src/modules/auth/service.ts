@@ -8,8 +8,8 @@ import { BadRequest, Unauthorized } from '../../lib/errors.js';
 
 const REFRESH_COOKIE = 'ec_refresh';
 
-export async function issueTokens(user: { id: string; name: string; tier: string }, deviceInfo?: string) {
-  const accessToken = signAccessToken(user);
+export async function issueTokens(user: { id: string; name: string; tier: string; role?: string }, deviceInfo?: string) {
+  const accessToken = signAccessToken({ id: user.id, name: user.name, tier: user.tier, role: (user as any).role });
   const refreshToken = signRefreshToken(user.id);
   await prisma.refreshToken.create({
     data: {
