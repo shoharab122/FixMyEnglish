@@ -4,7 +4,6 @@ import { Icon } from '../components/Icon';
 
 /* ============================================================
    STYLES — Langut-inspired
-   Deep purple + lime-yellow + chunky black outlines.
    ============================================================ */
 const SPEAK_CSS = `
 .ec-spk{
@@ -30,9 +29,6 @@ const SPEAK_CSS = `
 .ec-spk,
 .ec-spk *{box-sizing:border-box}
 
-/* ============================================================
-   HEAD
-   ============================================================ */
 .ec-spk-head{
   display:flex;align-items:flex-end;justify-content:space-between;
   gap:16px;flex-wrap:wrap;margin-bottom:18px;
@@ -43,9 +39,6 @@ const SPEAK_CSS = `
   color:var(--lang-purple);opacity:.95;
 }
 
-/* ============================================================
-   HERO — deep purple, chunky stats, mascot
-   ============================================================ */
 .ec-spk-hero{
   position:relative;overflow:hidden;
   border-radius:32px;
@@ -98,34 +91,22 @@ const SPEAK_CSS = `
   font-size:14px;line-height:1.6;
   opacity:.92;font-weight:500;max-width:52ch;
 }
-
-/* Price-tag style stat chips */
 .ec-spk-hero-stats{display:flex;gap:10px;flex-wrap:wrap;position:relative;z-index:1}
 .ec-spk-hero-stat{
   display:flex;flex-direction:column;gap:2px;
-  padding:9px 14px;
-  border-radius:14px;
+  padding:9px 14px;border-radius:14px;
   background:var(--lang-lime);
   border:2px solid var(--lang-line);
   box-shadow:0 3px 0 var(--lang-line);
   min-width:80px;
 }
-.ec-spk-hero-stat strong{
-  font-size:20px;font-weight:900;line-height:1;
-  letter-spacing:-.04em;
-  color:var(--lang-ink);
-}
-.ec-spk-hero-stat span{
-  font-size:9.5px;font-weight:900;letter-spacing:.1em;
-  text-transform:uppercase;color:var(--lang-ink);opacity:.75;
-}
+.ec-spk-hero-stat strong{font-size:20px;font-weight:900;line-height:1;letter-spacing:-.04em;color:var(--lang-ink)}
+.ec-spk-hero-stat span{font-size:9.5px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--lang-ink);opacity:.75}
 .ec-spk-hero-stat:nth-child(2){background:var(--lang-pink)}
 .ec-spk-hero-stat:nth-child(3){background:var(--lang-purple-2)}
 .ec-spk-hero-stat:nth-child(3) strong,
 .ec-spk-hero-stat:nth-child(3) span{color:#fff}
 .ec-spk-hero-stat:nth-child(4){background:var(--lang-yellow)}
-
-/* Mascot */
 .ec-spk-hero-mascot{
   position:relative;z-index:1;
   flex-shrink:0;
@@ -135,13 +116,7 @@ const SPEAK_CSS = `
 }
 @keyframes ec-spk-bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-10px) rotate(2deg)}}
 
-/* ============================================================
-   TOP TABS — chunky pills
-   ============================================================ */
-.ec-spk-tabs{
-  display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;
-  padding:6px 4px 16px;margin-bottom:8px;
-}
+.ec-spk-tabs{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding:6px 4px 16px;margin-bottom:8px}
 .ec-spk-tabs::-webkit-scrollbar{display:none}
 .ec-spk-tab{
   flex:0 0 auto;
@@ -155,29 +130,13 @@ const SPEAK_CSS = `
   box-shadow:0 3px 0 var(--lang-line);
   letter-spacing:.01em;
 }
-.ec-spk-tab:hover{
-  background:var(--lang-lime-soft);
-  transform:translateY(-2px);
-  box-shadow:0 5px 0 var(--lang-line);
-}
-.ec-spk-tab:active{
-  transform:translateY(1px);
-  box-shadow:0 1px 0 var(--lang-line);
-}
-.ec-spk-tab--active{
-  background:var(--lang-ink);color:var(--lang-lime);
-  box-shadow:0 3px 0 var(--lang-ink);
-}
+.ec-spk-tab:hover{background:var(--lang-lime-soft);transform:translateY(-2px);box-shadow:0 5px 0 var(--lang-line)}
+.ec-spk-tab:active{transform:translateY(1px);box-shadow:0 1px 0 var(--lang-line)}
+.ec-spk-tab--active{background:var(--lang-ink);color:var(--lang-lime);box-shadow:0 3px 0 var(--lang-ink)}
 .ec-spk-tab--active:hover{background:var(--lang-ink);color:var(--lang-lime)}
 .ec-spk-tab svg{width:16px;height:16px}
 
-/* ============================================================
-   CATEGORY PILLS
-   ============================================================ */
-.ec-spk-cats{
-  display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;
-  padding:6px 4px 14px;margin-bottom:8px;
-}
+.ec-spk-cats{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding:6px 4px 14px;margin-bottom:8px}
 .ec-spk-cats::-webkit-scrollbar{display:none}
 .ec-spk-cat{
   flex:0 0 auto;
@@ -190,41 +149,19 @@ const SPEAK_CSS = `
   display:inline-flex;align-items:center;gap:6px;
   box-shadow:0 3px 0 var(--lang-line);
 }
-.ec-spk-cat:hover{
-  background:var(--lang-lime-soft);
-  transform:translateY(-2px);
-  box-shadow:0 5px 0 var(--lang-line);
-}
-.ec-spk-cat:active{
-  transform:translateY(1px);
-  box-shadow:0 1px 0 var(--lang-line);
-}
-.ec-spk-cat--active{
-  background:var(--lang-ink);color:var(--lang-lime);
-  box-shadow:0 3px 0 var(--lang-ink);
-}
+.ec-spk-cat:hover{background:var(--lang-lime-soft);transform:translateY(-2px);box-shadow:0 5px 0 var(--lang-line)}
+.ec-spk-cat:active{transform:translateY(1px);box-shadow:0 1px 0 var(--lang-line)}
+.ec-spk-cat--active{background:var(--lang-ink);color:var(--lang-lime);box-shadow:0 3px 0 var(--lang-ink)}
 .ec-spk-cat-count{
   font-size:10px;font-weight:900;
   padding:2px 7px;border-radius:999px;
   background:var(--lang-lime);color:var(--lang-ink);
   border:2px solid var(--lang-line);
 }
-.ec-spk-cat--active .ec-spk-cat-count{
-  background:var(--lang-lime);color:var(--lang-ink);
-  border-color:var(--lang-line);
-}
+.ec-spk-cat--active .ec-spk-cat-count{background:var(--lang-lime);color:var(--lang-ink);border-color:var(--lang-line)}
 
-/* ============================================================
-   GRID
-   ============================================================ */
-.ec-spk-grid{
-  display:grid;grid-template-columns:minmax(0,1fr) 330px;
-  gap:22px;align-items:start;
-}
+.ec-spk-grid{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:22px;align-items:start}
 
-/* ============================================================
-   RECORD PANEL — chunky card
-   ============================================================ */
 .ec-spk-panel{
   background:#fff;
   border:3px solid var(--lang-line);
@@ -234,7 +171,6 @@ const SPEAK_CSS = `
   position:relative;overflow:hidden;
   background-image:radial-gradient(circle at 100% 0%,rgba(212,245,92,.14),transparent 55%);
 }
-
 .ec-spk-prompt-counter{
   position:relative;z-index:1;
   font-size:12px;font-weight:900;
@@ -266,9 +202,6 @@ const SPEAK_CSS = `
   margin:-12px 0 22px;font-weight:700;
 }
 
-/* ============================================================
-   RECORD BUTTON
-   ============================================================ */
 .ec-spk-record-wrap{
   position:relative;z-index:1;
   display:inline-flex;align-items:center;justify-content:center;
@@ -287,7 +220,6 @@ const SPEAK_CSS = `
   100%{opacity:0}
 }
 .ec-spk-record-wrap--active .ec-spk-record-ring{border-color:rgba(255,143,203,.75)}
-
 .ec-spk-record-btn{
   position:relative;z-index:1;
   width:92px;height:92px;border-radius:50%;
@@ -299,27 +231,12 @@ const SPEAK_CSS = `
   box-shadow:0 6px 0 var(--lang-line);
   transition:transform .18s ease,box-shadow .18s ease;
 }
-.ec-spk-record-btn:hover:not(:disabled){
-  transform:translateY(-3px);
-  box-shadow:0 9px 0 var(--lang-line);
-}
-.ec-spk-record-btn:active:not(:disabled){
-  transform:translateY(2px);
-  box-shadow:0 2px 0 var(--lang-line);
-}
+.ec-spk-record-btn:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 9px 0 var(--lang-line)}
+.ec-spk-record-btn:active:not(:disabled){transform:translateY(2px);box-shadow:0 2px 0 var(--lang-line)}
 .ec-spk-record-btn:disabled{opacity:.55;cursor:not-allowed}
-.ec-spk-record-btn--active{
-  background:linear-gradient(135deg,var(--lang-pink-2) 0%,#E0503C 100%);
-  box-shadow:0 6px 0 var(--lang-line);
-}
+.ec-spk-record-btn--active{background:linear-gradient(135deg,var(--lang-pink-2) 0%,#E0503C 100%);box-shadow:0 6px 0 var(--lang-line)}
 
-.ec-spk-record-status{
-  position:relative;z-index:1;
-  font-size:14px;font-weight:900;
-  color:var(--lang-ink);
-  margin:16px 0 4px;text-align:center;
-  letter-spacing:.01em;
-}
+.ec-spk-record-status{position:relative;z-index:1;font-size:14px;font-weight:900;color:var(--lang-ink);margin:16px 0 4px;text-align:center;letter-spacing:.01em}
 .ec-spk-record-time{
   position:relative;z-index:1;
   font-size:26px;font-weight:900;
@@ -334,39 +251,21 @@ const SPEAK_CSS = `
   display:inline-block;
   box-shadow:0 3px 0 var(--lang-line);
 }
-.ec-spk-record-wrap + .ec-spk-wave + .ec-spk-record-status + .ec-spk-record-time{
-  /* centers the record-time when it's the only child */
-  margin-left:auto;margin-right:auto;
-}
 
-/* ============================================================
-   WAVEFORM
-   ============================================================ */
 .ec-spk-wave{
   position:relative;z-index:1;
   height:48px;margin:14px auto 8px;
   max-width:420px;
   display:flex;align-items:center;justify-content:center;gap:3px;
 }
-.ec-spk-wave-bar{
-  width:4px;background:var(--lang-ink);border-radius:2px;
-  transition:height .15s ease;
-}
-.ec-spk-wave-idle .ec-spk-wave-bar{
-  height:4px !important;opacity:.35;
-}
+.ec-spk-wave-bar{width:4px;background:var(--lang-ink);border-radius:2px;transition:height .15s ease}
+.ec-spk-wave-idle .ec-spk-wave-bar{height:4px !important;opacity:.35}
 .ec-spk-wave-live .ec-spk-wave-bar{
   background:linear-gradient(180deg,var(--lang-purple-2),var(--lang-purple));
   animation:ec-spk-wave-bounce .8s ease-in-out infinite;
 }
-@keyframes ec-spk-wave-bounce{
-  0%,100%{transform:scaleY(.5)}
-  50%{transform:scaleY(1.2)}
-}
+@keyframes ec-spk-wave-bounce{0%,100%{transform:scaleY(.5)}50%{transform:scaleY(1.2)}}
 
-/* ============================================================
-   ERROR PILL
-   ============================================================ */
 .ec-spk-error{
   position:relative;z-index:1;
   font-size:13px;color:var(--lang-ink);
@@ -378,9 +277,6 @@ const SPEAK_CSS = `
   box-shadow:0 3px 0 var(--lang-line);
 }
 
-/* ============================================================
-   LIVE TRANSCRIPT
-   ============================================================ */
 .ec-spk-transcript{
   position:relative;z-index:1;
   background:var(--lang-lime-soft);
@@ -398,23 +294,10 @@ const SPEAK_CSS = `
   margin:0 0 12px;
   display:flex;align-items:center;gap:6px;
 }
-.ec-spk-transcript-label::before{
-  content:'';width:8px;height:8px;border-radius:50%;
-  background:var(--lang-ink);
-  box-shadow:0 0 0 3px rgba(23,16,46,.15);
-}
-.ec-spk-transcript-text{
-  font-size:14.5px;line-height:1.7;
-  color:var(--lang-ink);margin:0;
-  font-weight:700;word-wrap:break-word;
-}
-.ec-spk-transcript-text em{
-  font-style:normal;color:var(--lang-ink-soft);opacity:.85;
-}
-.ec-spk-transcript-empty{
-  font-size:13.5px;color:var(--lang-ink-soft);
-  font-style:italic;margin:0;font-weight:600;
-}
+.ec-spk-transcript-label::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--lang-ink);box-shadow:0 0 0 3px rgba(23,16,46,.15)}
+.ec-spk-transcript-text{font-size:14.5px;line-height:1.7;color:var(--lang-ink);margin:0;font-weight:700;word-wrap:break-word}
+.ec-spk-transcript-text em{font-style:normal;color:var(--lang-ink-soft);opacity:.85}
+.ec-spk-transcript-empty{font-size:13.5px;color:var(--lang-ink-soft);font-style:italic;margin:0;font-weight:600}
 .ec-spk-transcript mark{
   background:var(--lang-pink-2);
   color:#fff;
@@ -434,13 +317,7 @@ const SPEAK_CSS = `
 }
 .ec-spk-transcript-meta span{display:inline-flex;align-items:center;gap:4px}
 
-/* ============================================================
-   SCORE CARDS
-   ============================================================ */
-.ec-spk-scores{
-  display:grid;grid-template-columns:repeat(4,1fr);
-  gap:14px;margin-top:24px;position:relative;z-index:1;
-}
+.ec-spk-scores{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:24px;position:relative;z-index:1}
 .ec-spk-score{
   position:relative;
   background:#fff;
@@ -452,72 +329,26 @@ const SPEAK_CSS = `
   text-align:center;overflow:hidden;
   box-shadow:0 4px 0 var(--lang-line);
 }
-.ec-spk-score::before{
-  content:'';
-  position:absolute;
-  top:0;left:0;right:0;height:5px;
-  background:var(--score-color,var(--lang-purple));
-  border-bottom:2px solid var(--lang-line);
-}
+.ec-spk-score::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:var(--score-color,var(--lang-purple));border-bottom:2px solid var(--lang-line)}
 .ec-spk-score:nth-child(1){animation-delay:.05s}
 .ec-spk-score:nth-child(2){animation-delay:.1s}
 .ec-spk-score:nth-child(3){animation-delay:.15s}
 .ec-spk-score:nth-child(4){animation-delay:.2s}
-.ec-spk-score:hover{
-  transform:translateY(-3px);
-  box-shadow:0 7px 0 var(--lang-line);
-}
-@keyframes ec-spk-pop{
-  from{opacity:0;transform:translateY(14px) scale(.94)}
-  to{opacity:1;transform:translateY(0) scale(1)}
-}
+.ec-spk-score:hover{transform:translateY(-3px);box-shadow:0 7px 0 var(--lang-line)}
+@keyframes ec-spk-pop{from{opacity:0;transform:translateY(14px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}
 
 .ec-spk-score--excellent{--score-color:#B8E62E;}
 .ec-spk-score--good{--score-color:#7B5CF0;}
 .ec-spk-score--fair{--score-color:#F5E04D;}
 .ec-spk-score--low{--score-color:#FF8FCB;}
 
-.ec-spk-score-ring{
-  position:relative;
-  width:64px;height:64px;
-  margin:0 auto 8px;
-  display:flex;align-items:center;justify-content:center;
-}
-.ec-spk-score-ring svg{
-  position:absolute;inset:0;
-  transform:rotate(-90deg);
-}
-.ec-spk-score-ring-track{
-  fill:none;
-  stroke:#E8E5F2;
-  stroke-width:5;
-}
-.ec-spk-score-ring-fill{
-  fill:none;
-  stroke:var(--score-color,var(--lang-purple));
-  stroke-width:5;stroke-linecap:round;
-  transition:stroke-dashoffset 1s cubic-bezier(.22,1,.36,1);
-}
-.ec-spk-score-num{
-  position:relative;z-index:1;
-  font-size:24px;font-weight:900;
-  color:var(--lang-ink);
-  line-height:1;letter-spacing:-.04em;
-  font-variant-numeric:tabular-nums;
-}
-.ec-spk-score-label{
-  display:block;
-  font-size:10px;
-  font-weight:900;
-  color:var(--lang-ink-soft);
-  text-transform:uppercase;
-  letter-spacing:.1em;
-  margin-top:4px;
-}
+.ec-spk-score-ring{position:relative;width:64px;height:64px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center}
+.ec-spk-score-ring svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.ec-spk-score-ring-track{fill:none;stroke:#E8E5F2;stroke-width:5}
+.ec-spk-score-ring-fill{fill:none;stroke:var(--score-color,var(--lang-purple));stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset 1s cubic-bezier(.22,1,.36,1)}
+.ec-spk-score-num{position:relative;z-index:1;font-size:24px;font-weight:900;color:var(--lang-ink);line-height:1;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.ec-spk-score-label{display:block;font-size:10px;font-weight:900;color:var(--lang-ink-soft);text-transform:uppercase;letter-spacing:.1em;margin-top:4px}
 
-/* ============================================================
-   BAND SCORE
-   ============================================================ */
 .ec-spk-band{
   position:relative;z-index:1;
   margin-top:18px;
@@ -528,72 +359,20 @@ const SPEAK_CSS = `
   border:2px solid var(--lang-line);
   box-shadow:0 4px 0 var(--lang-line);
 }
-.ec-spk-band-label{
-  font-size:12.5px;font-weight:900;
-  color:var(--lang-ink);
-  text-transform:uppercase;letter-spacing:.08em;
-}
-.ec-spk-band-value{
-  font-size:28px;font-weight:900;
-  color:var(--lang-ink);
-  line-height:1;letter-spacing:-.03em;
-}
-.ec-spk-band-value small{
-  font-size:14px;font-weight:800;
-  color:var(--lang-ink);opacity:.7;
-  letter-spacing:0;margin-left:2px;
-}
+.ec-spk-band-label{font-size:12.5px;font-weight:900;color:var(--lang-ink);text-transform:uppercase;letter-spacing:.08em}
+.ec-spk-band-value{font-size:28px;font-weight:900;color:var(--lang-ink);line-height:1;letter-spacing:-.03em}
+.ec-spk-band-value small{font-size:14px;font-weight:800;color:var(--lang-ink);opacity:.7;letter-spacing:0;margin-left:2px}
 
-/* ============================================================
-   FAULT REPORT
-   ============================================================ */
-.ec-spk-faults{
-  margin-top:24px;position:relative;z-index:1;text-align:left;
-}
-.ec-spk-faults-head{
-  display:flex;align-items:center;justify-content:space-between;
-  gap:12px;margin-bottom:16px;flex-wrap:wrap;
-}
-.ec-spk-faults-title{
-  margin:0;font-size:17px;font-weight:900;
-  color:var(--lang-ink);letter-spacing:-.02em;
-}
-.ec-spk-faults-pill{
-  font-size:11px;font-weight:900;
-  padding:6px 14px;border-radius:999px;
-  letter-spacing:.06em;text-transform:uppercase;
-  border:2px solid var(--lang-line);
-  box-shadow:0 2px 0 var(--lang-line);
-}
-.ec-spk-faults-pill--ok{
-  background:var(--lang-lime);color:var(--lang-ink);
-}
-.ec-spk-faults-pill--warn{
-  background:var(--lang-yellow);color:var(--lang-ink);
-}
-.ec-spk-faults-pill--bad{
-  background:var(--lang-pink-2);color:#fff;
-}
-.ec-spk-fault{
-  display:flex;gap:14px;align-items:flex-start;
-  padding:14px 16px;border-radius:16px;
-  margin-bottom:12px;
-  background:#fff;
-  border:2px solid var(--lang-line);
-  box-shadow:0 3px 0 var(--lang-line);
-  transition:transform .18s ease,box-shadow .18s ease;
-}
-.ec-spk-fault:hover{
-  transform:translateY(-2px);
-  box-shadow:0 5px 0 var(--lang-line);
-}
-.ec-spk-fault-icon{
-  width:36px;height:36px;border-radius:12px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:16px;flex-shrink:0;
-  border:2px solid var(--lang-line);
-  font-weight:900;
-}
+.ec-spk-faults{margin-top:24px;position:relative;z-index:1;text-align:left}
+.ec-spk-faults-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.ec-spk-faults-title{margin:0;font-size:17px;font-weight:900;color:var(--lang-ink);letter-spacing:-.02em}
+.ec-spk-faults-pill{font-size:11px;font-weight:900;padding:6px 14px;border-radius:999px;letter-spacing:.06em;text-transform:uppercase;border:2px solid var(--lang-line);box-shadow:0 2px 0 var(--lang-line)}
+.ec-spk-faults-pill--ok{background:var(--lang-lime);color:var(--lang-ink)}
+.ec-spk-faults-pill--warn{background:var(--lang-yellow);color:var(--lang-ink)}
+.ec-spk-faults-pill--bad{background:var(--lang-pink-2);color:#fff}
+.ec-spk-fault{display:flex;gap:14px;align-items:flex-start;padding:14px 16px;border-radius:16px;margin-bottom:12px;background:#fff;border:2px solid var(--lang-line);box-shadow:0 3px 0 var(--lang-line);transition:transform .18s ease,box-shadow .18s ease}
+.ec-spk-fault:hover{transform:translateY(-2px);box-shadow:0 5px 0 var(--lang-line)}
+.ec-spk-fault-icon{width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;border:2px solid var(--lang-line);font-weight:900}
 .ec-spk-fault--ok .ec-spk-fault-icon{background:var(--lang-lime);color:var(--lang-ink)}
 .ec-spk-fault--warn .ec-spk-fault-icon{background:var(--lang-yellow);color:var(--lang-ink)}
 .ec-spk-fault--bad .ec-spk-fault-icon{background:var(--lang-pink-2);color:#fff}
@@ -601,26 +380,10 @@ const SPEAK_CSS = `
 .ec-spk-fault--warn{background:linear-gradient(180deg,#fff 0%,rgba(245,224,77,.10) 100%)}
 .ec-spk-fault--bad{background:linear-gradient(180deg,#fff 0%,rgba(255,143,203,.10) 100%)}
 .ec-spk-fault-body{flex:1;min-width:0}
-.ec-spk-fault-body p{
-  margin:0 0 4px;font-size:13.5px;font-weight:900;
-  color:var(--lang-ink);
-}
-.ec-spk-fault-body span{
-  font-size:12.5px;color:var(--lang-ink-soft);
-  line-height:1.55;font-weight:700;display:block;
-}
-.ec-spk-fault-body em{
-  font-style:normal;
-  background:var(--lang-yellow);
-  color:var(--lang-ink);
-  padding:2px 8px;border-radius:6px;
-  font-weight:900;font-size:12px;
-  border:1.5px solid var(--lang-line);
-}
+.ec-spk-fault-body p{margin:0 0 4px;font-size:13.5px;font-weight:900;color:var(--lang-ink)}
+.ec-spk-fault-body span{font-size:12.5px;color:var(--lang-ink-soft);line-height:1.55;font-weight:700;display:block}
+.ec-spk-fault-body em{font-style:normal;background:var(--lang-yellow);color:var(--lang-ink);padding:2px 8px;border-radius:6px;font-weight:900;font-size:12px;border:1.5px solid var(--lang-line)}
 
-/* ============================================================
-   FEEDBACK
-   ============================================================ */
 .ec-spk-feedback{
   margin:20px 0 0;
   padding:18px 20px 18px 22px;
@@ -635,13 +398,7 @@ const SPEAK_CSS = `
   box-shadow:0 4px 0 var(--lang-line);
 }
 
-/* ============================================================
-   ACTION BUTTONS
-   ============================================================ */
-.ec-spk-actions{
-  display:flex;justify-content:center;gap:12px;
-  margin-top:26px;flex-wrap:wrap;position:relative;z-index:1;
-}
+.ec-spk-actions{display:flex;justify-content:center;gap:12px;margin-top:26px;flex-wrap:wrap;position:relative;z-index:1}
 .ec-spk-btn-ghost{
   border:2px solid var(--lang-line);
   background:#fff;color:var(--lang-ink);
@@ -653,15 +410,8 @@ const SPEAK_CSS = `
   box-shadow:0 4px 0 var(--lang-line);
   letter-spacing:.02em;
 }
-.ec-spk-btn-ghost:hover{
-  background:var(--lang-lime-soft);
-  transform:translateY(-2px);
-  box-shadow:0 6px 0 var(--lang-line);
-}
-.ec-spk-btn-ghost:active{
-  transform:translateY(2px);
-  box-shadow:0 1px 0 var(--lang-line);
-}
+.ec-spk-btn-ghost:hover{background:var(--lang-lime-soft);transform:translateY(-2px);box-shadow:0 6px 0 var(--lang-line)}
+.ec-spk-btn-ghost:active{transform:translateY(2px);box-shadow:0 1px 0 var(--lang-line)}
 .ec-spk-btn-dark{
   border:2px solid var(--lang-line);
   background:var(--lang-ink);color:var(--lang-lime);
@@ -673,18 +423,9 @@ const SPEAK_CSS = `
   box-shadow:0 4px 0 var(--lang-line);
   letter-spacing:.02em;
 }
-.ec-spk-btn-dark:hover{
-  transform:translateY(-2px);
-  box-shadow:0 6px 0 var(--lang-line);
-}
-.ec-spk-btn-dark:active{
-  transform:translateY(2px);
-  box-shadow:0 1px 0 var(--lang-line);
-}
+.ec-spk-btn-dark:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--lang-line)}
+.ec-spk-btn-dark:active{transform:translateY(2px);box-shadow:0 1px 0 var(--lang-line)}
 
-/* ============================================================
-   CONVERSATION
-   ============================================================ */
 .ec-spk-convo{
   background:#fff;
   border:3px solid var(--lang-line);
@@ -695,24 +436,11 @@ const SPEAK_CSS = `
   height:calc(100vh - 300px);min-height:540px;max-height:760px;
   background-image:radial-gradient(circle at 100% 0%,rgba(255,143,203,.12),transparent 55%);
 }
-.ec-spk-convo-head{
-  margin:0 0 8px;font-size:18px;font-weight:900;
-  color:var(--lang-ink);flex-shrink:0;
-  letter-spacing:-.02em;
-}
-.ec-spk-convo-sub{
-  margin:0 0 20px;font-size:13px;
-  color:var(--lang-ink-soft);
-  line-height:1.55;flex-shrink:0;font-weight:700;
-}
-.ec-spk-convo-log{
-  flex:1;display:flex;flex-direction:column;gap:12px;
-  overflow-y:auto;padding-right:6px;margin-bottom:16px;min-height:0;
-}
+.ec-spk-convo-head{margin:0 0 8px;font-size:18px;font-weight:900;color:var(--lang-ink);flex-shrink:0;letter-spacing:-.02em}
+.ec-spk-convo-sub{margin:0 0 20px;font-size:13px;color:var(--lang-ink-soft);line-height:1.55;flex-shrink:0;font-weight:700}
+.ec-spk-convo-log{flex:1;display:flex;flex-direction:column;gap:12px;overflow-y:auto;padding-right:6px;margin-bottom:16px;min-height:0}
 .ec-spk-convo-log::-webkit-scrollbar{width:6px}
-.ec-spk-convo-log::-webkit-scrollbar-thumb{
-  background:var(--lang-purple-2);border-radius:999px;
-}
+.ec-spk-convo-log::-webkit-scrollbar-thumb{background:var(--lang-purple-2);border-radius:999px}
 .ec-spk-convo-msg{
   border-radius:18px;
   padding:13px 18px;
@@ -724,26 +452,10 @@ const SPEAK_CSS = `
   border:2px solid var(--lang-line);
   box-shadow:0 3px 0 var(--lang-line);
 }
-@keyframes ec-spk-msg-in{
-  from{opacity:0;transform:translateY(8px)}
-  to{opacity:1;transform:translateY(0)}
-}
-.ec-spk-convo-msg--ai{
-  align-self:flex-start;
-  background:var(--lang-lime);
-  color:var(--lang-ink);
-  border-bottom-left-radius:6px;
-}
-.ec-spk-convo-msg--user{
-  align-self:flex-end;
-  background:var(--lang-ink);
-  color:var(--lang-lime);
-  border-bottom-right-radius:6px;
-}
-.ec-spk-convo-msg audio{
-  display:block;margin-top:10px;
-  width:100%;max-width:240px;
-}
+@keyframes ec-spk-msg-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.ec-spk-convo-msg--ai{align-self:flex-start;background:var(--lang-lime);color:var(--lang-ink);border-bottom-left-radius:6px}
+.ec-spk-convo-msg--user{align-self:flex-end;background:var(--lang-ink);color:var(--lang-lime);border-bottom-right-radius:6px}
+.ec-spk-convo-msg audio{display:block;margin-top:10px;width:100%;max-width:240px}
 .ec-spk-convo-thinking{
   align-self:flex-start;
   display:inline-flex;align-items:center;gap:6px;
@@ -754,25 +466,12 @@ const SPEAK_CSS = `
   border:2px solid var(--lang-line);
   box-shadow:0 3px 0 var(--lang-line);
 }
-.ec-spk-convo-thinking span{
-  width:6px;height:6px;border-radius:50%;
-  background:currentColor;
-  animation:ec-spk-dot 1.2s ease-in-out infinite;
-}
+.ec-spk-convo-thinking span{width:6px;height:6px;border-radius:50%;background:currentColor;animation:ec-spk-dot 1.2s ease-in-out infinite}
 .ec-spk-convo-thinking span:nth-child(2){animation-delay:.2s}
 .ec-spk-convo-thinking span:nth-child(3){animation-delay:.4s}
-@keyframes ec-spk-dot{
-  0%,80%,100%{opacity:.3;transform:scale(.8)}
-  40%{opacity:1;transform:scale(1.1)}
-}
-.ec-spk-convo-actions{
-  display:flex;justify-content:center;gap:12px;
-  flex-wrap:wrap;flex-shrink:0;
-}
+@keyframes ec-spk-dot{0%,80%,100%{opacity:.3;transform:scale(.8)}40%{opacity:1;transform:scale(1.1)}}
+.ec-spk-convo-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;flex-shrink:0}
 
-/* ============================================================
-   HISTORY
-   ============================================================ */
 .ec-spk-history{display:flex;flex-direction:column;gap:14px}
 .ec-spk-history-item{
   display:flex;justify-content:space-between;align-items:center;
@@ -783,18 +482,9 @@ const SPEAK_CSS = `
   transition:all .18s ease;
   animation:ec-spk-msg-in .35s ease both;
 }
-.ec-spk-history-item:hover{
-  transform:translateY(-3px);
-  box-shadow:0 7px 0 var(--lang-line);
-}
-.ec-spk-history-title{
-  margin:0 0 4px;font-weight:900;font-size:14px;
-  color:var(--lang-ink);
-}
-.ec-spk-history-date{
-  font-size:11.5px;color:var(--lang-ink-soft);
-  font-weight:700;
-}
+.ec-spk-history-item:hover{transform:translateY(-3px);box-shadow:0 7px 0 var(--lang-line)}
+.ec-spk-history-title{margin:0 0 4px;font-weight:900;font-size:14px;color:var(--lang-ink)}
+.ec-spk-history-date{font-size:11.5px;color:var(--lang-ink-soft);font-weight:700}
 .ec-spk-band-pill{
   font-size:11px;font-weight:900;
   padding:6px 14px;border-radius:999px;
@@ -805,9 +495,6 @@ const SPEAK_CSS = `
   white-space:nowrap;
 }
 
-/* ============================================================
-   EMPTY STATES
-   ============================================================ */
 .ec-spk-empty{
   display:flex;flex-direction:column;
   align-items:center;justify-content:center;
@@ -830,9 +517,6 @@ const SPEAK_CSS = `
 }
 .ec-spk-empty-icon svg{width:28px;height:28px}
 
-/* ============================================================
-   SIDEBAR CARDS
-   ============================================================ */
 .ec-spk-side{
   background:#fff;
   border:2px solid var(--lang-line);
@@ -858,28 +542,11 @@ const SPEAK_CSS = `
   border:2px solid var(--lang-line);
   box-shadow:0 2px 0 var(--lang-line);
 }
-.ec-spk-tip{
-  display:flex;gap:12px;padding:12px 0;
-  border-bottom:2px dashed rgba(23,16,46,.1);
-  align-items:flex-start;
-}
+.ec-spk-tip{display:flex;gap:12px;padding:12px 0;border-bottom:2px dashed rgba(23,16,46,.1);align-items:flex-start}
 .ec-spk-tip:last-child{border-bottom:none;padding-bottom:0}
-.ec-spk-tip-icon{
-  width:34px;height:34px;border-radius:11px;
-  background:var(--lang-purple-2);color:#fff;
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;font-size:14px;font-weight:900;
-  border:2px solid var(--lang-line);
-  box-shadow:0 2px 0 var(--lang-line);
-}
-.ec-spk-tip-body p{
-  margin:0 0 3px;font-size:12.5px;font-weight:900;
-  color:var(--lang-ink);
-}
-.ec-spk-tip-body span{
-  font-size:11.5px;color:var(--lang-ink-soft);
-  line-height:1.45;display:block;font-weight:600;
-}
+.ec-spk-tip-icon{width:34px;height:34px;border-radius:11px;background:var(--lang-purple-2);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;font-weight:900;border:2px solid var(--lang-line);box-shadow:0 2px 0 var(--lang-line)}
+.ec-spk-tip-body p{margin:0 0 3px;font-size:12.5px;font-weight:900;color:var(--lang-ink)}
+.ec-spk-tip-body span{font-size:11.5px;color:var(--lang-ink-soft);line-height:1.45;display:block;font-weight:600}
 .ec-spk-criteria{display:flex;flex-direction:column;gap:10px}
 .ec-spk-criteria-item{
   display:flex;align-items:center;justify-content:space-between;
@@ -901,9 +568,6 @@ const SPEAK_CSS = `
   border:2px solid var(--lang-line);
 }
 
-/* ============================================================
-   TOAST
-   ============================================================ */
 .ec-spk-toast{
   position:fixed;top:78px;right:20px;z-index:50;
   background:var(--lang-ink);color:var(--lang-lime);
@@ -921,26 +585,13 @@ const SPEAK_CSS = `
   100%{transform:translateY(-8px) scale(.98);opacity:0}
 }
 
-/* ============================================================
-   ANIMATIONS
-   ============================================================ */
-@keyframes ec-spk-fade-in{
-  from{opacity:0;transform:translateY(12px)}
-  to{opacity:1;transform:translateY(0)}
-}
+@keyframes ec-spk-fade-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 .ec-spk-anim{animation:ec-spk-fade-in .45s ease both}
 
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
 @media (max-width:900px){
   .ec-spk-grid{grid-template-columns:1fr;gap:18px}
   .ec-spk-hero{flex-direction:column;align-items:flex-start;min-height:0}
-  .ec-spk-hero-mascot{
-    position:absolute;right:14px;bottom:14px;
-    transform:scale(.72);transform-origin:bottom right;
-    animation:none;
-  }
+  .ec-spk-hero-mascot{position:absolute;right:14px;bottom:14px;transform:scale(.72);transform-origin:bottom right;animation:none}
 }
 @media (max-width:720px){
   .ec-spk-hero{padding:22px 20px;border-radius:26px}
@@ -959,11 +610,7 @@ const SPEAK_CSS = `
   .ec-spk-score-num{font-size:22px}
   .ec-spk-score-label{font-size:9.5px}
   .ec-spk-band-value{font-size:24px}
-  .ec-spk-convo{
-    padding:20px;border-radius:26px;
-    height:auto;min-height:540px;max-height:none;
-    box-shadow:0 7px 0 var(--lang-line);
-  }
+  .ec-spk-convo{padding:20px;border-radius:26px;height:auto;min-height:540px;max-height:none;box-shadow:0 7px 0 var(--lang-line)}
   .ec-spk-convo-log{max-height:340px}
   .ec-spk-convo-msg{max-width:92%}
   .ec-spk-history-item{padding:14px 16px}
@@ -987,9 +634,12 @@ const SPEAK_CSS = `
 `;
 
 /* ============================================================
-   600+ EXERCISES ACROSS 10 CATEGORIES
+   PROMPT BANK — 1,004 prompts across 10 categories
    ============================================================ */
 const PROMPT_BANK = {
+  /* ============================================================
+     Pronunciation Drills — 200 prompts
+     ============================================================ */
   pron: {
     name: 'Pronunciation Drills', icon: 'mic',
     prompts: [
@@ -1093,8 +743,184 @@ const PROMPT_BANK = {
       'A pleasant place to place a plaice is a place where a plaice is pleased to be placed.',
       'The blacksmith made a horseshoe for the horse.',
       'A proper cup of coffee from a proper copper coffee pot.',
+      /* --- V / W minimal pairs --- */
+      'Very well, we will visit the village on Wednesday.',
+      'Victor wore a velvet vest in the west wind.',
+      'Vinegar and vanilla are very versatile flavours.',
+      'William watched the waves while walking west.',
+      'We were very weary and we wandered away.',
+      'The vet warned us about the wolf in the valley.',
+      'Wet weather makes the village very vibrant.',
+      'Vera waved at the vendor with a wave.',
+      /* --- TH sounds --- */
+      'The three brothers think the theatre is thrilling.',
+      'Thank the thoughtful thinkers for their theories.',
+      'Nothing is worth the thousand threats of weather.',
+      'Both brothers bathed in the northern river.',
+      'My mother and father gather leather together.',
+      /* --- R vs L --- */
+      'The pilot likes to fly the yellow plane slowly.',
+      'Really royal rulers rarely rule ruthlessly.',
+      'Light the lamp, Larry, before the long night.',
+      'Rusty railways run along the river reeds.',
+      /* --- S vs SH --- */
+      'She said she should see the ship on the shore.',
+      'Shy students should share their shiny shoes.',
+      'The chef sells fresh fish at the seaside shop.',
+      /* --- Short vs long vowels --- */
+      'The ship hit the sheep on the steep beach.',
+      'Fill the small pool with clean blue water.',
+      'Pull the full cart up the steep hill.',
+      'Sit still, sip the hot milk, then slip away.',
+      'The cat sat flat on the fat mat in the back.',
+      /* --- Silent letters --- */
+      'The knight knows how to write with his knuckles.',
+      'Please sign the receipt for the scissors.',
+      'The psalm was written by a psychologist.',
+      'He answered honestly about the climbed mountain.',
+      'The autumn wind blew through the exhausted soldier.',
+      'The castle listener whistled softly at the thistle.',
+      /* --- Word stress drills --- */
+      'Photograph, photographer, photographic — say them all.',
+      'Economy, economic, economist — stress each one correctly.',
+      'Develop, development, developmental — stress is the key.',
+      'Necessary, necessarily, necessity — practice all three.',
+      'Comfortable, comfortably, uncomfortable — smooth them out.',
+      /* --- Connected speech --- */
+      'What do you want to do today? — blend it all.',
+      'Would you like a cup of tea? — smooth and connected.',
+      'I’m going to see him in an hour. — natural rhythm.',
+      'She’s been working here for ages. — connected words.',
+      'There is a lot of it in there. — link every word.',
+      /* --- Intonation & rhythm --- */
+      'Did you really mean what you said yesterday?',
+      'Of course I’m going to the party tonight!',
+      'Wait — did you just say that?',
+      'Honestly, I have absolutely no idea.',
+      'What on earth were you thinking?',
+      /* --- Longer passages --- */
+      'Throughout the thoroughly thought-provoking third Thursday, the thriving theatre welcomed thirty-three thousand thoughtful guests.',
+      'Sheila Shaw shined her shiny silver shoes and shuffled slowly to the shimmering shore.',
+      'Peter’s poodle pranced proudly past the pretty purple pansies in the park.',
+      'Betty’s brother bounced a big blue ball beside the bubbling brook.',
+      'Chester chatted cheerfully with the charming children at the chilly church.',
+      'Frank fried fresh fish for Fred and Fran on Friday morning.',
+      'Grumpy Greg grabbed grapes and greeted the grinning green grocer.',
+      'Harriet’s happy hamster hopped happily around the huge hollow house.',
+      'Jolly Jack jiggled his jug of juice while joking with Jane.',
+      'Kevin kindly kept kicking the colourful kite in the kitchen.',
+      'Larry laughed loudly at the lovely lady’s little lamb.',
+      'Mary made many marvellous muffins on Monday morning.',
+      'Nina’s noisy nephew never noticed the neat new notebook.',
+      'Oliver officially offered old Olivia an orange on October the eighth.',
+      'Patty patiently painted pink peonies on a plain paper plate.',
+      'Quincy quickly questioned the quiet queen about her quirky quilt.',
+      'Rita really ran rapidly around the narrow red road.',
+      'Sammy slowly sipped sweet strawberry smoothies on Saturday.',
+      'Tommy tried to tie the tiny tiger’s tie twice.',
+      'Uma usually uses unusual umbrellas under the umbrella stand.',
+      'Victor vividly viewed the vast valley from the very high van.',
+      'Wendy wondered why Willy whistled wildly while walking west.',
+      'Xena excitedly explained the excellent new exercise.',
+      'Yolanda yelled at the young yellow yak yesterday.',
+      'Zack zealously zoomed through the zany zebra zone.',
+      /* --- Common word pronunciations --- */
+      'Say: comfortable, vegetable, chocolate, interesting.',
+      'Say: February, Wednesday, library, secretary.',
+      'Say: schedule, receipt, debt, subtle.',
+      'Say: courage, encourage, flourish, nourish.',
+      'Say: recipe, cuisine, buffet, chauffeur.',
+      'Say: thorough, though, through, thought, tough.',
+      'Say: word, world, work, worm, worry.',
+      'Say: early, earth, earn, learn, heard.',
+      'Say: sure, sugar, pleasure, treasure, measure.',
+      'Say: busy, business, biscuit, building.',
+      'Say: laugh, cough, rough, enough, tough.',
+      'Say: money, honey, monk, month, Monday.',
+      'Say: answer, sword, two, wrong, wrist.',
+      'Say: doubt, debt, subtle, thumb, plumber.',
+      'Say: foreign, sovereign, campaign, sign.',
+      'Say: choir, character, chemistry, chorus.',
+      'Say: rhythm, rhyme, honest, hour, heir.',
+      'Say: island, aisle, muscle, castle, whistle.',
+      'Say: salmon, almond, calm, palm, half.',
+      'Say: iron, environment, government, maintenance.',
+      /* --- More tongue twisters --- */
+      'A proper cup of coffee in a proper copper coffee pot.',
+      'Betty Botter bought a bit of better butter.',
+      'Black bugs bleed black blood.',
+      'Bring back the bright blue blistering barnacles.',
+      'Clean clams crammed in clean cans.',
+      'Eleven elves licked eleven little liquorice lollipops.',
+      'Fat frogs flying past fast.',
+      'Four furious friends fought for the phone.',
+      'Fresh fried fish, fish fried fresh.',
+      'Great grey geese graze in green grassy groves.',
+      'Harry Hunt hunts heavy hairy hares.',
+      'How many yaks could a yak chuck chuck if a yak could chuck yaks?',
+      'I saw a kitten eating chicken in the kitchen.',
+      'If two witches were watching two watches, which witch would watch which watch?',
+      'Irish wristwatch, Swiss wristwatch, Irish wristwatch.',
+      'Just think, that sphinx has a sphincter that stinks.',
+      'Knapsack straps snap on strong strapping young men.',
+      'Lemon liniment, lemon liniment, lemon liniment.',
+      'Mixed biscuits, mixed biscuits, mixed biscuits.',
+      'Nine nice night nurses nursing nicely.',
+      'Old oily Ollie oils old oily autos.',
+      'One-one was a racehorse, two-two was one too.',
+      'Pack a pink plastic pencil pouch.',
+      'Picky people pick Peter Pan peanut butter.',
+      'Please put the plump plum on the pretty plate.',
+      'Quick queens quickly quarrelled with quirky quails.',
+      'Really leery, rarely Larry, really, really leery Larry.',
+      'Red blood, black blood, blue blood — say each clearly.',
+      'Really rural, really rural, really rural.',
+      'Rolling red wagons, rolling red wagons.',
+      'Rubber baby buggy bumpers, rubber baby buggy bumpers.',
+      'Sally sells sea shells by the sea shore.',
+      'Send toast to ten tense stout saints’ ten tall tents.',
+      'Seven slick slimy snakes slid sideways.',
+      'She sees cheese, she sews sheets, she shushes.',
+      'Simple Simon sat sipping cider slowly.',
+      'Six sick hicks nick six slick bricks with picks and sticks.',
+      'Snap crackle pop, snap crackle pop.',
+      'Stupid superstition, stupid superstition.',
+      'The big black bug bit the big black bear.',
+      'The blue bluebird blinks, the blue bluebird blinks.',
+      'The epitome of femininity is a woman who says what she means.',
+      'The excellent execution of the exercise exhausted him.',
+      'The great Greek grape growers grow great Greek grapes.',
+      'The myth of Miss Muffet, the myth of Miss Muffet.',
+      'The oboe and the obelisk, the oboe and the obelisk.',
+      'The owner of the inside inn was outside his inside inn.',
+      'The sad sheik’s sad sheep’s sick.',
+      'The seething sea ceaseth, the seething sea sufficeth us.',
+      'The sixth sheikh’s sixth sheep is sick.',
+      'The sun shines on shop signs and ship signs.',
+      'The very very very very very very very very weary traveller.',
+      'Three grey geese in a green field grazing.',
+      'Three hundred and thirty-three thousand thirsty travellers.',
+      'Three short sharp sheep, three short sharp sheep.',
+      'Thrice the brinded cat hath mewed.',
+      'Tie twine to three tree twigs.',
+      'Truly rural, truly rural, truly rural.',
+      'Twelve twins twirled twelve twigs twice.',
+      'Two tiny tigers take two taxis to town.',
+      'Unique New York, unique New York, unique New York.',
+      'We surely shall see the sun shine soon.',
+      'We will walk the wet wide way westward.',
+      'Which Swiss witch switched the Swiss wristwatches?',
+      'Which wristwatches are Swiss wristwatches?',
+      'Will you, William, will you wash the windows?',
+      'Willy’s real rear wheel, Willy’s real rear wheel.',
+      'You know New York, you need New York.',
+      'Zebras zig and zebras zag in the zoo.',
     ],
   },
+
+  /* ============================================================
+     IELTS Part 1 · Short Answers — 150 prompts
+     ============================================================ */
   ielts1: {
     name: 'IELTS Part 1 · Short Answers', icon: 'chat',
     prompts: [
@@ -1179,8 +1005,76 @@ const PROMPT_BANK = {
       'Do you use social media?',
       'What social media platform do you use most?',
       'How much time do you spend on social media daily?',
+      'Do you like taking photographs?',
+      'Do you use a smartphone or a camera to take photos?',
+      'Do you ever share your photos online?',
+      'Do you like to give gifts?',
+      'What was the last gift you gave?',
+      'Do you prefer giving or receiving gifts?',
+      'Do you like flowers?',
+      'What is your favourite flower?',
+      'Do you ever buy flowers for yourself?',
+      'Do you like the colour of your bedroom?',
+      'Would you like to change the colour of your bedroom?',
+      'What colours do you like most?',
+      'Do you enjoy walking?',
+      'Where do you usually walk?',
+      'Do you walk more in the morning or evening?',
+      'Do you like to plan your day?',
+      'Are you a planner or spontaneous?',
+      'Do you keep a diary or journal?',
+      'Do you enjoy going to the beach?',
+      'What do you like about the sea?',
+      'Do you swim in the sea?',
+      'Do you like the countryside or the city?',
+      'Why do you prefer one over the other?',
+      'Do you ever go camping?',
+      'Do you like getting up early?',
+      'What time do you usually wake up?',
+      'Do you need coffee or tea to start your day?',
+      'Do you drink tea or coffee?',
+      'What is your favourite drink?',
+      'Do you ever drink juice?',
+      'Do you eat breakfast every day?',
+      'What do you usually eat for breakfast?',
+      'Do you like traditional food from your country?',
+      'What is your favourite dish?',
+      'Do you like spicy food?',
+      'Do you use cash or cards?',
+      'Do you carry cash with you?',
+      'Do you save money?',
+      'What would you buy if you had a million dollars?',
+      'Do you like going to markets?',
+      'Do you ever cook for other people?',
+      'What is your favourite thing to cook?',
+      'Do you like learning languages?',
+      'Why are you learning English?',
+      'How long have you been learning English?',
+      'Do you think English is difficult?',
+      'Do you speak any other languages?',
+      'Do you like meeting people from other countries?',
+      'Do you have friends abroad?',
+      'Do you like using the internet?',
+      'What do you use the internet for?',
+      'Do you think the internet is useful?',
+      'Do you like to use technology?',
+      'Do you like to learn new technology?',
+      'How do you feel about artificial intelligence?',
+      'Do you like to sleep in on weekends?',
+      'Do you take naps during the day?',
+      'Do you like to listen to music while working?',
+      'Do you dance?',
+      'Do you like dancing in public?',
+      'Do you like karaoke?',
+      'Do you like children?',
+      'Do you want children in the future?',
+      'Do you like babies?',
     ],
   },
+
+  /* ============================================================
+     IELTS Part 2 · Cue Cards — 150 prompts
+     ============================================================ */
   ielts2: {
     name: 'IELTS Part 2 · Cue Cards', icon: 'book',
     prompts: [
@@ -1242,8 +1136,98 @@ const PROMPT_BANK = {
       'Talk about a time when you learned something new. Say what you learned, how you learned it, and why it mattered.',
       'Describe a place where you like to study or work. Say where it is, what it looks like, and why it helps you.',
       'Talk about a piece of art you like. Say what it is, where you saw it, and why you like it.',
+      'Describe a memorable wedding you attended. Say whose wedding it was, where it was held, and why it was memorable.',
+      'Describe a popular book in your country. Say what it is, what it is about, and why it is popular.',
+      'Describe a piece of music you enjoy. Say what it is, when you listen to it, and why you enjoy it.',
+      'Describe a place where you like to go shopping. Say where it is, what it sells, and why you like it.',
+      'Talk about a time you had to make a difficult decision. Say what the decision was, what you chose, and why.',
+      'Describe a person you would like to meet. Say who they are, what they are like, and why you would like to meet them.',
+      'Talk about a day you will never forget. Say what happened, who was there, and why you will never forget it.',
+      'Describe a sport you enjoy watching. Say what it is, where you watch it, and why you enjoy it.',
+      'Talk about a childhood friend. Say who they are, how you met, and what you did together.',
+      'Describe a house or apartment you would like to live in. Say where it would be, what it would look like, and why you would like it.',
+      'Talk about a time you did something for the first time. Say what it was, when it happened, and how you felt.',
+      'Describe a skill your friend has that you admire. Say what the skill is, how your friend developed it, and why you admire it.',
+      'Talk about a local shop you often visit. Say where it is, what it sells, and why you visit it.',
+      'Describe a toy or game you enjoyed as a child. Say what it was, how you played with it, and why you enjoyed it.',
+      'Talk about a time you were very busy. Say when it was, what you were doing, and how you managed it.',
+      'Describe a piece of good news you received. Say what the news was, when you got it, and how you felt.',
+      'Talk about a photograph you took that you are proud of. Say what it shows, when you took it, and why you are proud of it.',
+      'Describe a place in your town where people go to relax. Say where it is, what people do there, and why they go.',
+      'Talk about a time you had to apologise. Say who you apologised to, why, and what happened afterwards.',
+      'Describe a member of your family you spend a lot of time with. Say who they are, what you do together, and why you enjoy their company.',
+      'Talk about a popular food from your country. Say what it is, how it is made, and why it is popular.',
+      'Describe a building you find interesting. Say where it is, what it looks like, and why you find it interesting.',
+      'Talk about a time you received help from someone. Say who helped you, what they did, and how it made you feel.',
+      'Describe a piece of technology you could not live without. Say what it is, how you use it, and why it is essential.',
+      'Talk about an important decision your family made. Say what the decision was, how it affected you, and why it was important.',
+      'Describe a teacher or mentor who encouraged you. Say who they are, what they did, and how it helped you.',
+      'Talk about a time you travelled by yourself. Say where you went, what you did, and what you learned.',
+      'Describe a gift you gave someone that they loved. Say what it was, who it was for, and why they loved it.',
+      'Talk about a tradition in your country that you like. Say what it is, when it happens, and why you like it.',
+      'Describe an important historical event in your country. Say what happened, when it happened, and why it was important.',
+      'Talk about a time you had to work with a team. Say what the project was, who was on the team, and how it went.',
+      'Describe a hobby you would like to take up. Say what it is, how you would start it, and why it interests you.',
+      'Talk about a subject you found difficult at school. Say what it was, why it was difficult, and how you dealt with it.',
+      'Describe an app or website that you find useful. Say what it is, how you use it, and why it helps you.',
+      'Talk about a friend who is very different from you. Say who they are, how you met, and how you are different.',
+      'Describe a neighbourhood you would like to live in. Say where it is, what it is like, and why you would like to live there.',
+      'Talk about a time when you had to wait for something. Say what you were waiting for, how long you waited, and how you felt.',
+      'Describe a piece of advice you would give to your younger self. Say what the advice would be, when you would give it, and why.',
+      'Talk about a person who speaks a language you find beautiful. Say who they are, what language they speak, and why you find it beautiful.',
+      'Describe a film that made you laugh. Say what it was, when you watched it, and why it made you laugh.',
+      'Talk about a place where you feel the most productive. Say where it is, what you do there, and why it works for you.',
+      'Describe a piece of traditional clothing in your country. Say what it is, when it is worn, and why it is special.',
+      'Talk about a moment when you felt very grateful. Say what happened, who was involved, and why you felt grateful.',
+      'Describe a subject you would like to teach. Say what it is, who you would teach, and why.',
+      'Talk about a time you received constructive criticism. Say what it was about, how you reacted, and what you learned.',
+      'Describe an outdoor activity you enjoy. Say what it is, where you do it, and why you enjoy it.',
+      'Talk about a person who is very organised. Say who they are, how they stay organised, and what you can learn from them.',
+      'Describe a time when you had to be patient. Say what the situation was, how you stayed patient, and what the outcome was.',
+      'Talk about a childhood dream you had. Say what the dream was, why you had it, and what happened to it.',
+      'Describe an item you own that has sentimental value. Say what it is, how you got it, and why it matters.',
+      'Talk about a time when you felt truly happy. Say what you were doing, who you were with, and why it made you happy.',
+      'Describe a public place you often visit. Say where it is, what people do there, and why you go there.',
+      'Talk about a time you had to change your plans. Say what the original plan was, why it changed, and how you handled it.',
+      'Describe a skill that took you a long time to learn. Say what the skill is, how long it took, and how you felt when you mastered it.',
+      'Talk about a friend you have known for a long time. Say who they are, how you met, and why the friendship has lasted.',
+      'Describe a hobby you used to have but stopped. Say what it was, why you stopped, and whether you would like to start again.',
+      'Talk about a book you would like to give as a gift. Say what the book is, who you would give it to, and why.',
+      'Describe a career you admire. Say what it is, who does it, and why you admire it.',
+      'Talk about a meal you cooked for someone. Say what you cooked, who it was for, and how it went.',
+      'Describe a piece of news that surprised you. Say what the news was, when you heard it, and why it surprised you.',
+      'Talk about a time you helped a family member. Say who it was, what you did, and how it made you feel.',
+      'Describe a personal goal you have already achieved. Say what it was, how you achieved it, and why it mattered.',
+      'Talk about a place where you go to think. Say where it is, when you go there, and why it helps you think.',
+      'Describe an app you would like to design. Say what it would do, who it would help, and why you would design it.',
+      'Talk about a time you made a new friend. Say where you met them, what you talked about, and why you became friends.',
+      'Describe something you do to stay healthy. Say what it is, how often you do it, and why it helps.',
+      'Talk about an important lesson you learned from your parents. Say what the lesson was, when you learned it, and how it has helped you.',
+      'Describe a favourite family photograph. Say what it shows, who is in it, and why it is your favourite.',
+      'Talk about a hobby that is popular in your country. Say what it is, who does it, and why it is popular.',
+      'Describe a place you like to visit on weekends. Say where it is, what you do there, and why you like it.',
+      'Talk about a time you surprised someone. Say who you surprised, how you did it, and how they reacted.',
+      'Describe a habit that helps you stay productive. Say what it is, when you do it, and why it works.',
+      'Talk about a piece of advice you would give to a tourist visiting your country. Say what the advice is, why it matters, and how it would help.',
+      'Describe a skill that everyone should learn. Say what it is, why it is important, and how people can learn it.',
+      'Talk about a time you had to say no to someone. Say who it was, why you said no, and how they reacted.',
+      'Describe a place where you would like to celebrate a special occasion. Say where it is, who you would invite, and why.',
+      'Talk about a piece of music that reminds you of a specific time. Say what the music is, when you heard it, and why it reminds you of that time.',
+      'Describe an experience that made you more confident. Say what the experience was, when it happened, and how it changed you.',
+      'Talk about a person who makes you laugh. Say who they are, what they do, and why they make you laugh.',
+      'Describe something you would like to learn from your grandparents. Say what it is, why it matters, and how you would learn it.',
+      'Talk about a recent purchase you are happy with. Say what it is, where you bought it, and why you are happy with it.',
+      'Describe a place where you have worked or studied. Say where it is, what you did there, and how you felt about it.',
+      'Talk about a time when you had to be brave. Say what the situation was, what you did, and how it turned out.',
+      'Describe an object you use every day. Say what it is, how you use it, and why it is important to you.',
+      'Talk about a festival or holiday you would like to experience. Say what it is, where it takes place, and why you would like to experience it.',
+      'Describe a decision that was difficult but correct. Say what the decision was, why it was difficult, and why it was correct.',
     ],
   },
+
+  /* ============================================================
+     IELTS Part 3 · Discussion — 100 prompts
+     ============================================================ */
   ielts3: {
     name: 'IELTS Part 3 · Discussion', icon: 'users',
     prompts: [
@@ -1297,8 +1281,63 @@ const PROMPT_BANK = {
       'Do you think happiness can be measured?',
       'Should there be limits on the number of cars in a city?',
       'How has your country changed in the last 20 years?',
+      'How important is it for people to have hobbies?',
+      'What are the benefits of learning a musical instrument?',
+      'Why do some people prefer to live alone?',
+      'How can governments reduce unemployment?',
+      'Should people be required to vote? Why?',
+      'How has online banking changed our lives?',
+      'Do you think advertising to children should be banned?',
+      'What are the pros and cons of being famous?',
+      'How has COVID-19 changed the way we work?',
+      'Is it important to preserve traditional crafts?',
+      'How can parents help their children succeed at school?',
+      'What role should schools play in teaching life skills?',
+      'Are video games a waste of time? Why or why not?',
+      'How does social media influence body image?',
+      'Should animals be kept in zoos? Why or why not?',
+      'What are the benefits of reading fiction?',
+      'Do you think the death penalty should exist?',
+      'How can we encourage more people to recycle?',
+      'Is it important to learn about other cultures?',
+      'Should companies be allowed to track employees’ data?',
+      'How has remote work affected family life?',
+      'What are the challenges of raising children today?',
+      'Should universities focus more on practical skills?',
+      'How can we make cities more age-friendly?',
+      'Should there be a universal basic income? Why or why not?',
+      'What is the role of the arts in society?',
+      'How can we reduce food waste in our homes?',
+      'Should schools teach financial literacy?',
+      'Do you think parenting has changed over the years?',
+      'How do documentaries influence public opinion?',
+      'Should private schools exist? Why or why not?',
+      'What makes a good neighbourhood?',
+      'How can we encourage more people to read?',
+      'Should companies allow pets in the workplace?',
+      'What are the challenges of working in a global team?',
+      'How has social media changed friendships?',
+      'Is remote work the future of employment?',
+      'Should there be limits on screen time for children?',
+      'How important is sleep for productivity?',
+      'What are the effects of ageing populations?',
+      'Should we invest in space tourism?',
+      'How can traditional medicine and modern medicine coexist?',
+      'What role do grandparents play in modern families?',
+      'Should governments subsidise public art?',
+      'How do films shape our perception of history?',
+      'Should everyone learn to code? Why or why not?',
+      'What are the challenges of being bilingual?',
+      'How can we make public spaces safer?',
+      'Should we ban single-use plastics globally?',
+      'How has artificial intelligence affected job markets?',
+      'What are the pros and cons of living abroad?',
     ],
   },
+
+  /* ============================================================
+     Conversation Starters — 200 prompts
+     ============================================================ */
   conv: {
     name: 'Conversation Starters', icon: 'chat',
     prompts: [
@@ -1383,8 +1422,121 @@ const PROMPT_BANK = {
       'What is a decision that changed your life?',
       'What is something that calms you down?',
       'What is your favourite weekend activity?',
+      'Who is your role model and why?',
+      'What is the most memorable trip you have taken?',
+      'What is a food you will never eat again?',
+      'What is something you are really good at?',
+      'What is the strangest dream you have had?',
+      'If you could time travel, where would you go?',
+      'What is your favourite way to exercise?',
+      'What is a hobby you want to try?',
+      'What is a movie that made you think differently?',
+      'Tell me about your favourite teacher.',
+      'What is the best piece of advice you ever gave?',
+      'What is something you would tell your younger self?',
+      'What is a typical day like for you?',
+      'What is your favourite thing about your city?',
+      'If you could change one thing about the world, what would it be?',
+      'What is a book you think everyone should read?',
+      'What is your favourite breakfast?',
+      'What is something that excites you?',
+      'What is a fear you have overcome?',
+      'What is your favourite thing about the summer?',
+      'What is something you did last week that you enjoyed?',
+      'What is your favourite drink?',
+      'What is a talent you wish you had?',
+      'Tell me about a time you were embarrassed.',
+      'What is a piece of music that moves you?',
+      'What is your favourite thing to do on a Sunday?',
+      'What is a place you have never been but want to go?',
+      'What is something you do that is uniquely you?',
+      'What is a lesson you learned the hard way?',
+      'What is a tradition you want to start?',
+      'What is your ideal holiday?',
+      'Tell me about a person who inspired you.',
+      'What is a small win you had recently?',
+      'What is your favourite genre of film?',
+      'What is something you would like to change about yourself?',
+      'What is a book that made you laugh out loud?',
+      'What is a food from your childhood you miss?',
+      'What is your favourite way to spend a Saturday?',
+      'If you could only eat one meal forever, what would it be?',
+      'What is a sport you would love to be good at?',
+      'What is something you were wrong about?',
+      'What is your favourite thing about being an adult?',
+      'What is something you miss about being a child?',
+      'What is your favourite thing to do with friends?',
+      'What is a piece of technology you cannot live without?',
+      'What is your favourite kind of weather?',
+      'Tell me about a person you would like to meet.',
+      'What is something you have done that you are proud of?',
+      'What is your favourite thing about your job or studies?',
+      'What is a challenge you are currently facing?',
+      'What is something you want to achieve this year?',
+      'What is your favourite animal and why?',
+      'What is a weird food combination you enjoy?',
+      'What is a good book you read recently?',
+      'What is your favourite way to spend a day off?',
+      'What is something you wish you had more time for?',
+      'What is a movie that surprised you with its ending?',
+      'What is something you are looking forward to this month?',
+      'What is your favourite thing about autumn?',
+      'What is a life lesson you would share with a friend?',
+      'What is your favourite kind of cake?',
+      'What is something you have done recently that was fun?',
+      'If you had to describe yourself in three words, what would they be?',
+      'What is a place where you feel most yourself?',
+      'What is a piece of art you love?',
+      'What is a topic you could talk about for hours?',
+      'What is your favourite memory from childhood?',
+      'What is something you do just for yourself?',
+      'What is your favourite time of day?',
+      'Tell me about a funny thing that happened to you.',
+      'What is your favourite ice cream flavour?',
+      'What is something you have learned recently?',
+      'What is your favourite kind of exercise?',
+      'What is a goal you achieved recently?',
+      'What is a bad habit you want to break?',
+      'What is a film that made you cry?',
+      'What is a place you love to visit?',
+      'What is your favourite childhood memory involving food?',
+      'What is something that makes you feel young?',
+      'What is a value you hold most dear?',
+      'What is something you do to take care of yourself?',
+      'What is your favourite thing to do at the beach?',
+      'What is a piece of advice you live by?',
+      'Tell me about a funny pet you know.',
+      'What is your favourite way to celebrate a birthday?',
+      'What is something you have recently discovered about yourself?',
+      'What is your favourite thing about your best friend?',
+      'What is something you enjoy doing alone?',
+      'What is your favourite season to travel?',
+      'What is something you will never do again?',
+      'What is your favourite way to stay healthy?',
+      'What is a hobby you would recommend to anyone?',
+      'What is something that always makes you smile?',
+      'What is a skill you learned as an adult?',
+      'What is something you do when you are stressed?',
+      'What is your favourite family recipe?',
+      'What is a film you would watch again tonight?',
+      'What is something you have always been curious about?',
+      'What is a lesson you learned from a mistake?',
+      'What is your favourite thing to do with your family?',
+      'What is your favourite thing to do with your best friend?',
+      'What is a trip you would like to take with your family?',
+      'What is something you have accomplished this week?',
+      'What is a way you have changed in the last five years?',
+      'What is your favourite memory from last year?',
+      'What is something you would like to be better at?',
+      'What is a movie you would recommend to a friend?',
+      'What is a new food you tried recently?',
+      'What is your favourite way to spend a lazy day?',
     ],
   },
+
+  /* ============================================================
+     Role Plays — 120 prompts
+     ============================================================ */
   role: {
     name: 'Role Plays', icon: 'users',
     prompts: [
@@ -1448,8 +1600,77 @@ const PROMPT_BANK = {
       'You are at a flower shop. Order a bouquet for a friend.',
       'You are at a furniture shop. Ask about delivery and assembly.',
       'You are at a shoe repair shop. Fix a broken heel.',
+      'You are at an embassy. Ask about the status of your visa application.',
+      'You are at a bank. Report a lost bank card.',
+      'You are at a supermarket. Ask where an item is and check the price.',
+      'You are at a train station. Ask about train times and change a ticket.',
+      'You are at a dentist. Book a cleaning appointment.',
+      'You are at a doctor’s office. Ask about a referral to a specialist.',
+      'You are at a ticket counter. Buy tickets for a concert.',
+      'You are at a hotel reception. Ask for a late checkout.',
+      'You are at a car dealership. Test-drive a car.',
+      'You are at a fitness studio. Ask about yoga classes.',
+      'You are at a café. Ask for a dairy-free option.',
+      'You are at a restaurant. Send back food that is not what you ordered.',
+      'You are at a jewellery shop. Ask about a warranty.',
+      'You are at a police station. Report a stolen phone.',
+      'You are at a telephone company. Change your data plan.',
+      'You are at a school. Ask about your child’s progress.',
+      'You are at a travel agent. Change a flight booking.',
+      'You are at a hotel. Ask about airport transfer.',
+      'You are at a rental car agency. Ask about fuel policy.',
+      'You are at a bakery. Ask about gluten-free bread.',
+      'You are at a pharmacy. Ask about a prescription refill.',
+      'You are at a tailoring shop. Give measurements for a kurta.',
+      'You are at a photo studio. Book a family portrait session.',
+      'You are at a spa. Ask about massage options.',
+      'You are at a wedding planner’s office. Discuss venue options.',
+      'You are at a florist. Order flowers for a funeral.',
+      'You are at a hardware store. Ask for advice on fixing a leaky tap.',
+      'You are at a home décor store. Ask about return policy.',
+      'You are at a pet groomer. Book an appointment for your dog.',
+      'You are at a karate class. Ask about trial lessons.',
+      'You are at a cooking school. Enquire about a short course.',
+      'You are at a job fair. Ask about internships.',
+      'You are at a bank. Apply for a loan.',
+      'You are at a real estate agency. Schedule a house viewing.',
+      'You are at a mobile phone shop. Get your screen repaired.',
+      'You are at a car wash. Ask about detailing options.',
+      'You are at a courier office. Track a missing package.',
+      'You are at a driving school. Enquire about a refresher course.',
+      'You are at an internet cafe. Ask about printing services.',
+      'You are at a ticket office. Book a theatre ticket.',
+      'You are at a music store. Ask about a trumpet for a beginner.',
+      'You are at a bookshop. Ask for a book recommendation.',
+      'You are at a shoe store. Ask about a return for a defective shoe.',
+      'You are at a jewellery shop. Get a chain repaired.',
+      'You are at a hotel. Ask about a meeting room for a business event.',
+      'You are at a catering office. Plan food for a party.',
+      'You are at a driving test centre. Ask about the test format.',
+      'You are at a university admissions office. Ask about transfer credits.',
+      'You are at a bank. Set up online banking.',
+      'You are at a hospital. Ask about visiting hours.',
+      'You are at a dentist. Ask about braces.',
+      'You are at a school. Ask about a parent-teacher meeting.',
+      'You are at a pharmacy. Ask about allergy medicine.',
+      'You are at a ticket counter. Ask about refund policy.',
+      'You are at a spa. Book a facial.',
+      'You are at a travel agency. Ask about travel insurance.',
+      'You are at a restaurant. Ask for a vegan option.',
+      'You are at a bank. Ask about a safety deposit box.',
+      'You are at a phone shop. Ask about phone insurance.',
+      'You are at a car repair shop. Ask about a warranty on repairs.',
+      'You are at a furniture store. Ask about a custom sofa.',
+      'You are at a gym. Ask about a personal training plan.',
+      'You are at a driving school. Book your first lesson.',
+      'You are at a lawyer’s office. Ask about rental agreements.',
+      'You are at a school. Ask about after-school programmes.',
     ],
   },
+
+  /* ============================================================
+     Story Retelling — 100 prompts
+     ============================================================ */
   story: {
     name: 'Story Retelling', icon: 'book',
     prompts: [
@@ -1490,8 +1711,75 @@ const PROMPT_BANK = {
       'Tell about a time you taught someone something.',
       'Describe a moment when you were misunderstood.',
       'Tell about a time you forgave someone.',
+      'Describe a time when you made a new friend.',
+      'Tell about a time you lost something important.',
+      'Describe a moment when you felt proud of someone else.',
+      'Tell about a time you were very nervous.',
+      'Describe a time you changed your mind about something.',
+      'Tell about a time you did something you thought you could not do.',
+      'Describe a moment when you felt truly alive.',
+      'Tell about a time you were disappointed.',
+      'Describe a moment when someone surprised you with kindness.',
+      'Tell about a time you had to wait a long time.',
+      'Describe a moment when you felt like giving up.',
+      'Tell about a time you decided to try again.',
+      'Describe a moment when you felt truly at peace.',
+      'Tell about a time you had to be patient with someone.',
+      'Describe a moment when you made someone smile.',
+      'Tell about a time you discovered something new about yourself.',
+      'Describe a moment when you felt truly connected to nature.',
+      'Tell about a time you had to ask for help.',
+      'Describe a moment when you felt proud of your work.',
+      'Tell about a time you made a promise and kept it.',
+      'Describe a moment when you felt truly loved.',
+      'Tell about a time you did something kind without being asked.',
+      'Describe a moment when you felt out of your comfort zone.',
+      'Tell about a time you solved a difficult problem.',
+      'Describe a moment when you felt inspired.',
+      'Tell about a time you learned from a sibling or cousin.',
+      'Describe a moment when you felt truly appreciated.',
+      'Tell about a time you had to be honest even when it was hard.',
+      'Describe a moment when you felt truly lucky.',
+      'Tell about a time you took a big risk.',
+      'Describe a moment when you felt truly understood.',
+      'Tell about a time you made a mistake and fixed it.',
+      'Describe a moment when you felt truly hopeful.',
+      'Tell about a time you had to make a decision quickly.',
+      'Describe a moment when you felt truly inspired by someone.',
+      'Tell about a time you surprised yourself.',
+      'Describe a moment when you felt truly grateful for your family.',
+      'Tell about a time you did something for the first time.',
+      'Describe a moment when you felt truly happy being alone.',
+      'Tell about a time you felt truly proud of a friend.',
+      'Describe a moment when you felt truly connected to someone.',
+      'Tell about a time you helped someone who needed it.',
+      'Describe a moment when you felt truly afraid.',
+      'Tell about a time you overcame a big challenge.',
+      'Describe a moment when you felt truly happy for someone else.',
+      'Tell about a time you learned a lesson the hard way.',
+      'Describe a moment when you felt truly alive in nature.',
+      'Tell about a time you made a friend in an unexpected place.',
+      'Describe a moment when you felt truly at home.',
+      'Tell about a time you realised something important about yourself.',
+      'Describe a moment when you felt truly inspired by art.',
+      'Tell about a time you did something that scared you.',
+      'Describe a moment when you felt truly grateful for small things.',
+      'Tell about a time you had to change your habits.',
+      'Describe a moment when you felt truly lucky to be alive.',
+      'Tell about a time you helped someone through a difficult time.',
+      'Describe a moment when you felt truly proud of your country.',
+      'Tell about a time you learned something from a child.',
+      'Describe a moment when you felt truly at peace with a decision.',
+      'Tell about a time you laughed until you cried.',
+      'Describe a moment when you felt truly seen.',
+      'Tell about a time you went out of your way for someone.',
+      'Describe a moment when you felt truly grateful for friendship.',
     ],
   },
+
+  /* ============================================================
+     Describe the Scenario — 100 prompts
+     ============================================================ */
   describe: {
     name: 'Describe the Scenario', icon: 'target',
     prompts: [
@@ -1535,8 +1823,71 @@ const PROMPT_BANK = {
       'Describe a childhood toy.',
       'Describe a place you go to feel calm.',
       'Describe a public holiday in your country.',
+      'Describe your neighbourhood.',
+      'Describe a library you have visited.',
+      'Describe a shop where you like to buy clothes.',
+      'Describe a bus or train journey you took.',
+      'Describe a street market you like.',
+      'Describe a hotel you stayed in.',
+      'Describe a beach you have visited.',
+      'Describe a restaurant you would recommend.',
+      'Describe the sound of your city at night.',
+      'Describe a person you see regularly on your commute.',
+      'Describe the weather today.',
+      'Describe your school or college.',
+      'Describe your favourite spot in your home.',
+      'Describe a wedding you attended.',
+      'Describe your morning routine.',
+      'Describe your evening routine.',
+      'Describe a museum you visited.',
+      'Describe a temple, mosque, or church you have seen.',
+      'Describe a monument or landmark in your city.',
+      'Describe a garden you like.',
+      'Describe a hill or viewpoint you have been to.',
+      'Describe a small business in your area.',
+      'Describe the smell of your favourite food.',
+      'Describe a piece of clothing someone gave you.',
+      'Describe a bag you carry every day.',
+      'Describe a photograph on your phone.',
+      'Describe a plant in your home or garden.',
+      'Describe your pet or a pet you know.',
+      'Describe a favourite toy you had as a child.',
+      'Describe your favourite shop for snacks.',
+      'Describe a place you go to exercise.',
+      'Describe a place you go to study.',
+      'Describe a place where you celebrate birthdays.',
+      'Describe a stair or hallway in your home.',
+      'Describe a family heirloom or keepsake.',
+      'Describe a hand-written letter or card you received.',
+      'Describe a book you have on your shelf.',
+      'Describe a piece of jewellery you own.',
+      'Describe a traditional dish from your region.',
+      'Describe a street food you love.',
+      'Describe a music concert you attended.',
+      'Describe a sports match you watched live.',
+      'Describe the first time you cooked a meal for someone.',
+      'Describe a long walk you have taken.',
+      'Describe a rainy day you remember well.',
+      'Describe a snowy or foggy day you experienced.',
+      'Describe a place you go to watch the sunset.',
+      'Describe a room in your grandparents’ house.',
+      'Describe a village you visited.',
+      'Describe your first day at a new job or school.',
+      'Describe a road trip you have taken.',
+      'Describe a scenic train journey.',
+      'Describe a building you find interesting.',
+      'Describe an old part of your city.',
+      'Describe a place where you feel safe.',
+      'Describe a place where you feel inspired.',
+      'Describe a place that reminds you of your childhood.',
+      'Describe a place that reminds you of a family member.',
+      'Describe a place you would like to take a visitor to.',
     ],
   },
+
+  /* ============================================================
+     Topic Discussion — 100 prompts
+     ============================================================ */
   topic: {
     name: 'Topic Discussion', icon: 'chat',
     prompts: [
@@ -1580,8 +1931,72 @@ const PROMPT_BANK = {
       'Discuss whether sports stars are paid too much.',
       'Talk about the importance of mental health.',
       'Discuss how to improve public transport in your city.',
+      'Talk about the value of learning history.',
+      'Discuss the pros and cons of remote work.',
+      'Talk about the role of teachers in society.',
+      'Discuss whether social media should be regulated.',
+      'Talk about how to make cities greener.',
+      'Discuss the importance of preserving local traditions.',
+      'Talk about the value of doing voluntary work.',
+      'Discuss whether children should learn coding at school.',
+      'Talk about the impact of fast fashion.',
+      'Discuss how to reduce food waste.',
+      'Talk about the pros and cons of being famous.',
+      'Discuss the effects of watching too much TV.',
+      'Talk about the importance of having hobbies.',
+      'Discuss whether exams should be replaced by projects.',
+      'Talk about the value of reading fiction.',
+      'Discuss how to encourage more people to read.',
+      'Talk about the role of music in everyday life.',
+      'Discuss whether everyone should learn a musical instrument.',
+      'Talk about how technology has changed the workplace.',
+      'Discuss the pros and cons of online education.',
+      'Talk about the importance of play for children.',
+      'Discuss the effects of advertising on young people.',
+      'Talk about the value of learning about other cultures.',
+      'Discuss whether parents should choose their children’s friends.',
+      'Talk about the importance of sleep for students.',
+      'Discuss the pros and cons of owning a pet.',
+      'Talk about how to improve recycling in your community.',
+      'Discuss whether city life is better than country life.',
+      'Talk about the impact of tourism on small towns.',
+      'Discuss the value of learning a foreign language early.',
+      'Talk about how to reduce stress at work.',
+      'Discuss the importance of community events.',
+      'Talk about whether public transport should be free.',
+      'Discuss how to make education more accessible.',
+      'Talk about the role of sport in schools.',
+      'Discuss whether sports should be compulsory at school.',
+      'Talk about the value of doing chores as a child.',
+      'Discuss whether fashion is important.',
+      'Talk about how to build a kinder society.',
+      'Discuss whether social media makes us less happy.',
+      'Talk about the importance of first impressions.',
+      'Discuss whether everyone should learn a second language.',
+      'Talk about how to make friends as an adult.',
+      'Discuss whether long-distance friendships can work.',
+      'Talk about the importance of family meals.',
+      'Discuss whether it is better to be an only child or have siblings.',
+      'Talk about the value of family traditions.',
+      'Discuss whether it is important to keep old photographs.',
+      'Talk about the importance of knowing your neighbours.',
+      'Discuss whether charity starts at home.',
+      'Talk about the value of learning practical skills at school.',
+      'Discuss whether it is better to rent or buy a home.',
+      'Talk about the importance of good manners.',
+      'Discuss whether social media is a good way to stay in touch.',
+      'Talk about the value of handwritten letters.',
+      'Discuss whether everyone should know how to cook.',
+      'Talk about the importance of financial literacy.',
+      'Discuss whether it is better to be self-employed or work for a company.',
+      'Talk about how to maintain a work-life balance.',
+      'Discuss the value of taking regular breaks from technology.',
     ],
   },
+
+  /* ============================================================
+     Interview Questions — 100 prompts
+     ============================================================ */
   interview: {
     name: 'Interview Questions', icon: 'users',
     prompts: [
@@ -1635,6 +2050,55 @@ const PROMPT_BANK = {
       'What is your biggest professional goal?',
       'Tell me about a time you adapted to change.',
       'How would you improve our company?',
+      'What has been your biggest professional growth moment?',
+      'How do you handle an underperforming teammate?',
+      'How do you set goals for yourself?',
+      'Describe a time you went above and beyond.',
+      'How do you manage your time effectively?',
+      'How do you respond to feedback you disagree with?',
+      'Tell me about a time you had to make a difficult decision.',
+      'How do you handle confidential information?',
+      'Describe a time you had to learn something quickly.',
+      'What is your approach to problem-solving?',
+      'How do you handle an angry client?',
+      'What is your biggest weakness as a professional?',
+      'How do you prioritise between urgent and important tasks?',
+      'Describe a time you had to persuade someone.',
+      'How do you stay motivated during repetitive work?',
+      'What is your approach to teamwork?',
+      'Describe your ideal working relationship with a manager.',
+      'How do you feel about working overtime?',
+      'How do you handle conflicts within a team?',
+      'What is a piece of feedback that changed how you work?',
+      'How do you measure success in your role?',
+      'How do you approach learning a new tool or software?',
+      'What would your previous manager say about you?',
+      'Describe a time you took initiative.',
+      'How do you handle change in priorities?',
+      'What kind of company culture do you thrive in?',
+      'Describe a time you had to apologise at work.',
+      'How do you contribute to a positive work environment?',
+      'What is your biggest strength as a team player?',
+      'How do you approach a task you have never done before?',
+      'Describe a time you had to say no to a request.',
+      'What is your biggest career regret?',
+      'How do you keep yourself accountable?',
+      'What do you do when you feel overwhelmed?',
+      'How do you like to receive feedback?',
+      'Describe a time when you mentored someone.',
+      'What is your leadership style?',
+      'How do you balance quality and speed?',
+      'What kind of projects excite you the most?',
+      'Describe a time when you had to work with limited resources.',
+      'How do you handle working with someone you do not get along with?',
+      'What is your approach to giving feedback to others?',
+      'How do you stay calm under pressure?',
+      'Describe a time when you had to defend your decision.',
+      'How do you decide when to ask for help?',
+      'What does work-life balance mean to you?',
+      'Describe a time when you took a risk at work.',
+      'How do you keep your skills up to date?',
+      'What is a mistake you learned the most from?',
     ],
   },
 };
@@ -2249,7 +2713,7 @@ export function Speaking() {
           <p className="ec-spk-eyebrow">Speaking</p>
           <h1 className="ec-page-title">Speak English with confidence</h1>
           <p className="ec-page-sub">
-            {TOTAL_PROMPTS}+ exercises, live transcription, fault detection, and an AI conversation partner.
+            {TOTAL_PROMPTS.toLocaleString()}+ exercises, live transcription, fault detection, and an AI conversation partner.
           </p>
         </div>
       </div>
@@ -2262,7 +2726,7 @@ export function Speaking() {
           <h1>Every attempt sharpens your <em>voice</em></h1>
           <p>Real-time speech recognition, automatic fault detection, and band-style scoring across 4 criteria.</p>
           <div className="ec-spk-hero-stats">
-            <div className="ec-spk-hero-stat"><strong>{TOTAL_PROMPTS}</strong><span>Exercises</span></div>
+            <div className="ec-spk-hero-stat"><strong>{TOTAL_PROMPTS.toLocaleString()}</strong><span>Exercises</span></div>
             <div className="ec-spk-hero-stat"><strong>{ALL_CATEGORIES.length}</strong><span>Categories</span></div>
             <div className="ec-spk-hero-stat"><strong>{xp}</strong><span>XP earned</span></div>
             <div className="ec-spk-hero-stat"><strong>4</strong><span>Criteria</span></div>
