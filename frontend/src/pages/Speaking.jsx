@@ -387,21 +387,22 @@ const SPEAK_CSS = `
 
 /* ============================================================
    SCORING CONFIG
-   Tunables for what counts as "real speech". Tune conservatively —
-   it's better to say "not enough data" than to lie with a band score.
+   These thresholds decide when we refuse to score and how the
+   score evolves. Tuned for IELTS-style speaking (Parts 1-3).
    ============================================================ */
 const SCORING = {
-  silencePeak: 0.035,       // RMS peak below this = treated as silence
-  minDurationSec: 2,        // refuse to score anything under this
-  minWords: 5,              // refuse to score transcripts under this
-  longAnswerWords: 60,      // target length for IELTS Part 2
-  idealWpm: [110, 160],     // ideal IELTS speaking pace
+  silencePeak: 0.035,       // RMS peak below this = silence
+  minDurationSec: 2,        // refuse to score under 2s
+  minWords: 5,              // refuse to score transcripts under 5 words
+  longAnswerWords: 60,      // IELTS Part 2 target length
+  idealWpm: [110, 160],     // ideal pace
   acceptWpm: [90, 180],     // acceptable pace
+  // Base score for a just-barely-valid answer. 4 ≈ IELTS "Limited user".
+  base: 4,
 };
 
 /* ============================================================
-   PROMPT BANK — 1,004 prompts across 10 categories
-   (identical to before — kept intact)
+   PROMPT BANK (unchanged from before — 1,004 prompts)
    ============================================================ */
 const PROMPT_BANK = {
   pron: {
@@ -1669,8 +1670,20 @@ function detectFaults(transcript, durationSec) {
 }
 
 /* ============================================================
-   SCORING ENGINE — rewritten so scores reflect actual evidence
-   Returns null when the transcript is too short to score honestly.
+   SCORING ENGINE
+   ------------------------------------------------------------------
+   Returns { fluency, vocabulary, grammar, pronunciation } or null.
+
+   Design principles:
+   1. Base = SCORING.base (4). Even a minimal valid answer is worth
+      ~4 (IELTS "Limited user"). It is NOT a passing band.
+   2. Each criterion starts at base and ACCUMULATES evidence-based
+      bonuses. Bonus magnitudes reflect how strong the evidence is.
+   3. Penalties are applied AFTER bonuses and are steep enough to
+      cancel gains for poor speech (e.g. heavy filler use).
+   4. Pronunciation is a proxy derived from pace + filler signals.
+      This is NOT true pronunciation analysis — it's a rough
+      browser-only estimate.
    ============================================================ */
 function scoreFromAnalysis(faults) {
   const words = faults.length.words;
@@ -1681,44 +1694,56 @@ function scoreFromAnalysis(faults) {
   const vocabRatio = faults.vocabulary.ratio;
   const [idealLo, idealHi] = SCORING.idealWpm;
   const [acceptLo, acceptHi] = SCORING.acceptWpm;
+  const rep = faults.repetition.count;
 
-  // --- Fluency: start at 5 (minimum valid), reward length + ideal pace, penalize fillers
-  let fluency = 5;
-  if (wpm >= idealLo && wpm <= idealHi) fluency += 1.5;
-  else if (wpm >= acceptLo && wpm <= acceptHi) fluency += 0.5;
-  else fluency -= 1;
+  // ---------------- FLUENCY ----------------
+  // The strongest signal of fluency is *pace in the ideal range*.
+  // Length comes second; filler density is a penalty.
+  let fluency = SCORING.base;
+  if (wpm >= idealLo && wpm <= idealHi) fluency += 2.5;
+  else if (wpm >= acceptLo && wpm <= acceptHi) fluency += 1.5;
+  else if (wpm > 0) fluency -= 0.5;
 
   if (words >= 30) fluency += 0.5;
-  if (words >= SCORING.longAnswerWords) fluency += 0.5;
-  if (words >= 100) fluency += 0.5;
-  if (fillerRatio > 0.08) fluency -= 1;
-  if (fillerRatio > 0.15) fluency -= 1;
+  if (words >= 60) fluency += 0.5;
+  if (words >= 90) fluency += 0.5;
+  if (words >= 120) fluency += 0.5;
 
-  // --- Vocabulary: driven by lexical diversity and total length
-  let vocabulary = 5;
-  if (vocabRatio > 0.5) vocabulary += 0.5;
-  if (vocabRatio > 0.6) vocabulary += 0.5;
-  if (vocabRatio > 0.7) vocabulary += 0.5;
-  if (words >= SCORING.longAnswerWords) vocabulary += 0.5;
-  if (words >= 100) vocabulary += 0.5;
-  if (vocabRatio < 0.35) vocabulary -= 1;
+  if (fillerRatio > 0.04) fluency -= 0.5;
+  if (fillerRatio > 0.08) fluency -= 1.0;
+  if (fillerRatio > 0.15) fluency -= 1.5;
 
-  // --- Grammar: penalize repetition, reward longer connected speech
-  let grammar = 5;
-  if (faults.repetition.count === 0 && words >= 20) grammar += 0.5;
-  if (faults.repetition.count === 0 && words >= 50) grammar += 0.5;
-  if (faults.repetition.count === 0 && words >= 80) grammar += 0.5;
-  if (faults.repetition.count >= 1) grammar -= 0.5;
-  if (faults.repetition.count >= 2) grammar -= 1;
+  // ---------------- VOCABULARY ----------------
+  // Lexical diversity is the primary signal; length adds a little.
+  let vocabulary = SCORING.base;
+  if (vocabRatio > 0.50) vocabulary += 1.0;
+  if (vocabRatio > 0.60) vocabulary += 1.0;
+  if (vocabRatio > 0.70) vocabulary += 1.0;
+  if (words >= 60) vocabulary += 1.0;
+  if (words >= 100) vocabulary += 1.0;
+  if (vocabRatio < 0.35 && words >= 20) vocabulary -= 1.0;
 
-  // --- Pronunciation: browser-only proxy — this is a *rough* estimate
-  let pronunciation = 5;
-  if (wpm >= idealLo && wpm <= idealHi && fillerRatio < 0.05) pronunciation += 2;
-  else if (wpm >= acceptLo && wpm <= acceptHi) pronunciation += 1;
-  else if (wpm === 0) pronunciation -= 1;
-  if (fillerRatio > 0.12) pronunciation -= 1;
+  // ---------------- GRAMMAR ----------------
+  // We can't judge grammar from a transcript without an NLP parser.
+  // Absence of repetition + length is the best proxy available.
+  let grammar = SCORING.base;
+  if (words >= 15) grammar += 0.5;
+  if (words >= 40) grammar += 1.0;
+  if (words >= 70) grammar += 1.0;
+  if (words >= 100) grammar += 0.5;
+  if (rep >= 1) grammar -= 0.5;
+  if (rep >= 3) grammar -= 1.0;
 
-  const clamp = (n) => Math.max(3.5, Math.min(9, Math.round(n * 10) / 10));
+  // ---------------- PRONUNCIATION (proxy) ----------------
+  // Pace in the ideal range AND low filler density → likely clear.
+  // This is the weakest of the four scores — labelled as a proxy in the UI.
+  let pronunciation = SCORING.base;
+  if (wpm >= idealLo && wpm <= idealHi) pronunciation += 2.0;
+  else if (wpm >= acceptLo && wpm <= acceptHi) pronunciation += 1.0;
+  if (fillerRatio < 0.04) pronunciation += 1.0;
+  if (fillerRatio > 0.12) pronunciation -= 1.0;
+
+  const clamp = (n) => Math.max(3, Math.min(9, Math.round(n * 10) / 10));
 
   return {
     fluency: clamp(fluency),
@@ -1726,6 +1751,39 @@ function scoreFromAnalysis(faults) {
     grammar: clamp(grammar),
     pronunciation: clamp(pronunciation),
   };
+}
+
+/* Explain what drove the score. Used in the auto-feedback message. */
+function scoreExplanation(faults, bands) {
+  const words = faults.length.words;
+  const wpm = faults.pace.wpm;
+  const fillerRatio = faults.fillers.count / Math.max(1, words);
+  const vocabRatio = faults.vocabulary.ratio;
+  const [idealLo, idealHi] = SCORING.idealWpm;
+
+  const lines = [];
+  lines.push(`You said ${words} words in about ${faults.pace.wpm ? Math.round(words / faults.pace.wpm * 60) : 0}s.`);
+
+  if (wpm >= idealLo && wpm <= idealHi) {
+    lines.push(`Your pace (${wpm} wpm) is in the ideal ${idealLo}–${idealHi} range.`);
+  } else if (wpm > 0) {
+    lines.push(`Your pace was ${wpm} wpm — aim for ${idealLo}–${idealHi}.`);
+  }
+
+  if (faults.fillers.count > 0) {
+    const top = Object.keys(faults.fillers.words).slice(0, 3);
+    lines.push(`Reduce filler words (${faults.fillers.count} found: ${top.join(', ')}).`);
+  }
+
+  if (words < SCORING.longAnswerWords) {
+    lines.push(`Speak longer — aim for ${SCORING.longAnswerWords}+ words to lift fluency.`);
+  }
+
+  if (vocabRatio < 0.5 && words >= 20) {
+    lines.push('Vary your word choice — repetition hurts your vocabulary score.');
+  }
+
+  return lines.join(' ');
 }
 
 /* ============================================================
@@ -1780,8 +1838,6 @@ function useSpeechRecognition() {
 
 /* ============================================================
    AUDIO RECORDER + LEVEL MONITOR
-   Tracks peak RMS via AnalyserNode. Returns { blob, peak, seconds }
-   from stop() so the caller can gate scoring on real audio.
    ============================================================ */
 function pickMimeType() {
   const candidates = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg;codecs=opus'];
@@ -2182,7 +2238,7 @@ export function Speaking() {
 
       const { blob, peak, seconds: dur } = captured;
 
-      // ---- Gate 1: silence ----
+      // Gate 1: silence
       if (peak < SCORING.silencePeak) {
         setSubmitError(
           'We didn\'t hear anything. Move closer to the mic, check it\'s not muted, and try again.'
@@ -2190,7 +2246,7 @@ export function Speaking() {
         return;
       }
 
-      // ---- Gate 2: duration ----
+      // Gate 2: duration
       if (dur < SCORING.minDurationSec) {
         setSubmitError(
           `Recording too short (${dur}s). Aim for at least ${SCORING.minDurationSec} seconds.`
@@ -2198,13 +2254,13 @@ export function Speaking() {
         return;
       }
 
-      // Small delay to let the last final speech result land
+      // Let the last final transcript land
       await new Promise((r) => setTimeout(r, 500));
 
       const finalText = speech.transcript || '';
       const wordList = finalText.trim().split(/\s+/).filter(Boolean);
 
-      // ---- Gate 3: transcript ----
+      // Gate 3: transcript
       if (speech.supported && wordList.length < SCORING.minWords) {
         if (wordList.length === 0) {
           setSubmitError(
@@ -2237,13 +2293,7 @@ export function Speaking() {
         } catch { /* ignore */ }
 
         if (!feedback) {
-          feedback = `You said ${detected.length.words} words in ${dur}s. ` +
-            (detected.fillers.count > 0
-              ? `Try to reduce filler words like "${Object.keys(detected.fillers.words).slice(0, 3).join('", "')}". `
-              : 'Great job avoiding filler words. ') +
-            (detected.length.words < SCORING.longAnswerWords
-              ? 'Speak for longer next time to boost your fluency score.'
-              : 'Nice long answer — keep it up!');
+          feedback = scoreExplanation(detected, bands);
         }
 
         setFaults(detected);
@@ -2345,7 +2395,6 @@ export function Speaking() {
     ? Math.round(((result.fluency + result.pronunciation + result.vocabulary + result.grammar) / 4) * 10) / 10
     : null;
 
-  /* Show the "we can't hear you" warning only after 2s of recording */
   const showSilentWarning =
     practiceRecorder.recording &&
     practiceRecorder.seconds >= 2 &&
@@ -2355,7 +2404,6 @@ export function Speaking() {
     <div className="ec-spk">
       <style>{SPEAK_CSS}</style>
 
-      {/* Heading */}
       <div className="ec-spk-head ec-spk-anim">
         <div>
           <p className="ec-spk-eyebrow">Speaking</p>
@@ -2366,7 +2414,6 @@ export function Speaking() {
         </div>
       </div>
 
-      {/* Hero */}
       <div className="ec-spk-hero ec-spk-anim">
         <div className="ec-spk-hero-orb" aria-hidden="true" />
         <div className="ec-spk-hero-copy">
@@ -2385,7 +2432,6 @@ export function Speaking() {
         </div>
       </div>
 
-      {/* Top tabs */}
       <div className="ec-spk-tabs" role="tablist">
         {[
           { id: 'practice', label: 'Practice', icon: 'mic' },
@@ -2405,7 +2451,6 @@ export function Speaking() {
         ))}
       </div>
 
-      {/* Category tabs */}
       {tab === 'practice' && (
         <div className="ec-spk-cats">
           {ALL_CATEGORIES.map((c) => (
@@ -2426,7 +2471,6 @@ export function Speaking() {
 
       <div className="ec-spk-grid">
         <section>
-          {/* ---------- PRACTICE ---------- */}
           {tab === 'practice' && (
             <div className="ec-spk-panel ec-spk-anim" key="practice">
               <div className="ec-spk-prompt-counter">
@@ -2477,7 +2521,6 @@ export function Speaking() {
                 <p className="ec-spk-error">{practiceRecorder.error || submitError}</p>
               )}
 
-              {/* Live transcript */}
               {(practiceRecorder.recording || speech.transcript || speech.interim) && (
                 <div className="ec-spk-transcript">
                   <p className="ec-spk-transcript-label">
@@ -2499,7 +2542,6 @@ export function Speaking() {
                 </div>
               )}
 
-              {/* Score cards — only rendered when we have a valid result */}
               {result && (
                 <>
                   <div className="ec-spk-scores">
@@ -2516,8 +2558,9 @@ export function Speaking() {
                   )}
                   {result.feedback && <p className="ec-spk-feedback">{result.feedback}</p>}
                   <p className="ec-spk-info">
-                    ℹ️ These scores are heuristic estimates based on transcript statistics. For real pronunciation
-                    analysis, use a dedicated STT service with audio feature extraction.
+                    ℹ️ Fluency, vocabulary, and grammar are derived from your transcript (pace, length,
+                    lexical diversity, repetition). Pronunciation is a pace/clarity proxy, not a real
+                    acoustic analysis. For true pronunciation scoring, a dedicated STT service is required.
                   </p>
                 </>
               )}
@@ -2540,7 +2583,6 @@ export function Speaking() {
             </div>
           )}
 
-          {/* ---------- CONVERSATION ---------- */}
           {tab === 'conversation' && (
             <div className="ec-spk-convo ec-spk-anim" key="conv">
               <h3 className="ec-spk-convo-head">AI conversation partner</h3>
@@ -2608,7 +2650,6 @@ export function Speaking() {
             </div>
           )}
 
-          {/* ---------- HISTORY ---------- */}
           {tab === 'history' && (
             <div className="ec-spk-history ec-spk-anim" key="history">
               {historyLoading ? (
@@ -2637,7 +2678,6 @@ export function Speaking() {
           )}
         </section>
 
-        {/* ---------- SIDEBAR ---------- */}
         <aside>
           <div className="ec-spk-side ec-spk-anim">
             <h3>Recording tips <span>Guide</span></h3>
