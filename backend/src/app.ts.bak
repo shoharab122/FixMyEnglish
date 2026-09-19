@@ -19,8 +19,6 @@ import communityRoutes   from './modules/community/routes.js';
 import liveRoomsRoutes   from './modules/liveRooms/routes.js';
 import paymentsRoutes    from './modules/payments/routes.js';
 import adminRoutes       from './modules/admin/routes.js';
-import examPapersUserRouter from './modules/exam-papers/user.routes.js';
-import examPapersAdminRouter from './modules/exam-papers/admin.routes.js';
 
 export function createApp() {
   const app = express();
@@ -47,9 +45,6 @@ export function createApp() {
   app.use('/api/live-rooms',   liveRoomsRoutes);
   app.use('/api/payments',     paymentsRoutes);
   app.use('/api/admin',        adminRoutes);
-
-  app.use('/api/exams/papers', examPapersUserRouter);
-  app.use('/api/admin/exam-papers', examPapersAdminRouter);
 
   app.use(notFound);
   app.use(errorHandler);

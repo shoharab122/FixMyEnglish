@@ -1,7 +1,7 @@
 import { api } from './client';
-
+import { normalizeSpeakingPrompt } from './normalizers';
 export const speakingApi = {
-  prompts: () => api.get('/api/speaking/prompts').then((r) => r.data),
+  prompts: () => api.get('/api/speaking/prompts').then((r) => (Array.isArray(r.data) ? r.data : []).map(normalizeSpeakingPrompt)),
   submitAttempt: (promptId, audioBlob) => {
     const form = new FormData();
     form.append('audio', audioBlob, 'attempt.webm');
