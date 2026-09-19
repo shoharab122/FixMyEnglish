@@ -3,7 +3,7 @@ import { speakingApi } from '../api/speaking';
 import { Icon } from '../components/Icon';
 
 /* ============================================================
-   STYLES — Langut-inspired
+   STYLES — mobile-first, chunky Langut look
    ============================================================ */
 const SPEAK_CSS = `
 .ec-spk{
@@ -15,17 +15,19 @@ const SPEAK_CSS = `
   --lang-ink:#17102E;--lang-ink-soft:#6B6488;--lang-line:#17102E;
 }
 .ec-spk,.ec-spk *{box-sizing:border-box}
+.ec-spk{-webkit-tap-highlight-color:transparent}
 
-.ec-spk-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.ec-spk-head{margin-bottom:16px}
 .ec-spk-eyebrow{margin:0 0 6px;font-size:11.5px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:var(--lang-purple);opacity:.95}
 
+/* ---------- HERO ---------- */
 .ec-spk-hero{
   position:relative;overflow:hidden;border-radius:32px;
-  padding:clamp(26px,4vw,40px) clamp(24px,4vw,42px);
+  padding:clamp(24px,4vw,40px) clamp(20px,4vw,42px);
   color:#fff;
   background:linear-gradient(140deg,#2A1A6E 0%,#1E1252 55%,#3B2596 100%);
   box-shadow:0 20px 52px rgba(30,18,82,.34);
-  border:2px solid var(--lang-line);margin-bottom:22px;min-height:240px;
+  border:2px solid var(--lang-line);margin-bottom:20px;min-height:220px;
   display:flex;align-items:center;justify-content:space-between;gap:20px;
 }
 .ec-spk-hero::before{
@@ -38,18 +40,18 @@ const SPEAK_CSS = `
 }
 .ec-spk-hero-orb{position:absolute;top:-90px;right:180px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(212,245,92,.22),transparent 68%);animation:ec-spk-drift 14s ease-in-out infinite}
 @keyframes ec-spk-drift{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-18px,16px) scale(1.08)}}
-.ec-spk-hero-copy{position:relative;z-index:1;max-width:580px}
+.ec-spk-hero-copy{position:relative;z-index:1;max-width:580px;min-width:0;flex:1}
 .ec-spk-hero-badge{
   display:inline-flex;align-items:center;font-size:10.5px;font-weight:900;
   letter-spacing:.16em;text-transform:uppercase;padding:7px 14px;border-radius:999px;
   background:var(--lang-lime);color:var(--lang-ink);border:2px solid var(--lang-line);
-  box-shadow:0 3px 0 rgba(0,0,0,.4);margin-bottom:16px;
+  box-shadow:0 3px 0 rgba(0,0,0,.4);margin-bottom:14px;
 }
-.ec-spk-hero h1{margin:0 0 10px;font-size:clamp(26px,2.4vw + 16px,38px);font-weight:900;letter-spacing:-.035em;line-height:1.1;color:#fff}
+.ec-spk-hero h1{margin:0 0 10px;font-size:clamp(24px,2.4vw + 14px,38px);font-weight:900;letter-spacing:-.035em;line-height:1.1;color:#fff}
 .ec-spk-hero h1 em{font-style:normal;color:var(--lang-lime)}
-.ec-spk-hero p{margin:0 0 22px;font-size:14px;line-height:1.6;opacity:.92;font-weight:500;max-width:52ch}
+.ec-spk-hero p{margin:0 0 18px;font-size:14px;line-height:1.6;opacity:.92;font-weight:500;max-width:52ch}
 .ec-spk-hero-stats{display:flex;gap:10px;flex-wrap:wrap;position:relative;z-index:1}
-.ec-spk-hero-stat{display:flex;flex-direction:column;gap:2px;padding:9px 14px;border-radius:14px;background:var(--lang-lime);border:2px solid var(--lang-line);box-shadow:0 3px 0 var(--lang-line);min-width:80px}
+.ec-spk-hero-stat{display:flex;flex-direction:column;gap:2px;padding:9px 14px;border-radius:14px;background:var(--lang-lime);border:2px solid var(--lang-line);box-shadow:0 3px 0 var(--lang-line);min-width:76px}
 .ec-spk-hero-stat strong{font-size:20px;font-weight:900;line-height:1;letter-spacing:-.04em;color:var(--lang-ink)}
 .ec-spk-hero-stat span{font-size:9.5px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--lang-ink);opacity:.75}
 .ec-spk-hero-stat:nth-child(2){background:var(--lang-pink)}
@@ -60,14 +62,15 @@ const SPEAK_CSS = `
 .ec-spk-hero-mascot{position:relative;z-index:1;flex-shrink:0;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 14px 28px rgba(0,0,0,.28));animation:ec-spk-bob 4s ease-in-out infinite}
 @keyframes ec-spk-bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-10px) rotate(2deg)}}
 
-.ec-spk-tabs{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding:6px 4px 16px;margin-bottom:8px}
+/* ---------- TABS ---------- */
+.ec-spk-tabs{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding:6px 4px 16px;margin-bottom:4px;-webkit-overflow-scrolling:touch}
 .ec-spk-tabs::-webkit-scrollbar{display:none}
 .ec-spk-tab{
   flex:0 0 auto;display:inline-flex;align-items:center;gap:8px;
-  padding:11px 18px;border-radius:999px;border:2px solid var(--lang-line);
-  background:#fff;color:var(--lang-ink);font-size:13px;font-weight:900;
+  padding:12px 20px;border-radius:999px;border:2px solid var(--lang-line);
+  background:#fff;color:var(--lang-ink);font-size:13.5px;font-weight:900;
   cursor:pointer;white-space:nowrap;transition:all .18s ease;font-family:inherit;
-  box-shadow:0 3px 0 var(--lang-line);letter-spacing:.01em;
+  box-shadow:0 3px 0 var(--lang-line);letter-spacing:.01em;min-height:46px;
 }
 .ec-spk-tab:hover{background:var(--lang-lime-soft);transform:translateY(-2px);box-shadow:0 5px 0 var(--lang-line)}
 .ec-spk-tab:active{transform:translateY(1px);box-shadow:0 1px 0 var(--lang-line)}
@@ -75,14 +78,15 @@ const SPEAK_CSS = `
 .ec-spk-tab--active:hover{background:var(--lang-ink);color:var(--lang-lime)}
 .ec-spk-tab svg{width:16px;height:16px}
 
-.ec-spk-cats{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding:6px 4px 14px;margin-bottom:8px}
+/* ---------- CATEGORY PILLS ---------- */
+.ec-spk-cats{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding:6px 4px 14px;margin-bottom:4px;-webkit-overflow-scrolling:touch}
 .ec-spk-cats::-webkit-scrollbar{display:none}
 .ec-spk-cat{
-  flex:0 0 auto;padding:9px 16px;border-radius:999px;
+  flex:0 0 auto;padding:10px 16px;border-radius:999px;
   border:2px solid var(--lang-line);background:#fff;color:var(--lang-ink);
-  font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap;
+  font-size:12.5px;font-weight:900;cursor:pointer;white-space:nowrap;
   transition:all .16s ease;font-family:inherit;display:inline-flex;align-items:center;gap:6px;
-  box-shadow:0 3px 0 var(--lang-line);
+  box-shadow:0 3px 0 var(--lang-line);min-height:42px;
 }
 .ec-spk-cat:hover{background:var(--lang-lime-soft);transform:translateY(-2px);box-shadow:0 5px 0 var(--lang-line)}
 .ec-spk-cat:active{transform:translateY(1px);box-shadow:0 1px 0 var(--lang-line)}
@@ -90,12 +94,14 @@ const SPEAK_CSS = `
 .ec-spk-cat-count{font-size:10px;font-weight:900;padding:2px 7px;border-radius:999px;background:var(--lang-lime);color:var(--lang-ink);border:2px solid var(--lang-line)}
 .ec-spk-cat--active .ec-spk-cat-count{background:var(--lang-lime);color:var(--lang-ink);border-color:var(--lang-line)}
 
+/* ---------- LAYOUT ---------- */
 .ec-spk-grid{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:22px;align-items:start}
 
 .ec-spk-panel{
   background:#fff;border:3px solid var(--lang-line);border-radius:32px;padding:28px;
   box-shadow:0 10px 0 var(--lang-line);position:relative;overflow:hidden;
   background-image:radial-gradient(circle at 100% 0%,rgba(212,245,92,.14),transparent 55%);
+  text-align:center;
 }
 .ec-spk-prompt-counter{
   position:relative;z-index:1;font-size:12px;font-weight:900;
@@ -103,35 +109,38 @@ const SPEAK_CSS = `
   display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;
 }
 .ec-spk-prompt-tag{font-size:10.5px;font-weight:900;padding:4px 12px;border-radius:999px;background:var(--lang-lime);color:var(--lang-ink);border:2px solid var(--lang-line);box-shadow:0 2px 0 var(--lang-line);letter-spacing:.06em;text-transform:uppercase}
-.ec-spk-prompt-text{position:relative;z-index:1;font-size:clamp(18px,1.6vw + 12px,22px);font-weight:900;line-height:1.4;margin:12px 0 20px;color:var(--lang-ink);letter-spacing:-.02em;max-width:680px}
-.ec-spk-prompt-hint{position:relative;z-index:1;font-size:12.5px;color:var(--lang-ink-soft);margin:-12px 0 22px;font-weight:700}
+.ec-spk-prompt-text{position:relative;z-index:1;font-size:clamp(17px,1.6vw + 11px,22px);font-weight:900;line-height:1.4;margin:12px 0 8px;color:var(--lang-ink);letter-spacing:-.02em;text-align:left}
+.ec-spk-prompt-hint{position:relative;z-index:1;font-size:12.5px;color:var(--lang-ink-soft);margin:0 0 20px;font-weight:700;text-align:left}
 
-.ec-spk-record-wrap{position:relative;z-index:1;display:inline-flex;align-items:center;justify-content:center;width:130px;height:130px;margin:8px auto 4px}
-.ec-spk-record-ring{position:absolute;inset:0;border-radius:50%;border:3px solid rgba(123,92,240,.55);animation:ec-spk-ring 2.4s ease-out infinite}
+/* ---------- RECORD BUTTON ---------- */
+.ec-spk-record-wrap{position:relative;z-index:1;display:inline-flex;align-items:center;justify-content:center;width:140px;height:140px;margin:4px auto 0}
+.ec-spk-record-ring{position:absolute;inset:0;border-radius:50%;border:3px solid rgba(123,92,240,.55);animation:ec-spk-ring 2.4s ease-out infinite;pointer-events:none}
 .ec-spk-record-ring:nth-child(2){animation-delay:.8s}
 .ec-spk-record-ring:nth-child(3){animation-delay:1.6s}
 @keyframes ec-spk-ring{0%{transform:scale(.6);opacity:.9}80%{transform:scale(1.35);opacity:0}100%{opacity:0}}
 .ec-spk-record-wrap--active .ec-spk-record-ring{border-color:rgba(255,143,203,.75)}
 .ec-spk-record-btn{
-  position:relative;z-index:1;width:92px;height:92px;border-radius:50%;
+  position:relative;z-index:1;width:100px;height:100px;border-radius:50%;
   border:3px solid var(--lang-line);
   background:linear-gradient(135deg,var(--lang-purple) 0%,var(--lang-purple-2) 100%);
-  color:#fff;font-size:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;
+  color:#fff;font-size:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;
   box-shadow:0 6px 0 var(--lang-line);transition:transform .18s ease,box-shadow .18s ease;
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
 }
 .ec-spk-record-btn:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 9px 0 var(--lang-line)}
 .ec-spk-record-btn:active:not(:disabled){transform:translateY(2px);box-shadow:0 2px 0 var(--lang-line)}
 .ec-spk-record-btn:disabled{opacity:.55;cursor:not-allowed}
 .ec-spk-record-btn--active{background:linear-gradient(135deg,var(--lang-pink-2) 0%,#E0503C 100%);box-shadow:0 6px 0 var(--lang-line)}
 
-.ec-spk-record-status{position:relative;z-index:1;font-size:14px;font-weight:900;color:var(--lang-ink);margin:16px 0 4px;text-align:center;letter-spacing:.01em}
-.ec-spk-record-time{position:relative;z-index:1;font-size:26px;font-weight:900;color:var(--lang-ink);letter-spacing:-.03em;font-variant-numeric:tabular-nums;text-align:center;background:var(--lang-lime);border:2px solid var(--lang-line);border-radius:14px;padding:6px 18px;display:inline-block;box-shadow:0 3px 0 var(--lang-line)}
+.ec-spk-record-status{position:relative;z-index:1;font-size:14.5px;font-weight:900;color:var(--lang-ink);margin:14px 0 6px;text-align:center;letter-spacing:.01em}
+.ec-spk-record-time{position:relative;z-index:1;font-size:26px;font-weight:900;color:var(--lang-ink);letter-spacing:-.03em;font-variant-numeric:tabular-nums;text-align:center;background:var(--lang-lime);border:2px solid var(--lang-line);border-radius:14px;padding:6px 18px;display:inline-block;box-shadow:0 3px 0 var(--lang-line);margin:4px 0 0}
 
+/* ---------- LEVEL METER (ref-driven, no re-renders) ---------- */
 .ec-spk-live-level{
   position:relative;z-index:1;
   display:flex;align-items:center;gap:10px;
-  max-width:360px;margin:10px auto 0;
-  padding:8px 14px;border-radius:999px;
+  max-width:380px;margin:12px auto 0;
+  padding:9px 14px;border-radius:999px;
   background:#fff;border:2px solid var(--lang-line);
   box-shadow:0 2px 0 var(--lang-line);
   font-size:11px;font-weight:900;
@@ -145,6 +154,7 @@ const SPEAK_CSS = `
   height:100%;border-radius:999px;
   background:linear-gradient(90deg,#B8E62E,#D4F55C);
   transition:width .08s linear;
+  will-change:width;
 }
 .ec-spk-live-level--silent .ec-spk-live-level-fill{background:linear-gradient(90deg,#FF8FCB,#E0503C)}
 .ec-spk-live-level--silent{color:#A52C1C}
@@ -162,27 +172,30 @@ const SPEAK_CSS = `
 }
 @keyframes ec-spk-warning-pulse{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
 
+/* ---------- WAVEFORM ---------- */
 .ec-spk-wave{position:relative;z-index:1;height:48px;margin:14px auto 8px;max-width:420px;display:flex;align-items:center;justify-content:center;gap:3px}
 .ec-spk-wave-bar{width:4px;background:var(--lang-ink);border-radius:2px;transition:height .15s ease}
 .ec-spk-wave-idle .ec-spk-wave-bar{height:4px !important;opacity:.35}
 .ec-spk-wave-live .ec-spk-wave-bar{background:linear-gradient(180deg,var(--lang-purple-2),var(--lang-purple));animation:ec-spk-wave-bounce .8s ease-in-out infinite}
 @keyframes ec-spk-wave-bounce{0%,100%{transform:scaleY(.5)}50%{transform:scaleY(1.2)}}
 
+/* ---------- ALERTS ---------- */
 .ec-spk-error{
   position:relative;z-index:1;font-size:13px;color:var(--lang-ink);
   background:var(--lang-pink-2);padding:12px 16px;border-radius:14px;
-  display:inline-block;margin:14px 0 0;font-weight:900;
+  display:block;margin:14px auto 0;font-weight:900;
   border:2px solid var(--lang-line);box-shadow:0 3px 0 var(--lang-line);
   max-width:520px;text-align:left;
 }
 .ec-spk-info{
   position:relative;z-index:1;font-size:13px;color:var(--lang-ink);
   background:var(--lang-yellow);padding:12px 16px;border-radius:14px;
-  display:inline-block;margin:14px 0 0;font-weight:900;
+  display:block;margin:14px 0 0;font-weight:900;
   border:2px solid var(--lang-line);box-shadow:0 3px 0 var(--lang-line);
   max-width:520px;text-align:left;
 }
 
+/* ---------- TRANSCRIPT ---------- */
 .ec-spk-transcript{
   position:relative;z-index:1;background:var(--lang-lime-soft);
   border:2px solid var(--lang-line);border-radius:18px;padding:18px 20px;
@@ -197,6 +210,7 @@ const SPEAK_CSS = `
 .ec-spk-transcript-meta{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:2px dashed rgba(23,16,46,.15);font-size:11.5px;font-weight:900;color:var(--lang-ink-soft);letter-spacing:.02em}
 .ec-spk-transcript-meta span{display:inline-flex;align-items:center;gap:4px}
 
+/* ---------- SCORES ---------- */
 .ec-spk-scores{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:24px;position:relative;z-index:1}
 .ec-spk-score{
   position:relative;background:#fff;border:2px solid var(--lang-line);border-radius:20px;
@@ -231,6 +245,7 @@ const SPEAK_CSS = `
 .ec-spk-band-value{font-size:28px;font-weight:900;color:var(--lang-ink);line-height:1;letter-spacing:-.03em}
 .ec-spk-band-value small{font-size:14px;font-weight:800;color:var(--lang-ink);opacity:.7;letter-spacing:0;margin-left:2px}
 
+/* ---------- FAULT REPORT ---------- */
 .ec-spk-faults{margin-top:24px;position:relative;z-index:1;text-align:left}
 .ec-spk-faults-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap}
 .ec-spk-faults-title{margin:0;font-size:17px;font-weight:900;color:var(--lang-ink);letter-spacing:-.02em}
@@ -259,33 +274,40 @@ const SPEAK_CSS = `
   font-weight:700;box-shadow:0 4px 0 var(--lang-line);
 }
 
-.ec-spk-actions{display:flex;justify-content:center;gap:12px;margin-top:26px;flex-wrap:wrap;position:relative;z-index:1}
+/* ---------- ACTIONS ---------- */
+.ec-spk-actions{display:flex;justify-content:center;gap:12px;margin-top:24px;flex-wrap:wrap;position:relative;z-index:1}
 .ec-spk-btn-ghost{
   border:2px solid var(--lang-line);background:#fff;color:var(--lang-ink);
-  padding:13px 24px;border-radius:999px;font-size:13.5px;font-weight:900;
+  padding:14px 24px;border-radius:999px;font-size:13.5px;font-weight:900;
   cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:8px;
   transition:all .16s ease;box-shadow:0 4px 0 var(--lang-line);letter-spacing:.02em;
+  min-height:48px;-webkit-tap-highlight-color:transparent;
 }
 .ec-spk-btn-ghost:hover{background:var(--lang-lime-soft);transform:translateY(-2px);box-shadow:0 6px 0 var(--lang-line)}
 .ec-spk-btn-ghost:active{transform:translateY(2px);box-shadow:0 1px 0 var(--lang-line)}
 .ec-spk-btn-dark{
   border:2px solid var(--lang-line);background:var(--lang-ink);color:var(--lang-lime);
-  padding:13px 26px;border-radius:999px;font-size:13.5px;font-weight:900;
+  padding:14px 26px;border-radius:999px;font-size:13.5px;font-weight:900;
   cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:8px;
   transition:all .16s ease;box-shadow:0 4px 0 var(--lang-line);letter-spacing:.02em;
+  min-height:48px;-webkit-tap-highlight-color:transparent;
 }
 .ec-spk-btn-dark:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--lang-line)}
 .ec-spk-btn-dark:active{transform:translateY(2px);box-shadow:0 1px 0 var(--lang-line)}
 
+/* ---------- CONVERSATION ---------- */
 .ec-spk-convo{
   background:#fff;border:3px solid var(--lang-line);border-radius:32px;padding:26px;
   box-shadow:0 10px 0 var(--lang-line);display:flex;flex-direction:column;
-  height:calc(100vh - 300px);min-height:540px;max-height:760px;
+  min-height:520px;max-height:min(760px, calc(100dvh - 220px));
   background-image:radial-gradient(circle at 100% 0%,rgba(255,143,203,.12),transparent 55%);
+}
+@supports not (height: 100dvh) {
+  .ec-spk-convo{max-height:calc(100vh - 220px)}
 }
 .ec-spk-convo-head{margin:0 0 8px;font-size:18px;font-weight:900;color:var(--lang-ink);flex-shrink:0;letter-spacing:-.02em}
 .ec-spk-convo-sub{margin:0 0 20px;font-size:13px;color:var(--lang-ink-soft);line-height:1.55;flex-shrink:0;font-weight:700}
-.ec-spk-convo-log{flex:1;display:flex;flex-direction:column;gap:12px;overflow-y:auto;padding-right:6px;margin-bottom:16px;min-height:0}
+.ec-spk-convo-log{flex:1;display:flex;flex-direction:column;gap:12px;overflow-y:auto;padding-right:6px;margin-bottom:16px;min-height:0;-webkit-overflow-scrolling:touch}
 .ec-spk-convo-log::-webkit-scrollbar{width:6px}
 .ec-spk-convo-log::-webkit-scrollbar-thumb{background:var(--lang-purple-2);border-radius:999px}
 .ec-spk-convo-msg{
@@ -304,6 +326,7 @@ const SPEAK_CSS = `
 @keyframes ec-spk-dot{0%,80%,100%{opacity:.3;transform:scale(.8)}40%{opacity:1;transform:scale(1.1)}}
 .ec-spk-convo-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;flex-shrink:0}
 
+/* ---------- HISTORY ---------- */
 .ec-spk-history{display:flex;flex-direction:column;gap:14px}
 .ec-spk-history-item{
   display:flex;justify-content:space-between;align-items:center;gap:12px;background:#fff;
@@ -320,6 +343,7 @@ const SPEAK_CSS = `
 .ec-spk-empty-icon{width:64px;height:64px;border-radius:50%;background:var(--lang-lime);color:var(--lang-ink);display:flex;align-items:center;justify-content:center;font-size:24px;border:2px solid var(--lang-line);box-shadow:0 3px 0 var(--lang-line)}
 .ec-spk-empty-icon svg{width:28px;height:28px}
 
+/* ---------- SIDEBAR ---------- */
 .ec-spk-side{background:#fff;border:2px solid var(--lang-line);border-radius:24px;padding:22px;box-shadow:0 6px 0 var(--lang-line);margin-bottom:16px}
 .ec-spk-side:last-child{margin-bottom:0}
 .ec-spk-side h3{margin:0 0 16px;font-size:15px;font-weight:900;color:var(--lang-ink);display:flex;justify-content:space-between;align-items:center;gap:8px;letter-spacing:-.01em}
@@ -334,49 +358,96 @@ const SPEAK_CSS = `
 .ec-spk-criteria-item:hover{transform:translateX(3px)}
 .ec-spk-criteria-item span:last-child{font-size:10.5px;color:var(--lang-ink);background:var(--lang-lime);padding:3px 10px;border-radius:999px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;border:2px solid var(--lang-line)}
 
-.ec-spk-toast{position:fixed;top:78px;right:20px;z-index:50;background:var(--lang-ink);color:var(--lang-lime);padding:12px 22px;border-radius:999px;font-weight:900;font-size:13px;border:2px solid var(--lang-lime);box-shadow:0 12px 28px rgba(23,16,46,.4);animation:ec-spk-toast-pop 1s ease both;letter-spacing:.03em}
+/* ---------- TOAST ---------- */
+.ec-spk-toast{position:fixed;top:78px;right:20px;z-index:9999;background:var(--lang-ink);color:var(--lang-lime);padding:12px 22px;border-radius:999px;font-weight:900;font-size:13px;border:2px solid var(--lang-lime);box-shadow:0 12px 28px rgba(23,16,46,.4);animation:ec-spk-toast-pop 1.2s ease both;letter-spacing:.03em}
 @keyframes ec-spk-toast-pop{0%{transform:translateY(-10px) scale(.9);opacity:0}20%{transform:translateY(0) scale(1);opacity:1}80%{transform:translateY(0) scale(1);opacity:1}100%{transform:translateY(-8px) scale(.98);opacity:0}}
 
 @keyframes ec-spk-fade-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 .ec-spk-anim{animation:ec-spk-fade-in .45s ease both}
 
+/* ============================================================
+   RESPONSIVE — TABLET
+   ============================================================ */
 @media (max-width:900px){
   .ec-spk-grid{grid-template-columns:1fr;gap:18px}
-  .ec-spk-hero{flex-direction:column;align-items:flex-start;min-height:0}
-  .ec-spk-hero-mascot{position:absolute;right:14px;bottom:14px;transform:scale(.72);transform-origin:bottom right;animation:none}
+  .ec-spk-hero{flex-direction:column;align-items:flex-start;min-height:0;padding:24px 22px}
+  .ec-spk-hero-mascot{position:absolute;right:10px;bottom:10px;transform:scale(.65);transform-origin:bottom right;animation:none;opacity:.9}
 }
+
+/* ============================================================
+   RESPONSIVE — MOBILE (≤ 720px)
+   ============================================================ */
 @media (max-width:720px){
-  .ec-spk-hero{padding:22px 20px;border-radius:26px}
-  .ec-spk-hero h1{font-size:23px}
-  .ec-spk-hero p{font-size:13px}
-  .ec-spk-hero-stats{gap:8px;margin-top:14px}
-  .ec-spk-hero-stat{padding:8px 12px;min-width:74px;border-radius:12px}
-  .ec-spk-hero-stat strong{font-size:17px}
-  .ec-spk-hero-stat span{font-size:9px}
-  .ec-spk-hero-mascot{display:none}
+  .ec-spk-head{margin-bottom:12px}
+  .ec-spk-hero{padding:20px 18px;border-radius:24px;margin-bottom:16px}
+  .ec-spk-hero h1{font-size:22px;padding-right:70px}
+  .ec-spk-hero p{font-size:13px;margin-bottom:14px;padding-right:0}
+  .ec-spk-hero-badge{font-size:10px;padding:5px 11px;margin-bottom:12px}
+  .ec-spk-hero-stats{gap:8px;margin-top:12px;padding-right:60px}
+  .ec-spk-hero-stat{padding:7px 11px;min-width:66px;border-radius:11px}
+  .ec-spk-hero-stat strong{font-size:16px}
+  .ec-spk-hero-stat span{font-size:8.5px}
+  .ec-spk-hero-mascot{right:6px;bottom:6px;transform:scale(.55);opacity:.85}
+  .ec-spk-hero-mascot svg{filter:drop-shadow(0 8px 16px rgba(0,0,0,.35))}
+
+  .ec-spk-tab{padding:11px 16px;font-size:12.5px;min-height:44px}
+  .ec-spk-cat{padding:9px 14px;font-size:12px;min-height:40px}
+
   .ec-spk-panel{padding:22px 18px;border-radius:26px;box-shadow:0 7px 0 var(--lang-line)}
-  .ec-spk-record-wrap{width:114px;height:114px}
-  .ec-spk-record-btn{width:82px;height:82px;font-size:28px}
-  .ec-spk-scores{grid-template-columns:1fr 1fr;gap:12px}
+  .ec-spk-prompt-counter{font-size:11px}
+  .ec-spk-prompt-text{font-size:17px;margin:10px 0 6px}
+  .ec-spk-prompt-hint{font-size:12px;margin-bottom:16px}
+
+  /* Larger tap target on mobile */
+  .ec-spk-record-wrap{width:150px;height:150px}
+  .ec-spk-record-btn{width:110px;height:110px;font-size:38px}
+  .ec-spk-record-status{font-size:15px;margin-top:16px}
+  .ec-spk-record-time{font-size:24px}
+
+  .ec-spk-scores{grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
   .ec-spk-score-ring{width:56px;height:56px}
   .ec-spk-score-num{font-size:22px}
   .ec-spk-score-label{font-size:9.5px}
   .ec-spk-band-value{font-size:24px}
-  .ec-spk-convo{padding:20px;border-radius:26px;height:auto;min-height:540px;max-height:none;box-shadow:0 7px 0 var(--lang-line)}
-  .ec-spk-convo-log{max-height:340px}
-  .ec-spk-convo-msg{max-width:92%}
+
+  .ec-spk-convo{padding:20px;border-radius:26px;box-shadow:0 7px 0 var(--lang-line);min-height:440px;max-height:calc(100dvh - 200px)}
+  @supports not (height: 100dvh) {
+    .ec-spk-convo{max-height:calc(100vh - 200px)}
+  }
+  .ec-spk-convo-log{max-height:none}
+  .ec-spk-convo-msg{max-width:90%;font-size:13.5px;padding:12px 15px}
+
   .ec-spk-history-item{padding:14px 16px}
   .ec-spk-side{padding:18px;border-radius:20px;box-shadow:0 5px 0 var(--lang-line)}
   .ec-spk-fault{padding:12px 14px}
   .ec-spk-faults-title{font-size:16px}
+
+  .ec-spk-transcript{padding:16px 16px}
+  .ec-spk-transcript-text{font-size:14px}
+
+  .ec-spk-btn-ghost,.ec-spk-btn-dark{min-height:50px;font-size:14px;padding:14px 22px}
+  .ec-spk-actions{flex-direction:column-reverse;align-items:stretch}
+  .ec-spk-actions > button{width:100%;justify-content:center}
 }
+
+@media (max-width:420px){
+  .ec-spk-hero h1{font-size:20px;padding-right:64px}
+  .ec-spk-hero-stats{padding-right:0;gap:6px}
+  .ec-spk-hero-stat{padding:6px 10px;min-width:60px}
+  .ec-spk-hero-stat strong{font-size:15px}
+  .ec-spk-hero-stat span{font-size:8px}
+  .ec-spk-hero-mascot{transform:scale(.5);opacity:.8}
+}
+
 @media (max-width:380px){
   .ec-spk-scores{grid-template-columns:1fr 1fr;gap:10px}
   .ec-spk-score{padding:12px 8px}
   .ec-spk-score-num{font-size:20px}
+  .ec-spk-score-ring{width:50px;height:50px}
   .ec-spk-tab{padding:10px 14px;font-size:12px}
-  .ec-spk-cat{padding:8px 13px;font-size:11.5px}
+  .ec-spk-cat{padding:8px 12px;font-size:11.5px}
 }
+
 @media (prefers-reduced-motion: reduce){
   .ec-spk-anim,.ec-spk-score,.ec-spk-convo-msg,.ec-spk-history-item,.ec-spk-toast,.ec-spk-record-warning{animation:none!important}
   .ec-spk-hero-orb,.ec-spk-hero-mascot,.ec-spk-record-ring,.ec-spk-wave-bar,.ec-spk-convo-thinking span{animation:none!important}
@@ -387,22 +458,19 @@ const SPEAK_CSS = `
 
 /* ============================================================
    SCORING CONFIG
-   These thresholds decide when we refuse to score and how the
-   score evolves. Tuned for IELTS-style speaking (Parts 1-3).
    ============================================================ */
 const SCORING = {
-  silencePeak: 0.035,       // RMS peak below this = silence
-  minDurationSec: 2,        // refuse to score under 2s
-  minWords: 5,              // refuse to score transcripts under 5 words
-  longAnswerWords: 60,      // IELTS Part 2 target length
-  idealWpm: [110, 160],     // ideal pace
-  acceptWpm: [90, 180],     // acceptable pace
-  // Base score for a just-barely-valid answer. 4 ≈ IELTS "Limited user".
+  silencePeak: 0.035,
+  minDurationSec: 2,
+  minWords: 5,
+  longAnswerWords: 60,
+  idealWpm: [110, 160],
+  acceptWpm: [90, 180],
   base: 4,
 };
 
 /* ============================================================
-   PROMPT BANK (unchanged from before — 1,004 prompts)
+   PROMPT BANK — unchanged (data only)
    ============================================================ */
 const PROMPT_BANK = {
   pron: {
@@ -1613,7 +1681,34 @@ const CRITERIA = [
 ];
 
 /* ============================================================
-   FAULT DETECTION
+   BROWSER / DEVICE CAPABILITY DETECTION
+   ============================================================ */
+function detectEnvironment() {
+  if (typeof window === 'undefined') return { https: true, mediaRecorder: false, speechRecognition: false, audioContext: false, isIOS: false, isMobile: false };
+  const https = location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  const mediaRecorder = typeof window.MediaRecorder !== 'undefined' && !!navigator.mediaDevices?.getUserMedia;
+  const speechRecognition = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+  const audioContext = !!(window.AudioContext || window.webkitAudioContext);
+  const ua = navigator.userAgent || '';
+  const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+  return { https, mediaRecorder, speechRecognition, audioContext, isIOS, isMobile };
+}
+
+function pickMimeType(isIOS) {
+  if (typeof MediaRecorder === 'undefined' || !MediaRecorder.isTypeSupported) return '';
+  // iOS Safari only supports mp4/aac — webm must not be tried first there.
+  const candidates = isIOS
+    ? ['audio/mp4;codecs=mp4a.40.2', 'audio/mp4', 'audio/aac', 'audio/webm']
+    : ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg;codecs=opus'];
+  for (const t of candidates) {
+    if (MediaRecorder.isTypeSupported(t)) return t;
+  }
+  return '';
+}
+
+/* ============================================================
+   FAULT DETECTION + SCORING (unchanged logic)
    ============================================================ */
 const FILLER_WORDS = ['um', 'uh', 'er', 'ah', 'like', 'you know', 'basically', 'actually', 'literally', 'so', 'well', 'anyway', 'kind of', 'sort of'];
 
@@ -1669,22 +1764,6 @@ function detectFaults(transcript, durationSec) {
   return result;
 }
 
-/* ============================================================
-   SCORING ENGINE
-   ------------------------------------------------------------------
-   Returns { fluency, vocabulary, grammar, pronunciation } or null.
-
-   Design principles:
-   1. Base = SCORING.base (4). Even a minimal valid answer is worth
-      ~4 (IELTS "Limited user"). It is NOT a passing band.
-   2. Each criterion starts at base and ACCUMULATES evidence-based
-      bonuses. Bonus magnitudes reflect how strong the evidence is.
-   3. Penalties are applied AFTER bonuses and are steep enough to
-      cancel gains for poor speech (e.g. heavy filler use).
-   4. Pronunciation is a proxy derived from pace + filler signals.
-      This is NOT true pronunciation analysis — it's a rough
-      browser-only estimate.
-   ============================================================ */
 function scoreFromAnalysis(faults) {
   const words = faults.length.words;
   if (words < SCORING.minWords) return null;
@@ -1696,25 +1775,18 @@ function scoreFromAnalysis(faults) {
   const [acceptLo, acceptHi] = SCORING.acceptWpm;
   const rep = faults.repetition.count;
 
-  // ---------------- FLUENCY ----------------
-  // The strongest signal of fluency is *pace in the ideal range*.
-  // Length comes second; filler density is a penalty.
   let fluency = SCORING.base;
   if (wpm >= idealLo && wpm <= idealHi) fluency += 2.5;
   else if (wpm >= acceptLo && wpm <= acceptHi) fluency += 1.5;
   else if (wpm > 0) fluency -= 0.5;
-
   if (words >= 30) fluency += 0.5;
   if (words >= 60) fluency += 0.5;
   if (words >= 90) fluency += 0.5;
   if (words >= 120) fluency += 0.5;
-
   if (fillerRatio > 0.04) fluency -= 0.5;
   if (fillerRatio > 0.08) fluency -= 1.0;
   if (fillerRatio > 0.15) fluency -= 1.5;
 
-  // ---------------- VOCABULARY ----------------
-  // Lexical diversity is the primary signal; length adds a little.
   let vocabulary = SCORING.base;
   if (vocabRatio > 0.50) vocabulary += 1.0;
   if (vocabRatio > 0.60) vocabulary += 1.0;
@@ -1723,9 +1795,6 @@ function scoreFromAnalysis(faults) {
   if (words >= 100) vocabulary += 1.0;
   if (vocabRatio < 0.35 && words >= 20) vocabulary -= 1.0;
 
-  // ---------------- GRAMMAR ----------------
-  // We can't judge grammar from a transcript without an NLP parser.
-  // Absence of repetition + length is the best proxy available.
   let grammar = SCORING.base;
   if (words >= 15) grammar += 0.5;
   if (words >= 40) grammar += 1.0;
@@ -1734,9 +1803,6 @@ function scoreFromAnalysis(faults) {
   if (rep >= 1) grammar -= 0.5;
   if (rep >= 3) grammar -= 1.0;
 
-  // ---------------- PRONUNCIATION (proxy) ----------------
-  // Pace in the ideal range AND low filler density → likely clear.
-  // This is the weakest of the four scores — labelled as a proxy in the UI.
   let pronunciation = SCORING.base;
   if (wpm >= idealLo && wpm <= idealHi) pronunciation += 2.0;
   else if (wpm >= acceptLo && wpm <= acceptHi) pronunciation += 1.0;
@@ -1753,8 +1819,7 @@ function scoreFromAnalysis(faults) {
   };
 }
 
-/* Explain what drove the score. Used in the auto-feedback message. */
-function scoreExplanation(faults, bands) {
+function scoreExplanation(faults) {
   const words = faults.length.words;
   const wpm = faults.pace.wpm;
   const fillerRatio = faults.fillers.count / Math.max(1, words);
@@ -1762,7 +1827,7 @@ function scoreExplanation(faults, bands) {
   const [idealLo, idealHi] = SCORING.idealWpm;
 
   const lines = [];
-  lines.push(`You said ${words} words in about ${faults.pace.wpm ? Math.round(words / faults.pace.wpm * 60) : 0}s.`);
+  lines.push(`You said ${words} words in about ${wpm ? Math.round(words / wpm * 60) : 0}s.`);
 
   if (wpm >= idealLo && wpm <= idealHi) {
     lines.push(`Your pace (${wpm} wpm) is in the ideal ${idealLo}–${idealHi} range.`);
@@ -1787,22 +1852,34 @@ function scoreExplanation(faults, bands) {
 }
 
 /* ============================================================
-   SPEECH RECOGNITION HOOK
+   SPEECH RECOGNITION HOOK — mobile friendly
+   ------------------------------------------------------------
+   Changes vs old version:
+   - Recognises iOS only supports it inside Safari
+   - Uses `continuous` but restarts if it ends prematurely (Chrome/Safari on Android/iOS)
+   - `onend` restarts while still recording
+   - Errors are captured instead of swallowed
    ============================================================ */
-function useSpeechRecognition() {
+function useSpeechRecognition(enabled) {
   const [supported, setSupported] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [interim, setInterim] = useState('');
+  const [error, setError] = useState(null);
   const recogRef = useRef(null);
+  const wantActiveRef = useRef(false);
+  const restartTimerRef = useRef(null);
 
   useEffect(() => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) return;
     setSupported(true);
+
     const r = new SR();
     r.continuous = true;
     r.interimResults = true;
     r.lang = 'en-US';
+    r.maxAlternatives = 1;
+
     r.onresult = (e) => {
       let final = '';
       let pending = '';
@@ -1814,44 +1891,78 @@ function useSpeechRecognition() {
       if (final) setTranscript((t) => (t + ' ' + final).trim());
       setInterim(pending);
     };
-    r.onerror = () => {};
+
+    r.onerror = (event) => {
+      // `no-speech` and `aborted` are benign; everything else is worth surfacing.
+      if (event.error === 'no-speech' || event.error === 'aborted') return;
+      setError(event.error || 'speech-error');
+    };
+
+    r.onend = () => {
+      // Auto-restart if the caller still wants recognition running.
+      if (wantActiveRef.current) {
+        clearTimeout(restartTimerRef.current);
+        restartTimerRef.current = setTimeout(() => {
+          try { r.start(); } catch { /* ignore */ }
+        }, 250);
+      }
+    };
+
     recogRef.current = r;
-    return () => { try { r.stop(); } catch { /* noop */ } };
+    return () => {
+      wantActiveRef.current = false;
+      clearTimeout(restartTimerRef.current);
+      try { r.stop(); } catch { /* noop */ }
+    };
   }, []);
+
+  // Keep `wantActiveRef` in sync with the caller's intent
+  useEffect(() => {
+    wantActiveRef.current = !!enabled;
+    if (!enabled) {
+      try { recogRef.current?.stop(); } catch { /* noop */ }
+      clearTimeout(restartTimerRef.current);
+    }
+  }, [enabled]);
 
   const startRecog = useCallback(() => {
     setTranscript('');
     setInterim('');
-    try { recogRef.current?.start(); } catch { /* noop */ }
+    setError(null);
+    wantActiveRef.current = true;
+    try { recogRef.current?.start(); } catch { /* already started */ }
   }, []);
+
   const stopRecog = useCallback(() => {
+    wantActiveRef.current = false;
+    clearTimeout(restartTimerRef.current);
     try { recogRef.current?.stop(); } catch { /* noop */ }
     setInterim('');
   }, []);
+
   const reset = useCallback(() => {
     setTranscript('');
     setInterim('');
+    setError(null);
   }, []);
 
-  return { supported, transcript, interim, startRecog, stopRecog, reset };
+  return { supported, transcript, interim, error, startRecog, stopRecog, reset };
 }
 
 /* ============================================================
-   AUDIO RECORDER + LEVEL MONITOR
+   AUDIO RECORDER
+   ------------------------------------------------------------
+   Key fixes vs old version:
+   - `liveLevel` is a ref, not state → no 60fps re-renders
+   - iOS: passes `audio/mp4` MIME
+   - iOS: resumes the AudioContext (it starts suspended)
+   - Handles `getUserMedia` failure with actionable messages
    ============================================================ */
-function pickMimeType() {
-  const candidates = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg;codecs=opus'];
-  for (const type of candidates) {
-    if (window.MediaRecorder?.isTypeSupported?.(type)) return type;
-  }
-  return '';
-}
-
-function useAudioRecorder() {
+function useAudioRecorder({ isIOS }) {
   const [recording, setRecording] = useState(false);
   const [error, setError] = useState(null);
   const [seconds, setSeconds] = useState(0);
-  const [liveLevel, setLiveLevel] = useState(0);
+  const levelRef = useRef(0);
 
   const mediaRecorderRef = useRef(null);
   const streamRef = useRef(null);
@@ -1885,9 +1996,16 @@ function useAudioRecorder() {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (!AudioCtx) return;
       const ctx = new AudioCtx();
+
+      // iOS Safari creates a suspended context — resume immediately.
+      if (ctx.state === 'suspended') {
+        ctx.resume().catch(() => { /* user can retry */ });
+      }
+
       const source = ctx.createMediaStreamSource(stream);
       const analyser = ctx.createAnalyser();
-      analyser.fftSize = 2048;
+      analyser.fftSize = 1024;      // smaller = cheaper on mobile
+      analyser.smoothingTimeConstant = 0.4;
       source.connect(analyser);
       const buffer = new Uint8Array(analyser.fftSize);
       audioCtxRef.current = ctx;
@@ -1895,16 +2013,17 @@ function useAudioRecorder() {
       const tick = () => {
         analyser.getByteTimeDomainData(buffer);
         let peak = 0;
-        for (let i = 0; i < buffer.length; i++) {
+        // Sample every 4th value — 4x cheaper, still accurate for peak.
+        for (let i = 0; i < buffer.length; i += 4) {
           const v = Math.abs(buffer[i] - 128) / 128;
           if (v > peak) peak = v;
         }
         if (peak > peakLevelRef.current) peakLevelRef.current = peak;
-        setLiveLevel(peak);
+        levelRef.current = peak;
         rafRef.current = requestAnimationFrame(tick);
       };
       tick();
-    } catch { /* ignore */ }
+    } catch { /* level monitor is optional */ }
   };
 
   const stopLevelMonitor = () => {
@@ -1912,34 +2031,56 @@ function useAudioRecorder() {
     rafRef.current = null;
     try { audioCtxRef.current?.close(); } catch { /* noop */ }
     audioCtxRef.current = null;
-    setLiveLevel(0);
+    levelRef.current = 0;
   };
 
   const start = async () => {
     setError(null);
     peakLevelRef.current = 0;
-    setLiveLevel(0);
+    levelRef.current = 0;
+
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setError('This browser does not support audio recording.');
+      return false;
+    }
+
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
+      });
       streamRef.current = stream;
       chunksRef.current = [];
-      const mimeType = pickMimeType();
-      const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+
+      const mimeType = pickMimeType(isIOS);
+      const options = mimeType ? { mimeType } : undefined;
+      const recorder = new MediaRecorder(stream, options);
+
       recorder.ondataavailable = (e) => {
         if (e.data && e.data.size > 0) chunksRef.current.push(e.data);
       };
+
       mediaRecorderRef.current = recorder;
-      recorder.start();
+      recorder.start(250);   // smaller chunks → partial data even if user navigates away
       setRecording(true);
       startTimer();
       startLevelMonitor(stream);
       return true;
     } catch (err) {
-      setError(
-        err?.name === 'NotAllowedError'
-          ? 'Microphone access denied. Allow mic access in your browser settings.'
-          : 'Could not access your microphone.'
-      );
+      let msg = 'Could not access your microphone.';
+      if (err?.name === 'NotAllowedError' || err?.name === 'PermissionDeniedError') {
+        msg = 'Microphone access denied. Allow mic access in your browser settings, then reload.';
+      } else if (err?.name === 'NotFoundError') {
+        msg = 'No microphone found on this device.';
+      } else if (err?.name === 'NotReadableError') {
+        msg = 'Microphone is in use by another app or tab.';
+      } else if (err?.name === 'SecurityError') {
+        msg = 'Microphone blocked. On iOS/Android this needs an HTTPS connection.';
+      }
+      setError(msg);
       setRecording(false);
       stopStream();
       return false;
@@ -1965,7 +2106,11 @@ function useAudioRecorder() {
         setRecording(false);
         resolve({ blob, peak: peakLevelRef.current, seconds: finalSeconds });
       };
-      recorder.stop();
+      try { recorder.stop(); } catch {
+        setRecording(false);
+        stopLevelMonitor();
+        resolve(null);
+      }
     });
 
   const cancel = () => {
@@ -1973,7 +2118,7 @@ function useAudioRecorder() {
     stopTimer();
     if (recorder && recorder.state !== 'inactive') {
       recorder.onstop = null;
-      recorder.stop();
+      try { recorder.stop(); } catch { /* noop */ }
     }
     chunksRef.current = [];
     stopStream();
@@ -1986,46 +2131,64 @@ function useAudioRecorder() {
 
   useEffect(() => () => cancel(), []);
 
-  return { recording, error, seconds, liveLevel, start, stop, cancel };
+  return { recording, error, seconds, levelRef, start, stop, cancel };
 }
 
 /* ============================================================
-   WAVEFORM
+   SUB-COMPONENTS
    ============================================================ */
 function Waveform({ active }) {
   const bars = useMemo(
-    () => Array.from({ length: 32 }).map((_, i) => 18 + Math.sin(i * 0.7) * 10 + Math.random() * 14),
+    () => Array.from({ length: 28 }).map((_, i) => 16 + Math.sin(i * 0.7) * 9 + Math.random() * 12),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [active]
   );
   return (
     <div className={`ec-spk-wave ${active ? 'ec-spk-wave-live' : 'ec-spk-wave-idle'}`}>
       {bars.map((h, i) => (
-        <div key={i} className="ec-spk-wave-bar" style={{ height: `${h}px`, animationDelay: `${i * 0.045}s` }} />
+        <div key={i} className="ec-spk-wave-bar" style={{ height: `${h}px`, animationDelay: `${i * 0.05}s` }} />
       ))}
     </div>
   );
 }
 
-/* ============================================================
-   LIVE INPUT LEVEL METER
-   ============================================================ */
-function LiveLevelMeter({ level }) {
-  const pct = Math.max(2, Math.min(100, Math.round(level * 400)));
-  const isSilent = level < SCORING.silencePeak;
+/* Ref-driven level meter: the RAF loop lives here and mutates the DOM
+   directly. No re-renders while recording. */
+function LiveLevelMeter({ levelRef, recording }) {
+  const fillRef = useRef(null);
+  const [silent, setSilent] = useState(true);
+  const lastCheckRef = useRef(0);
+
+  useEffect(() => {
+    if (!recording) return undefined;
+    let raf;
+    const tick = (now) => {
+      const level = levelRef.current || 0;
+      const pct = Math.max(2, Math.min(100, Math.round(level * 400)));
+      if (fillRef.current) fillRef.current.style.width = `${pct}%`;
+      // Low-frequency state update (every 350ms) to flip the "silent" style
+      if (now - lastCheckRef.current > 350) {
+        const isSilent = level < SCORING.silencePeak;
+        setSilent((prev) => (prev === isSilent ? prev : isSilent));
+        lastCheckRef.current = now;
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [recording, levelRef]);
+
+  const cls = `ec-spk-live-level${silent && recording ? ' ec-spk-live-level--silent' : ''}`;
   return (
-    <div className={`ec-spk-live-level${isSilent ? ' ec-spk-live-level--silent' : ''}`}>
-      <span>{isSilent ? '🔇 Silent' : '🎤 Mic'}</span>
+    <div className={cls}>
+      <span>{silent && recording ? '🔇 Silent' : '🎤 Mic'}</span>
       <div className="ec-spk-live-level-track">
-        <div className="ec-spk-live-level-fill" style={{ width: `${pct}%` }} />
+        <div ref={fillRef} className="ec-spk-live-level-fill" style={{ width: '2%' }} />
       </div>
-      <span>{pct}%</span>
     </div>
   );
 }
 
-/* ============================================================
-   TRANSCRIPT WITH HIGHLIGHTS
-   ============================================================ */
 function HighlightedTranscript({ text }) {
   if (!text) return null;
   const parts = text.split(/(\s+)/);
@@ -2042,9 +2205,6 @@ function HighlightedTranscript({ text }) {
   );
 }
 
-/* ============================================================
-   SCORE CARD
-   ============================================================ */
 function scoreClass(v) {
   if (v >= 8) return 'ec-spk-score--excellent';
   if (v >= 6.5) return 'ec-spk-score--good';
@@ -2075,46 +2235,33 @@ function ScoreCard({ label, value }) {
   );
 }
 
-/* ============================================================
-   FAULT REPORT
-   ============================================================ */
 function FaultReport({ faults }) {
   const severityToIcon = { ok: '✓', warn: '!', bad: '✕' };
   const items = [
     {
-      id: 'fillers',
-      label: 'Filler words',
-      severity: faults.fillers.severity,
+      id: 'fillers', label: 'Filler words', severity: faults.fillers.severity,
       detail: faults.fillers.count > 0
         ? `Found ${faults.fillers.count} filler${faults.fillers.count === 1 ? '' : 's'}: ${Object.entries(faults.fillers.words).map(([w, n]) => `${w} (${n})`).join(', ')}`
         : 'No filler words detected. Excellent.',
     },
     {
-      id: 'rep',
-      label: 'Word repetition',
-      severity: faults.repetition.severity,
+      id: 'rep', label: 'Word repetition', severity: faults.repetition.severity,
       detail: faults.repetition.count > 0
         ? `Repeated words: ${[...new Set(faults.repetition.examples)].join(', ')}`
         : 'No repeated word blocks detected.',
     },
     {
-      id: 'pace',
-      label: 'Speaking pace',
-      severity: faults.pace.severity,
+      id: 'pace', label: 'Speaking pace', severity: faults.pace.severity,
       detail: faults.pace.wpm > 0
         ? `You spoke at ${faults.pace.wpm} words per minute. Ideal range: ${SCORING.idealWpm[0]}–${SCORING.idealWpm[1]} wpm.`
         : 'Not enough audio to measure pace.',
     },
     {
-      id: 'len',
-      label: 'Answer length',
-      severity: faults.length.severity,
+      id: 'len', label: 'Answer length', severity: faults.length.severity,
       detail: `${faults.length.words} words spoken. Aim for ${SCORING.longAnswerWords}+ words for IELTS Part 2.`,
     },
     {
-      id: 'vocab',
-      label: 'Vocabulary richness',
-      severity: faults.vocabulary.severity,
+      id: 'vocab', label: 'Vocabulary richness', severity: faults.vocabulary.severity,
       detail: `${faults.vocabulary.unique} unique words (${Math.round(faults.vocabulary.ratio * 100)}% uniqueness).`,
     },
   ];
@@ -2146,9 +2293,6 @@ function FaultReport({ faults }) {
   );
 }
 
-/* ============================================================
-   Mascot
-   ============================================================ */
 function LangutMascot({ size = 170 }) {
   return (
     <svg viewBox="0 0 170 170" width={size} height={size} fill="none" aria-hidden="true">
@@ -2178,6 +2322,8 @@ function LangutMascot({ size = 170 }) {
    MAIN COMPONENT
    ============================================================ */
 export function Speaking() {
+  const env = useMemo(() => detectEnvironment(), []);
+
   const [tab, setTab] = useState('practice');
   const [catId, setCatId] = useState('ielts2');
   const [promptIndex, setPromptIndex] = useState(0);
@@ -2198,24 +2344,29 @@ export function Speaking() {
   const [toast, setToast] = useState(null);
   const [xp, setXp] = useState(0);
 
-  const practiceRecorder = useAudioRecorder();
-  const conversationRecorder = useAudioRecorder();
-  const speech = useSpeechRecognition();
+  // Speech recognition is enabled only while we're actively recording.
+  const [speechActive, setSpeechActive] = useState(false);
+  const speech = useSpeechRecognition(speechActive);
+  const practiceRecorder = useAudioRecorder({ isIOS: env.isIOS });
+  const conversationRecorder = useAudioRecorder({ isIOS: env.isIOS });
   const audioUrlsRef = useRef([]);
+  const toastTimerRef = useRef(null);
 
   useEffect(() => () => {
     audioUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
+    clearTimeout(toastTimerRef.current);
   }, []);
 
   const showToast = (text) => {
     setToast(text);
-    setTimeout(() => setToast(null), 1200);
+    clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = setTimeout(() => setToast(null), 1300);
   };
 
   useEffect(() => {
     setHistoryLoading(true);
     speakingApi.history()
-      .then((h) => setHistory(h || []))
+      .then((h) => setHistory(Array.isArray(h) ? h : []))
       .catch(() => setHistory([]))
       .finally(() => setHistoryLoading(false));
   }, []);
@@ -2228,8 +2379,11 @@ export function Speaking() {
     setSubmitError(null);
 
     if (practiceRecorder.recording) {
-      const captured = await practiceRecorder.stop();
+      // STOP: stop speech recognition FIRST so the last final transcript lands.
+      setSpeechActive(false);
       speech.stopRecog();
+
+      const captured = await practiceRecorder.stop();
 
       if (!captured || !captured.blob || captured.blob.size === 0) {
         setSubmitError('No audio captured. Try again.');
@@ -2238,7 +2392,6 @@ export function Speaking() {
 
       const { blob, peak, seconds: dur } = captured;
 
-      // Gate 1: silence
       if (peak < SCORING.silencePeak) {
         setSubmitError(
           'We didn\'t hear anything. Move closer to the mic, check it\'s not muted, and try again.'
@@ -2246,25 +2399,30 @@ export function Speaking() {
         return;
       }
 
-      // Gate 2: duration
       if (dur < SCORING.minDurationSec) {
+        setSubmitError(`Recording too short (${dur}s). Aim for at least ${SCORING.minDurationSec} seconds.`);
+        return;
+      }
+
+      // Wait for the last final transcript chunk
+      await new Promise((r) => setTimeout(r, 500));
+
+      const finalText = (speech.transcript || '').trim();
+      const wordList = finalText.split(/\s+/).filter(Boolean);
+
+      // If speech recognition isn't available at all, we still let the user record
+      // but skip scoring — better than blocking them.
+      if (!speech.supported) {
         setSubmitError(
-          `Recording too short (${dur}s). Aim for at least ${SCORING.minDurationSec} seconds.`
+          'Recording saved, but live transcription isn\'t available in this browser — try Chrome, Edge, or Safari to get scored.'
         );
         return;
       }
 
-      // Let the last final transcript land
-      await new Promise((r) => setTimeout(r, 500));
-
-      const finalText = speech.transcript || '';
-      const wordList = finalText.trim().split(/\s+/).filter(Boolean);
-
-      // Gate 3: transcript
-      if (speech.supported && wordList.length < SCORING.minWords) {
+      if (wordList.length < SCORING.minWords) {
         if (wordList.length === 0) {
           setSubmitError(
-            'We detected audio but couldn\'t transcribe any words. Speak more clearly, reduce background noise, or use Chrome/Edge for better recognition.'
+            'We detected audio but couldn\'t transcribe any words. Speak more clearly or reduce background noise.'
           );
         } else {
           setSubmitError(
@@ -2282,19 +2440,18 @@ export function Speaking() {
 
         if (!bands) {
           setSubmitError('Not enough speech to score. Try a longer answer.');
-          setScoring(false);
           return;
         }
 
+        // Best-effort backend call — the client-side score is authoritative.
         let feedback = '';
         try {
-          const data = await speakingApi.submitAttempt(promptText, blob);
+          const promptId = `${catId}-${promptIndex}`;
+          const data = await speakingApi.submitAttempt(promptId, blob);
           if (data?.feedback) feedback = data.feedback;
-        } catch { /* ignore */ }
+        } catch { /* offline is fine */ }
 
-        if (!feedback) {
-          feedback = scoreExplanation(detected, bands);
-        }
+        if (!feedback) feedback = scoreExplanation(detected);
 
         setFaults(detected);
         setResult({ ...bands, feedback, transcript: finalText, duration: dur });
@@ -2304,16 +2461,31 @@ export function Speaking() {
         setScoring(false);
       }
     } else {
+      // START: reset everything.
       setResult(null);
       setFaults(null);
+      setSubmitError(null);
       speech.reset();
+
+      // IMPORTANT: kick off speech recognition IN the user gesture, before any await.
+      // iOS Safari discards the gesture token after an await.
+      if (speech.supported) {
+        setSpeechActive(true);
+        speech.startRecog();
+      }
+
       const ok = await practiceRecorder.start();
-      if (ok) speech.startRecog();
+      if (!ok) {
+        // Recorder failed — clean up speech too.
+        setSpeechActive(false);
+        speech.stopRecog();
+      }
     }
   };
 
   const goToNextPrompt = () => {
     practiceRecorder.cancel();
+    setSpeechActive(false);
     speech.stopRecog();
     speech.reset();
     setResult(null);
@@ -2324,6 +2496,7 @@ export function Speaking() {
 
   const pickCategory = (id) => {
     practiceRecorder.cancel();
+    setSpeechActive(false);
     speech.stopRecog();
     speech.reset();
     setCatId(id);
@@ -2365,7 +2538,7 @@ export function Speaking() {
         const data = await speakingApi.conversationTurn(sessionId, blob);
         setTurns((t) => [...t, { role: 'ai', text: data?.reply || data?.text || 'Thanks — tell me more.' }]);
       } catch {
-        const keywordPrompts = [
+        const fallback = [
           "That's interesting — can you tell me more about that?",
           'Why do you think that matters to you?',
           'How did that make you feel at the time?',
@@ -2373,7 +2546,7 @@ export function Speaking() {
           "Let's move on — how does that compare to your daily life?",
           'Can you give me a specific example?',
         ];
-        const reply = keywordPrompts[turns.length % keywordPrompts.length];
+        const reply = fallback[turns.length % fallback.length];
         setTurns((t) => [...t, { role: 'ai', text: reply }]);
       } finally {
         setConversationBusy(false);
@@ -2381,7 +2554,8 @@ export function Speaking() {
       }
     } else {
       if (!sessionId) startConversation();
-      await conversationRecorder.start();
+      const ok = await conversationRecorder.start();
+      if (!ok) setConversationError(conversationRecorder.error || 'Could not start recording.');
     }
   };
 
@@ -2398,20 +2572,20 @@ export function Speaking() {
   const showSilentWarning =
     practiceRecorder.recording &&
     practiceRecorder.seconds >= 2 &&
-    practiceRecorder.liveLevel < SCORING.silencePeak;
+    (practiceRecorder.levelRef.current || 0) < SCORING.silencePeak;
+
+  const practiceError = practiceRecorder.error || submitError;
 
   return (
     <div className="ec-spk">
       <style>{SPEAK_CSS}</style>
 
       <div className="ec-spk-head ec-spk-anim">
-        <div>
-          <p className="ec-spk-eyebrow">Speaking</p>
-          <h1 className="ec-page-title">Speak English with confidence</h1>
-          <p className="ec-page-sub">
-            {TOTAL_PROMPTS.toLocaleString()}+ exercises, live transcription, fault detection, and an AI conversation partner.
-          </p>
-        </div>
+        <p className="ec-spk-eyebrow">Speaking</p>
+        <h1 className="ec-page-title">Speak English with confidence</h1>
+        <p className="ec-page-sub">
+          {TOTAL_PROMPTS.toLocaleString()}+ exercises, live transcription, fault detection, and an AI conversation partner.
+        </p>
       </div>
 
       <div className="ec-spk-hero ec-spk-anim">
@@ -2444,6 +2618,7 @@ export function Speaking() {
             aria-selected={tab === t.id}
             className={`ec-spk-tab${tab === t.id ? ' ec-spk-tab--active' : ''}`}
             onClick={() => setTab(t.id)}
+            type="button"
           >
             <Icon name={t.icon} />
             {t.label}
@@ -2458,6 +2633,7 @@ export function Speaking() {
               key={c.id}
               className={`ec-spk-cat${catId === c.id ? ' ec-spk-cat--active' : ''}`}
               onClick={() => pickCategory(c.id)}
+              type="button"
             >
               <Icon name={c.icon} />
               {c.label}
@@ -2487,6 +2663,7 @@ export function Speaking() {
                 <span className="ec-spk-record-ring" aria-hidden="true" />
                 <span className="ec-spk-record-ring" aria-hidden="true" />
                 <button
+                  type="button"
                   className={`ec-spk-record-btn${practiceRecorder.recording ? ' ec-spk-record-btn--active' : ''}`}
                   onClick={handleToggleRecord}
                   disabled={scoring}
@@ -2499,7 +2676,7 @@ export function Speaking() {
               <Waveform active={practiceRecorder.recording} />
 
               {practiceRecorder.recording && (
-                <LiveLevelMeter level={practiceRecorder.liveLevel} />
+                <LiveLevelMeter levelRef={practiceRecorder.levelRef} recording={practiceRecorder.recording} />
               )}
 
               <p className="ec-spk-record-status">
@@ -2514,12 +2691,22 @@ export function Speaking() {
               )}
 
               {showSilentWarning && (
-                <p className="ec-spk-record-warning">🔇 We can\'t hear you — check your mic</p>
+                <p className="ec-spk-record-warning">🔇 We can't hear you — check your mic</p>
               )}
 
-              {(practiceRecorder.error || submitError) && (
-                <p className="ec-spk-error">{practiceRecorder.error || submitError}</p>
+              {!env.https && (
+                <p className="ec-spk-error">
+                  ⚠️ Mic access needs HTTPS. Open this page over a secure connection to record.
+                </p>
               )}
+
+              {!env.mediaRecorder && (
+                <p className="ec-spk-error">
+                  ⚠️ This browser can't record audio. Try Chrome, Edge, or Safari.
+                </p>
+              )}
+
+              {practiceError && <p className="ec-spk-error">{practiceError}</p>}
 
               {(practiceRecorder.recording || speech.transcript || speech.interim) && (
                 <div className="ec-spk-transcript">
@@ -2560,7 +2747,7 @@ export function Speaking() {
                   <p className="ec-spk-info">
                     ℹ️ Fluency, vocabulary, and grammar are derived from your transcript (pace, length,
                     lexical diversity, repetition). Pronunciation is a pace/clarity proxy, not a real
-                    acoustic analysis. For true pronunciation scoring, a dedicated STT service is required.
+                    acoustic analysis.
                   </p>
                 </>
               )}
@@ -2568,13 +2755,18 @@ export function Speaking() {
               {faults && <FaultReport faults={faults} />}
 
               <div className="ec-spk-actions">
-                <button className="ec-spk-btn-ghost" onClick={goToNextPrompt}>
+                <button type="button" className="ec-spk-btn-ghost" onClick={goToNextPrompt}>
                   Next prompt →
                 </button>
                 {practiceRecorder.recording && (
                   <button
+                    type="button"
                     className="ec-spk-btn-ghost"
-                    onClick={() => { practiceRecorder.cancel(); speech.stopRecog(); }}
+                    onClick={() => {
+                      practiceRecorder.cancel();
+                      setSpeechActive(false);
+                      speech.stopRecog();
+                    }}
                   >
                     Cancel
                   </button>
@@ -2615,6 +2807,7 @@ export function Speaking() {
                 <span className="ec-spk-record-ring" aria-hidden="true" />
                 <span className="ec-spk-record-ring" aria-hidden="true" />
                 <button
+                  type="button"
                   className={`ec-spk-record-btn${conversationRecorder.recording ? ' ec-spk-record-btn--active' : ''}`}
                   onClick={handleConversationToggle}
                   disabled={conversationBusy}
@@ -2626,7 +2819,7 @@ export function Speaking() {
 
               {conversationRecorder.recording && (
                 <>
-                  <LiveLevelMeter level={conversationRecorder.liveLevel} />
+                  <LiveLevelMeter levelRef={conversationRecorder.levelRef} recording={conversationRecorder.recording} />
                   <p className="ec-spk-record-time">{formatTime(conversationRecorder.seconds)}</p>
                 </>
               )}
@@ -2637,6 +2830,7 @@ export function Speaking() {
               <div className="ec-spk-convo-actions">
                 {turns.length > 0 && (
                   <button
+                    type="button"
                     className="ec-spk-btn-ghost"
                     onClick={() => {
                       conversationRecorder.cancel();
@@ -2722,8 +2916,9 @@ export function Speaking() {
             <div className="ec-spk-side ec-spk-anim" style={{ background: 'var(--lang-yellow)' }}>
               <h3>Browser note</h3>
               <p style={{ margin: 0, fontSize: 12.5, color: 'var(--lang-ink)', lineHeight: 1.6, fontWeight: 700 }}>
-                Live transcription requires Chrome, Edge, or Safari. You can still record in this browser,
-                but scoring is disabled because we can't verify what you said.
+                Live transcription works best in <strong>Safari</strong> on iOS, and{' '}
+                <strong>Chrome</strong>/<strong>Edge</strong> on Android and desktop. On iOS, open this page
+                in Safari — Chrome on iOS can't run speech recognition.
               </p>
             </div>
           )}
