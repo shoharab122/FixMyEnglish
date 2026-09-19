@@ -135,7 +135,7 @@ const SPEAK_CSS = `
 .ec-spk-record-status{position:relative;z-index:1;font-size:14.5px;font-weight:900;color:var(--lang-ink);margin:14px 0 6px;text-align:center;letter-spacing:.01em}
 .ec-spk-record-time{position:relative;z-index:1;font-size:26px;font-weight:900;color:var(--lang-ink);letter-spacing:-.03em;font-variant-numeric:tabular-nums;text-align:center;background:var(--lang-lime);border:2px solid var(--lang-line);border-radius:14px;padding:6px 18px;display:inline-block;box-shadow:0 3px 0 var(--lang-line);margin:4px 0 0}
 
-/* ---------- LEVEL METER (ref-driven, no re-renders) ---------- */
+/* ---------- LEVEL METER ---------- */
 .ec-spk-live-level{
   position:relative;z-index:1;
   display:flex;align-items:center;gap:10px;
@@ -172,12 +172,10 @@ const SPEAK_CSS = `
 }
 @keyframes ec-spk-warning-pulse{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
 
-/* ---------- WAVEFORM ---------- */
-.ec-spk-wave{position:relative;z-index:1;height:48px;margin:14px auto 8px;max-width:420px;display:flex;align-items:center;justify-content:center;gap:3px}
-.ec-spk-wave-bar{width:4px;background:var(--lang-ink);border-radius:2px;transition:height .15s ease}
-.ec-spk-wave-idle .ec-spk-wave-bar{height:4px !important;opacity:.35}
-.ec-spk-wave-live .ec-spk-wave-bar{background:linear-gradient(180deg,var(--lang-purple-2),var(--lang-purple));animation:ec-spk-wave-bounce .8s ease-in-out infinite}
-@keyframes ec-spk-wave-bounce{0%,100%{transform:scaleY(.5)}50%{transform:scaleY(1.2)}}
+/* ---------- WAVEFORM (JS-driven, level-reactive) ---------- */
+.ec-spk-wave{position:relative;z-index:1;height:52px;margin:16px auto 8px;max-width:440px;display:flex;align-items:center;justify-content:center;gap:3px}
+.ec-spk-wave-bar{width:4px;height:4px;background:var(--lang-ink);border-radius:2px;opacity:.35;transition:background .2s ease,opacity .2s ease;will-change:height}
+.ec-spk-wave-live .ec-spk-wave-bar{opacity:1;background:linear-gradient(180deg,var(--lang-purple-2),var(--lang-purple))}
 
 /* ---------- ALERTS ---------- */
 .ec-spk-error{
@@ -245,27 +243,89 @@ const SPEAK_CSS = `
 .ec-spk-band-value{font-size:28px;font-weight:900;color:var(--lang-ink);line-height:1;letter-spacing:-.03em}
 .ec-spk-band-value small{font-size:14px;font-weight:800;color:var(--lang-ink);opacity:.7;letter-spacing:0;margin-left:2px}
 
-/* ---------- FAULT REPORT ---------- */
-.ec-spk-faults{margin-top:24px;position:relative;z-index:1;text-align:left}
+/* ============================================================
+   FAULT REPORT — redesigned as metric cards
+   ============================================================ */
+.ec-spk-faults{margin-top:26px;position:relative;z-index:1;text-align:left}
 .ec-spk-faults-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap}
-.ec-spk-faults-title{margin:0;font-size:17px;font-weight:900;color:var(--lang-ink);letter-spacing:-.02em}
-.ec-spk-faults-pill{font-size:11px;font-weight:900;padding:6px 14px;border-radius:999px;letter-spacing:.06em;text-transform:uppercase;border:2px solid var(--lang-line);box-shadow:0 2px 0 var(--lang-line)}
+.ec-spk-faults-title{margin:0;font-size:18px;font-weight:900;color:var(--lang-ink);letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
+.ec-spk-faults-title::before{content:'';display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--lang-purple-2);box-shadow:0 2px 0 var(--lang-line);border:2px solid var(--lang-line)}
+.ec-spk-faults-pill{font-size:11px;font-weight:900;padding:7px 15px;border-radius:999px;letter-spacing:.06em;text-transform:uppercase;border:2px solid var(--lang-line);box-shadow:0 3px 0 var(--lang-line);display:inline-flex;align-items:center;gap:6px}
 .ec-spk-faults-pill--ok{background:var(--lang-lime);color:var(--lang-ink)}
 .ec-spk-faults-pill--warn{background:var(--lang-yellow);color:var(--lang-ink)}
 .ec-spk-faults-pill--bad{background:var(--lang-pink-2);color:#fff}
-.ec-spk-fault{display:flex;gap:14px;align-items:flex-start;padding:14px 16px;border-radius:16px;margin-bottom:12px;background:#fff;border:2px solid var(--lang-line);box-shadow:0 3px 0 var(--lang-line);transition:transform .18s ease,box-shadow .18s ease}
-.ec-spk-fault:hover{transform:translateY(-2px);box-shadow:0 5px 0 var(--lang-line)}
-.ec-spk-fault-icon{width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;border:2px solid var(--lang-line);font-weight:900}
-.ec-spk-fault--ok .ec-spk-fault-icon{background:var(--lang-lime);color:var(--lang-ink)}
-.ec-spk-fault--warn .ec-spk-fault-icon{background:var(--lang-yellow);color:var(--lang-ink)}
-.ec-spk-fault--bad .ec-spk-fault-icon{background:var(--lang-pink-2);color:#fff}
-.ec-spk-fault--ok{background:linear-gradient(180deg,#fff 0%,rgba(212,245,92,.08) 100%)}
-.ec-spk-fault--warn{background:linear-gradient(180deg,#fff 0%,rgba(245,224,77,.10) 100%)}
-.ec-spk-fault--bad{background:linear-gradient(180deg,#fff 0%,rgba(255,143,203,.10) 100%)}
-.ec-spk-fault-body{flex:1;min-width:0}
-.ec-spk-fault-body p{margin:0 0 4px;font-size:13.5px;font-weight:900;color:var(--lang-ink)}
-.ec-spk-fault-body span{font-size:12.5px;color:var(--lang-ink-soft);line-height:1.55;font-weight:700;display:block}
-.ec-spk-fault-body em{font-style:normal;background:var(--lang-yellow);color:var(--lang-ink);padding:2px 8px;border-radius:6px;font-weight:900;font-size:12px;border:1.5px solid var(--lang-line)}
+
+.ec-spk-fault-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.ec-spk-fault-card{
+  position:relative;background:#fff;border:2px solid var(--lang-line);
+  border-radius:20px;padding:16px 16px 14px;
+  box-shadow:0 4px 0 var(--lang-line);
+  display:flex;flex-direction:column;gap:10px;
+  overflow:hidden;transition:transform .18s ease,box-shadow .18s ease;
+  animation:ec-spk-pop .4s cubic-bezier(.34,1.56,.64,1) both;
+}
+.ec-spk-fault-card:nth-child(1){animation-delay:.04s}
+.ec-spk-fault-card:nth-child(2){animation-delay:.10s}
+.ec-spk-fault-card:nth-child(3){animation-delay:.16s}
+.ec-spk-fault-card:nth-child(4){animation-delay:.22s}
+.ec-spk-fault-card:nth-child(5){animation-delay:.28s}
+.ec-spk-fault-card:hover{transform:translateY(-3px);box-shadow:0 7px 0 var(--lang-line)}
+.ec-spk-fault-card::before{content:'';position:absolute;top:0;left:0;right:0;height:6px;background:var(--sev-color,var(--lang-purple));border-bottom:2px solid var(--lang-line)}
+.ec-spk-fault-card--ok{--sev-color:#B8E62E}
+.ec-spk-fault-card--warn{--sev-color:#F5E04D}
+.ec-spk-fault-card--bad{--sev-color:#FF8FCB}
+
+.ec-spk-fault-card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:4px}
+.ec-spk-fault-emoji{
+  width:42px;height:42px;border-radius:13px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;
+  background:var(--sev-color,var(--lang-purple));
+  border:2px solid var(--lang-line);
+  box-shadow:0 3px 0 var(--lang-line);
+}
+.ec-spk-fault-card--bad .ec-spk-fault-emoji{background:var(--lang-pink-2);color:#fff}
+.ec-spk-fault-card--warn .ec-spk-fault-emoji{background:var(--lang-yellow);color:var(--lang-ink)}
+.ec-spk-fault-card--ok .ec-spk-fault-emoji{background:var(--lang-lime);color:var(--lang-ink)}
+
+.ec-spk-fault-sev{
+  font-size:9.5px;font-weight:900;
+  padding:4px 10px;border-radius:999px;
+  border:2px solid var(--lang-line);
+  box-shadow:0 2px 0 var(--lang-line);
+  letter-spacing:.08em;text-transform:uppercase;
+  white-space:nowrap;
+}
+.ec-spk-fault-sev--ok{background:var(--lang-lime);color:var(--lang-ink)}
+.ec-spk-fault-sev--warn{background:var(--lang-yellow);color:var(--lang-ink)}
+.ec-spk-fault-sev--bad{background:var(--lang-pink-2);color:#fff}
+
+.ec-spk-fault-label{margin:0;font-size:12.5px;font-weight:900;color:var(--lang-ink);letter-spacing:.02em;text-transform:uppercase;opacity:.7}
+.ec-spk-fault-value{
+  margin:0;font-size:26px;font-weight:900;color:var(--lang-ink);
+  line-height:1;letter-spacing:-.035em;font-variant-numeric:tabular-nums;
+  display:flex;align-items:baseline;gap:6px;
+}
+.ec-spk-fault-value small{font-size:12px;font-weight:800;color:var(--lang-ink-soft);letter-spacing:.02em;text-transform:uppercase}
+.ec-spk-fault-bar{height:8px;border-radius:999px;background:#E8E5F2;overflow:hidden;border:1.5px solid var(--lang-line)}
+.ec-spk-fault-bar-fill{height:100%;border-radius:999px;background:var(--sev-color);transition:width .8s cubic-bezier(.22,1,.36,1)}
+.ec-spk-fault-detail{margin:0;font-size:12px;line-height:1.55;color:var(--lang-ink-soft);font-weight:700}
+.ec-spk-fault-tip{
+  display:flex;gap:7px;align-items:flex-start;
+  margin:0;padding:9px 11px;border-radius:11px;
+  background:var(--lang-lime-soft);border:1.5px solid var(--lang-line);
+  font-size:11.5px;font-weight:800;color:var(--lang-ink);
+  line-height:1.45;
+}
+.ec-spk-fault-tip-icon{flex-shrink:0;font-size:13px}
+.ec-spk-fault-words{display:flex;flex-wrap:wrap;gap:5px;margin:2px 0 0}
+.ec-spk-fault-word{
+  font-size:10.5px;font-weight:900;
+  padding:3px 9px;border-radius:999px;
+  background:var(--lang-pink-2);color:#fff;
+  border:2px solid var(--lang-line);
+  box-shadow:0 1.5px 0 var(--lang-line);
+}
 
 .ec-spk-feedback{
   margin:20px 0 0;padding:18px 20px 18px 22px;background:#fff;
@@ -381,7 +441,7 @@ const SPEAK_CSS = `
   .ec-spk-head{margin-bottom:12px}
   .ec-spk-hero{padding:20px 18px;border-radius:24px;margin-bottom:16px}
   .ec-spk-hero h1{font-size:22px;padding-right:70px}
-  .ec-spk-hero p{font-size:13px;margin-bottom:14px;padding-right:0}
+  .ec-spk-hero p{font-size:13px;margin-bottom:14px}
   .ec-spk-hero-badge{font-size:10px;padding:5px 11px;margin-bottom:12px}
   .ec-spk-hero-stats{gap:8px;margin-top:12px;padding-right:60px}
   .ec-spk-hero-stat{padding:7px 11px;min-width:66px;border-radius:11px}
@@ -398,7 +458,6 @@ const SPEAK_CSS = `
   .ec-spk-prompt-text{font-size:17px;margin:10px 0 6px}
   .ec-spk-prompt-hint{font-size:12px;margin-bottom:16px}
 
-  /* Larger tap target on mobile */
   .ec-spk-record-wrap{width:150px;height:150px}
   .ec-spk-record-btn{width:110px;height:110px;font-size:38px}
   .ec-spk-record-status{font-size:15px;margin-top:16px}
@@ -410,6 +469,14 @@ const SPEAK_CSS = `
   .ec-spk-score-label{font-size:9.5px}
   .ec-spk-band-value{font-size:24px}
 
+  /* Fault report — stack on mobile */
+  .ec-spk-fault-grid{grid-template-columns:1fr;gap:12px}
+  .ec-spk-fault-card{padding:14px}
+  .ec-spk-fault-value{font-size:22px}
+  .ec-spk-fault-emoji{width:38px;height:38px;font-size:18px}
+  .ec-spk-faults-title{font-size:16px}
+  .ec-spk-faults-pill{font-size:10px;padding:6px 12px}
+
   .ec-spk-convo{padding:20px;border-radius:26px;box-shadow:0 7px 0 var(--lang-line);min-height:440px;max-height:calc(100dvh - 200px)}
   @supports not (height: 100dvh) {
     .ec-spk-convo{max-height:calc(100vh - 200px)}
@@ -419,8 +486,6 @@ const SPEAK_CSS = `
 
   .ec-spk-history-item{padding:14px 16px}
   .ec-spk-side{padding:18px;border-radius:20px;box-shadow:0 5px 0 var(--lang-line)}
-  .ec-spk-fault{padding:12px 14px}
-  .ec-spk-faults-title{font-size:16px}
 
   .ec-spk-transcript{padding:16px 16px}
   .ec-spk-transcript-text{font-size:14px}
@@ -449,10 +514,10 @@ const SPEAK_CSS = `
 }
 
 @media (prefers-reduced-motion: reduce){
-  .ec-spk-anim,.ec-spk-score,.ec-spk-convo-msg,.ec-spk-history-item,.ec-spk-toast,.ec-spk-record-warning{animation:none!important}
-  .ec-spk-hero-orb,.ec-spk-hero-mascot,.ec-spk-record-ring,.ec-spk-wave-bar,.ec-spk-convo-thinking span{animation:none!important}
-  .ec-spk-record-btn,.ec-spk-tab,.ec-spk-cat,.ec-spk-btn-ghost,.ec-spk-btn-dark,.ec-spk-fault,.ec-spk-history-item,.ec-spk-criteria-item{transition:none!important}
-  .ec-spk-score-ring-fill{transition:none!important}
+  .ec-spk-anim,.ec-spk-score,.ec-spk-convo-msg,.ec-spk-history-item,.ec-spk-toast,.ec-spk-record-warning,.ec-spk-fault-card{animation:none!important}
+  .ec-spk-hero-orb,.ec-spk-hero-mascot,.ec-spk-record-ring,.ec-spk-convo-thinking span{animation:none!important}
+  .ec-spk-record-btn,.ec-spk-tab,.ec-spk-cat,.ec-spk-btn-ghost,.ec-spk-btn-dark,.ec-spk-fault-card,.ec-spk-history-item,.ec-spk-criteria-item{transition:none!important}
+  .ec-spk-score-ring-fill,.ec-spk-fault-bar-fill{transition:none!important}
 }
 `;
 
@@ -470,7 +535,7 @@ const SCORING = {
 };
 
 /* ============================================================
-   PROMPT BANK — unchanged (data only)
+   PROMPT BANK — full data set
    ============================================================ */
 const PROMPT_BANK = {
   pron: {
@@ -622,31 +687,6 @@ const PROMPT_BANK = {
       'Wait — did you just say that?',
       'Honestly, I have absolutely no idea.',
       'What on earth were you thinking?',
-      'Throughout the thoroughly thought-provoking third Thursday, the thriving theatre welcomed thirty-three thousand thoughtful guests.',
-      'Sheila Shaw shined her shiny silver shoes and shuffled slowly to the shimmering shore.',
-      'Peter’s poodle pranced proudly past the pretty purple pansies in the park.',
-      'Betty’s brother bounced a big blue ball beside the bubbling brook.',
-      'Chester chatted cheerfully with the charming children at the chilly church.',
-      'Frank fried fresh fish for Fred and Fran on Friday morning.',
-      'Grumpy Greg grabbed grapes and greeted the grinning green grocer.',
-      'Harriet’s happy hamster hopped happily around the huge hollow house.',
-      'Jolly Jack jiggled his jug of juice while joking with Jane.',
-      'Kevin kindly kept kicking the colourful kite in the kitchen.',
-      'Larry laughed loudly at the lovely lady’s little lamb.',
-      'Mary made many marvellous muffins on Monday morning.',
-      'Nina’s noisy nephew never noticed the neat new notebook.',
-      'Oliver officially offered old Olivia an orange on October the eighth.',
-      'Patty patiently painted pink peonies on a plain paper plate.',
-      'Quincy quickly questioned the quiet queen about her quirky quilt.',
-      'Rita really ran rapidly around the narrow red road.',
-      'Sammy slowly sipped sweet strawberry smoothies on Saturday.',
-      'Tommy tried to tie the tiny tiger’s tie twice.',
-      'Uma usually uses unusual umbrellas under the umbrella stand.',
-      'Victor vividly viewed the vast valley from the very high van.',
-      'Wendy wondered why Willy whistled wildly while walking west.',
-      'Xena excitedly explained the excellent new exercise.',
-      'Yolanda yelled at the young yellow yak yesterday.',
-      'Zack zealously zoomed through the zany zebra zone.',
       'Say: comfortable, vegetable, chocolate, interesting.',
       'Say: February, Wednesday, library, secretary.',
       'Say: schedule, receipt, debt, subtle.',
@@ -667,75 +707,6 @@ const PROMPT_BANK = {
       'Say: island, aisle, muscle, castle, whistle.',
       'Say: salmon, almond, calm, palm, half.',
       'Say: iron, environment, government, maintenance.',
-      'A proper cup of coffee in a proper copper coffee pot.',
-      'Betty Botter bought a bit of better butter.',
-      'Black bugs bleed black blood.',
-      'Bring back the bright blue blistering barnacles.',
-      'Clean clams crammed in clean cans.',
-      'Eleven elves licked eleven little liquorice lollipops.',
-      'Fat frogs flying past fast.',
-      'Four furious friends fought for the phone.',
-      'Fresh fried fish, fish fried fresh.',
-      'Great grey geese graze in green grassy groves.',
-      'Harry Hunt hunts heavy hairy hares.',
-      'How many yaks could a yak chuck chuck if a yak could chuck yaks?',
-      'I saw a kitten eating chicken in the kitchen.',
-      'If two witches were watching two watches, which witch would watch which watch?',
-      'Irish wristwatch, Swiss wristwatch, Irish wristwatch.',
-      'Just think, that sphinx has a sphincter that stinks.',
-      'Knapsack straps snap on strong strapping young men.',
-      'Lemon liniment, lemon liniment, lemon liniment.',
-      'Mixed biscuits, mixed biscuits, mixed biscuits.',
-      'Nine nice night nurses nursing nicely.',
-      'Old oily Ollie oils old oily autos.',
-      'One-one was a racehorse, two-two was one too.',
-      'Pack a pink plastic pencil pouch.',
-      'Picky people pick Peter Pan peanut butter.',
-      'Please put the plump plum on the pretty plate.',
-      'Quick queens quickly quarrelled with quirky quails.',
-      'Really leery, rarely Larry, really, really leery Larry.',
-      'Red blood, black blood, blue blood — say each clearly.',
-      'Really rural, really rural, really rural.',
-      'Rolling red wagons, rolling red wagons.',
-      'Rubber baby buggy bumpers, rubber baby buggy bumpers.',
-      'Sally sells sea shells by the sea shore.',
-      'Send toast to ten tense stout saints’ ten tall tents.',
-      'Seven slick slimy snakes slid sideways.',
-      'She sees cheese, she sews sheets, she shushes.',
-      'Simple Simon sat sipping cider slowly.',
-      'Six sick hicks nick six slick bricks with picks and sticks.',
-      'Snap crackle pop, snap crackle pop.',
-      'Stupid superstition, stupid superstition.',
-      'The big black bug bit the big black bear.',
-      'The blue bluebird blinks, the blue bluebird blinks.',
-      'The epitome of femininity is a woman who says what she means.',
-      'The excellent execution of the exercise exhausted him.',
-      'The great Greek grape growers grow great Greek grapes.',
-      'The myth of Miss Muffet, the myth of Miss Muffet.',
-      'The oboe and the obelisk, the oboe and the obelisk.',
-      'The owner of the inside inn was outside his inside inn.',
-      'The sad sheik’s sad sheep’s sick.',
-      'The seething sea ceaseth, the seething sea sufficeth us.',
-      'The sixth sheikh’s sixth sheep is sick.',
-      'The sun shines on shop signs and ship signs.',
-      'The very very very very very very very very weary traveller.',
-      'Three grey geese in a green field grazing.',
-      'Three hundred and thirty-three thousand thirsty travellers.',
-      'Three short sharp sheep, three short sharp sheep.',
-      'Thrice the brinded cat hath mewed.',
-      'Tie twine to three tree twigs.',
-      'Truly rural, truly rural, truly rural.',
-      'Twelve twins twirled twelve twigs twice.',
-      'Two tiny tigers take two taxis to town.',
-      'Unique New York, unique New York, unique New York.',
-      'We surely shall see the sun shine soon.',
-      'We will walk the wet wide way westward.',
-      'Which Swiss witch switched the Swiss wristwatches?',
-      'Which wristwatches are Swiss wristwatches?',
-      'Will you, William, will you wash the windows?',
-      'Willy’s real rear wheel, Willy’s real rear wheel.',
-      'You know New York, you need New York.',
-      'Zebras zig and zebras zag in the zoo.',
     ],
   },
   ielts1: {
@@ -1681,7 +1652,7 @@ const CRITERIA = [
 ];
 
 /* ============================================================
-   BROWSER / DEVICE CAPABILITY DETECTION
+   ENVIRONMENT
    ============================================================ */
 function detectEnvironment() {
   if (typeof window === 'undefined') return { https: true, mediaRecorder: false, speechRecognition: false, audioContext: false, isIOS: false, isMobile: false };
@@ -1697,7 +1668,6 @@ function detectEnvironment() {
 
 function pickMimeType(isIOS) {
   if (typeof MediaRecorder === 'undefined' || !MediaRecorder.isTypeSupported) return '';
-  // iOS Safari only supports mp4/aac — webm must not be tried first there.
   const candidates = isIOS
     ? ['audio/mp4;codecs=mp4a.40.2', 'audio/mp4', 'audio/aac', 'audio/webm']
     : ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg;codecs=opus'];
@@ -1708,7 +1678,7 @@ function pickMimeType(isIOS) {
 }
 
 /* ============================================================
-   FAULT DETECTION + SCORING (unchanged logic)
+   FAULT DETECTION + SCORING
    ============================================================ */
 const FILLER_WORDS = ['um', 'uh', 'er', 'ah', 'like', 'you know', 'basically', 'actually', 'literally', 'so', 'well', 'anyway', 'kind of', 'sort of'];
 
@@ -1852,22 +1822,20 @@ function scoreExplanation(faults) {
 }
 
 /* ============================================================
-   SPEECH RECOGNITION HOOK — mobile friendly
-   ------------------------------------------------------------
-   Changes vs old version:
-   - Recognises iOS only supports it inside Safari
-   - Uses `continuous` but restarts if it ends prematurely (Chrome/Safari on Android/iOS)
-   - `onend` restarts while still recording
-   - Errors are captured instead of swallowed
+   SPEECH RECOGNITION HOOK — mobile-friendly with refs + finalize
    ============================================================ */
 function useSpeechRecognition(enabled) {
   const [supported, setSupported] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [interim, setInterim] = useState('');
   const [error, setError] = useState(null);
+
   const recogRef = useRef(null);
+  const transcriptRef = useRef('');  // ← synchronous access
+  const interimRef = useRef('');
   const wantActiveRef = useRef(false);
   const restartTimerRef = useRef(null);
+  const onEndResolversRef = useRef([]);
 
   useEffect(() => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1881,30 +1849,45 @@ function useSpeechRecognition(enabled) {
     r.maxAlternatives = 1;
 
     r.onresult = (e) => {
-      let final = '';
-      let pending = '';
+      let finalChunk = '';
+      let interimChunk = '';
       for (let i = e.resultIndex; i < e.results.length; i++) {
         const res = e.results[i];
-        if (res.isFinal) final += res[0].transcript + ' ';
-        else pending += res[0].transcript;
+        if (res.isFinal) finalChunk += res[0].transcript + ' ';
+        else interimChunk += res[0].transcript;
       }
-      if (final) setTranscript((t) => (t + ' ' + final).trim());
-      setInterim(pending);
+      if (finalChunk) {
+        transcriptRef.current = (transcriptRef.current + ' ' + finalChunk).replace(/\s+/g, ' ').trim();
+        setTranscript(transcriptRef.current);
+      }
+      interimRef.current = interimChunk;
+      setInterim(interimChunk);
     };
 
     r.onerror = (event) => {
-      // `no-speech` and `aborted` are benign; everything else is worth surfacing.
       if (event.error === 'no-speech' || event.error === 'aborted') return;
       setError(event.error || 'speech-error');
     };
 
     r.onend = () => {
-      // Auto-restart if the caller still wants recognition running.
+      // Merge any un-flushed interim into the transcript — some mobile
+      // browsers never emit `isFinal = true` for the last phrase.
+      if (interimRef.current) {
+        transcriptRef.current = (transcriptRef.current + ' ' + interimRef.current).replace(/\s+/g, ' ').trim();
+        setTranscript(transcriptRef.current);
+        interimRef.current = '';
+        setInterim('');
+      }
+      // Resolve any pending finalize() promises
+      const resolvers = onEndResolversRef.current;
+      onEndResolversRef.current = [];
+      resolvers.forEach((fn) => fn());
+      // Auto-restart if the caller still wants recognition running
       if (wantActiveRef.current) {
         clearTimeout(restartTimerRef.current);
         restartTimerRef.current = setTimeout(() => {
-          try { r.start(); } catch { /* ignore */ }
-        }, 250);
+          try { r.start(); } catch { /* already started */ }
+        }, 200);
       }
     };
 
@@ -1916,7 +1899,6 @@ function useSpeechRecognition(enabled) {
     };
   }, []);
 
-  // Keep `wantActiveRef` in sync with the caller's intent
   useEffect(() => {
     wantActiveRef.current = !!enabled;
     if (!enabled) {
@@ -1926,6 +1908,8 @@ function useSpeechRecognition(enabled) {
   }, [enabled]);
 
   const startRecog = useCallback(() => {
+    transcriptRef.current = '';
+    interimRef.current = '';
     setTranscript('');
     setInterim('');
     setError(null);
@@ -1937,26 +1921,47 @@ function useSpeechRecognition(enabled) {
     wantActiveRef.current = false;
     clearTimeout(restartTimerRef.current);
     try { recogRef.current?.stop(); } catch { /* noop */ }
-    setInterim('');
+  }, []);
+
+  /* Wait for the current recognition cycle to end and return the
+     accumulated transcript. Falls back to what we have after 2s. */
+  const finalize = useCallback(() => {
+    wantActiveRef.current = false;
+    clearTimeout(restartTimerRef.current);
+    return new Promise((resolve) => {
+      const recog = recogRef.current;
+      if (!recog) {
+        resolve(transcriptRef.current);
+        return;
+      }
+      let resolved = false;
+      const done = () => {
+        if (resolved) return;
+        resolved = true;
+        if (interimRef.current) {
+          transcriptRef.current = (transcriptRef.current + ' ' + interimRef.current).replace(/\s+/g, ' ').trim();
+        }
+        resolve(transcriptRef.current);
+      };
+      onEndResolversRef.current.push(done);
+      try { recog.stop(); } catch { done(); }
+      setTimeout(done, 2000);  // safety net
+    });
   }, []);
 
   const reset = useCallback(() => {
+    transcriptRef.current = '';
+    interimRef.current = '';
     setTranscript('');
     setInterim('');
     setError(null);
   }, []);
 
-  return { supported, transcript, interim, error, startRecog, stopRecog, reset };
+  return { supported, transcript, interim, error, startRecog, stopRecog, finalize, reset };
 }
 
 /* ============================================================
    AUDIO RECORDER
-   ------------------------------------------------------------
-   Key fixes vs old version:
-   - `liveLevel` is a ref, not state → no 60fps re-renders
-   - iOS: passes `audio/mp4` MIME
-   - iOS: resumes the AudioContext (it starts suspended)
-   - Handles `getUserMedia` failure with actionable messages
    ============================================================ */
 function useAudioRecorder({ isIOS }) {
   const [recording, setRecording] = useState(false);
@@ -1996,15 +2001,12 @@ function useAudioRecorder({ isIOS }) {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (!AudioCtx) return;
       const ctx = new AudioCtx();
-
-      // iOS Safari creates a suspended context — resume immediately.
       if (ctx.state === 'suspended') {
         ctx.resume().catch(() => { /* user can retry */ });
       }
-
       const source = ctx.createMediaStreamSource(stream);
       const analyser = ctx.createAnalyser();
-      analyser.fftSize = 1024;      // smaller = cheaper on mobile
+      analyser.fftSize = 1024;
       analyser.smoothingTimeConstant = 0.4;
       source.connect(analyser);
       const buffer = new Uint8Array(analyser.fftSize);
@@ -2013,7 +2015,6 @@ function useAudioRecorder({ isIOS }) {
       const tick = () => {
         analyser.getByteTimeDomainData(buffer);
         let peak = 0;
-        // Sample every 4th value — 4x cheaper, still accurate for peak.
         for (let i = 0; i < buffer.length; i += 4) {
           const v = Math.abs(buffer[i] - 128) / 128;
           if (v > peak) peak = v;
@@ -2064,7 +2065,7 @@ function useAudioRecorder({ isIOS }) {
       };
 
       mediaRecorderRef.current = recorder;
-      recorder.start(250);   // smaller chunks → partial data even if user navigates away
+      recorder.start(250);
       setRecording(true);
       startTimer();
       startLevelMonitor(stream);
@@ -2137,23 +2138,49 @@ function useAudioRecorder({ isIOS }) {
 /* ============================================================
    SUB-COMPONENTS
    ============================================================ */
-function Waveform({ active }) {
-  const bars = useMemo(
-    () => Array.from({ length: 28 }).map((_, i) => 16 + Math.sin(i * 0.7) * 9 + Math.random() * 12),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [active]
-  );
+
+/* Waveform — reacts to real-time mic level via RAF, no re-renders */
+function Waveform({ active, levelRef }) {
+  const containerRef = useRef(null);
+  const phaseRef = useRef(0);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return undefined;
+    const bars = container.querySelectorAll('.ec-spk-wave-bar');
+    if (!bars.length) return undefined;
+
+    if (!active) {
+      bars.forEach((b) => { b.style.height = '4px'; });
+      return undefined;
+    }
+
+    let raf;
+    const tick = () => {
+      phaseRef.current += 0.18;
+      const level = levelRef?.current || 0;
+      const amplitude = Math.min(1, level * 6);  // boost small levels
+      bars.forEach((bar, i) => {
+        const wave = Math.sin(phaseRef.current + i * 0.45) * 0.5 + 0.5;
+        const jitter = Math.random() * 0.25;
+        const h = 5 + (amplitude * 32 + jitter * 8) * wave;
+        bar.style.height = `${Math.min(44, h)}px`;
+      });
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [active, levelRef]);
+
   return (
-    <div className={`ec-spk-wave ${active ? 'ec-spk-wave-live' : 'ec-spk-wave-idle'}`}>
-      {bars.map((h, i) => (
-        <div key={i} className="ec-spk-wave-bar" style={{ height: `${h}px`, animationDelay: `${i * 0.05}s` }} />
+    <div ref={containerRef} className={`ec-spk-wave ${active ? 'ec-spk-wave-live' : 'ec-spk-wave-idle'}`}>
+      {Array.from({ length: 36 }).map((_, i) => (
+        <div key={i} className="ec-spk-wave-bar" />
       ))}
     </div>
   );
 }
 
-/* Ref-driven level meter: the RAF loop lives here and mutates the DOM
-   directly. No re-renders while recording. */
 function LiveLevelMeter({ levelRef, recording }) {
   const fillRef = useRef(null);
   const [silent, setSilent] = useState(true);
@@ -2166,7 +2193,6 @@ function LiveLevelMeter({ levelRef, recording }) {
       const level = levelRef.current || 0;
       const pct = Math.max(2, Math.min(100, Math.round(level * 400)));
       if (fillRef.current) fillRef.current.style.width = `${pct}%`;
-      // Low-frequency state update (every 350ms) to flip the "silent" style
       if (now - lastCheckRef.current > 350) {
         const isSilent = level < SCORING.silencePeak;
         setSilent((prev) => (prev === isSilent ? prev : isSilent));
@@ -2235,34 +2261,82 @@ function ScoreCard({ label, value }) {
   );
 }
 
+/* ---------- FAULT REPORT — redesigned metric cards ---------- */
 function FaultReport({ faults }) {
-  const severityToIcon = { ok: '✓', warn: '!', bad: '✕' };
   const items = [
     {
-      id: 'fillers', label: 'Filler words', severity: faults.fillers.severity,
+      id: 'fillers',
+      emoji: faults.fillers.count === 0 ? '✨' : '🗣️',
+      label: 'Filler words',
+      value: faults.fillers.count === 0 ? 'None' : faults.fillers.count,
+      unit: faults.fillers.count === 0 ? '' : 'found',
+      severity: faults.fillers.severity,
+      progress: Math.min(100, Math.round((faults.fillers.count / 20) * 100)),
       detail: faults.fillers.count > 0
-        ? `Found ${faults.fillers.count} filler${faults.fillers.count === 1 ? '' : 's'}: ${Object.entries(faults.fillers.words).map(([w, n]) => `${w} (${n})`).join(', ')}`
-        : 'No filler words detected. Excellent.',
+        ? `Top: ${Object.entries(faults.fillers.words).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([w, n]) => `${w} (${n})`).join(', ')}`
+        : 'None detected — clean delivery.',
+      words: Object.keys(faults.fillers.words).slice(0, 5),
+      tip: 'Replace fillers with a short, confident pause.',
     },
     {
-      id: 'rep', label: 'Word repetition', severity: faults.repetition.severity,
+      id: 'repetition',
+      emoji: faults.repetition.count === 0 ? '✨' : '🔁',
+      label: 'Word repetition',
+      value: faults.repetition.count === 0 ? 'None' : faults.repetition.count,
+      unit: faults.repetition.count === 0 ? '' : 'blocks',
+      severity: faults.repetition.severity,
+      progress: Math.min(100, Math.round((faults.repetition.count / 5) * 100)),
       detail: faults.repetition.count > 0
-        ? `Repeated words: ${[...new Set(faults.repetition.examples)].join(', ')}`
-        : 'No repeated word blocks detected.',
+        ? `Repeated: ${[...new Set(faults.repetition.examples)].slice(0, 4).join(', ')}`
+        : 'No repeated word blocks.',
+      words: [...new Set(faults.repetition.examples)].slice(0, 5),
+      tip: 'Swap repeated words for synonyms.',
     },
     {
-      id: 'pace', label: 'Speaking pace', severity: faults.pace.severity,
+      id: 'pace',
+      emoji: faults.pace.wpm === 0 ? '❓' : faults.pace.severity === 'ok' ? '🎯' : '⚡',
+      label: 'Speaking pace',
+      value: faults.pace.wpm || '—',
+      unit: faults.pace.wpm ? 'wpm' : '',
+      severity: faults.pace.severity,
+      progress: Math.min(100, Math.round((faults.pace.wpm / 220) * 100)),
       detail: faults.pace.wpm > 0
-        ? `You spoke at ${faults.pace.wpm} words per minute. Ideal range: ${SCORING.idealWpm[0]}–${SCORING.idealWpm[1]} wpm.`
-        : 'Not enough audio to measure pace.',
+        ? `Ideal ${SCORING.idealWpm[0]}–${SCORING.idealWpm[1]} wpm.`
+        : 'Not enough audio to measure.',
+      words: [],
+      tip: faults.pace.wpm && faults.pace.wpm < SCORING.idealWpm[0]
+        ? 'Speak a little faster — aim for a steady rhythm.'
+        : faults.pace.wpm && faults.pace.wpm > SCORING.idealWpm[1]
+          ? 'Slow down — let your ideas breathe.'
+          : 'Pace sounds natural.',
     },
     {
-      id: 'len', label: 'Answer length', severity: faults.length.severity,
-      detail: `${faults.length.words} words spoken. Aim for ${SCORING.longAnswerWords}+ words for IELTS Part 2.`,
+      id: 'length',
+      emoji: faults.length.severity === 'ok' ? '📏' : '📐',
+      label: 'Answer length',
+      value: faults.length.words,
+      unit: 'words',
+      severity: faults.length.severity,
+      progress: Math.min(100, Math.round((faults.length.words / 120) * 100)),
+      detail: `Target ${SCORING.longAnswerWords}+ words.`,
+      words: [],
+      tip: faults.length.words < SCORING.longAnswerWords
+        ? `Add ~${SCORING.longAnswerWords - faults.length.words} more words next time.`
+        : 'Great length — well developed.',
     },
     {
-      id: 'vocab', label: 'Vocabulary richness', severity: faults.vocabulary.severity,
-      detail: `${faults.vocabulary.unique} unique words (${Math.round(faults.vocabulary.ratio * 100)}% uniqueness).`,
+      id: 'vocab',
+      emoji: faults.vocabulary.ratio > 0.6 ? '📚' : '🔤',
+      label: 'Vocabulary richness',
+      value: `${Math.round(faults.vocabulary.ratio * 100)}%`,
+      unit: 'unique',
+      severity: faults.vocabulary.severity,
+      progress: Math.round(faults.vocabulary.ratio * 100),
+      detail: `${faults.vocabulary.unique} unique words used.`,
+      words: [],
+      tip: faults.vocabulary.ratio < 0.55
+        ? 'Try richer synonyms for common words.'
+        : 'Varied, natural vocabulary.',
     },
   ];
 
@@ -2271,8 +2345,13 @@ function FaultReport({ faults }) {
     return rank[i.severity] > rank[acc] ? i.severity : acc;
   }, 'ok');
 
-  const pillClass = worstSeverity === 'ok' ? 'ec-spk-faults-pill--ok' : worstSeverity === 'warn' ? 'ec-spk-faults-pill--warn' : 'ec-spk-faults-pill--bad';
-  const pillText = worstSeverity === 'ok' ? 'Clean delivery' : worstSeverity === 'warn' ? 'Needs polish' : 'Fix these issues';
+  const pillClass = worstSeverity === 'ok'
+    ? 'ec-spk-faults-pill--ok'
+    : worstSeverity === 'warn'
+      ? 'ec-spk-faults-pill--warn'
+      : 'ec-spk-faults-pill--bad';
+  const pillText = worstSeverity === 'ok' ? '✓ Clean delivery' : worstSeverity === 'warn' ? '⚠ Needs polish' : '✕ Fix these issues';
+  const sevLabel = { ok: 'Good', warn: 'Watch', bad: 'Fix' };
 
   return (
     <div className="ec-spk-faults">
@@ -2280,15 +2359,36 @@ function FaultReport({ faults }) {
         <h3 className="ec-spk-faults-title">Speech analysis</h3>
         <span className={`ec-spk-faults-pill ${pillClass}`}>{pillText}</span>
       </div>
-      {items.map((it) => (
-        <div key={it.id} className={`ec-spk-fault ec-spk-fault--${it.severity}`}>
-          <span className="ec-spk-fault-icon">{severityToIcon[it.severity]}</span>
-          <div className="ec-spk-fault-body">
-            <p>{it.label}</p>
-            <span>{it.detail}</span>
+      <div className="ec-spk-fault-grid">
+        {items.map((it) => (
+          <div key={it.id} className={`ec-spk-fault-card ec-spk-fault-card--${it.severity}`}>
+            <div className="ec-spk-fault-card-head">
+              <span className="ec-spk-fault-emoji" aria-hidden="true">{it.emoji}</span>
+              <span className={`ec-spk-fault-sev ec-spk-fault-sev--${it.severity}`}>
+                {sevLabel[it.severity]}
+              </span>
+            </div>
+            <p className="ec-spk-fault-label">{it.label}</p>
+            <p className="ec-spk-fault-value">
+              {it.value}
+              {it.unit && <small>{it.unit}</small>}
+            </p>
+            <div className="ec-spk-fault-bar">
+              <div className="ec-spk-fault-bar-fill" style={{ width: `${it.progress}%` }} />
+            </div>
+            <p className="ec-spk-fault-detail">{it.detail}</p>
+            {it.words.length > 0 && (
+              <div className="ec-spk-fault-words">
+                {it.words.map((w) => <span key={w} className="ec-spk-fault-word">{w}</span>)}
+              </div>
+            )}
+            <p className="ec-spk-fault-tip">
+              <span className="ec-spk-fault-tip-icon" aria-hidden="true">💡</span>
+              <span>{it.tip}</span>
+            </p>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }
@@ -2344,7 +2444,6 @@ export function Speaking() {
   const [toast, setToast] = useState(null);
   const [xp, setXp] = useState(0);
 
-  // Speech recognition is enabled only while we're actively recording.
   const [speechActive, setSpeechActive] = useState(false);
   const speech = useSpeechRecognition(speechActive);
   const practiceRecorder = useAudioRecorder({ isIOS: env.isIOS });
@@ -2379,11 +2478,16 @@ export function Speaking() {
     setSubmitError(null);
 
     if (practiceRecorder.recording) {
-      // STOP: stop speech recognition FIRST so the last final transcript lands.
-      setSpeechActive(false);
-      speech.stopRecog();
-
+      /* ---------- STOP ---------- */
+      // 1. Stop the recorder first — captures the blob.
       const captured = await practiceRecorder.stop();
+
+      // 2. finalize() waits for the SpeechRecognition `onend` event,
+      //    giving us the last final + interim chunks. This is THE fix.
+      const finalText = (await speech.finalize()).trim();
+
+      // 3. Sync the enabled flag (cleanup effect will call stop() again, no-op).
+      setSpeechActive(false);
 
       if (!captured || !captured.blob || captured.blob.size === 0) {
         setSubmitError('No audio captured. Try again.');
@@ -2394,7 +2498,7 @@ export function Speaking() {
 
       if (peak < SCORING.silencePeak) {
         setSubmitError(
-          'We didn\'t hear anything. Move closer to the mic, check it\'s not muted, and try again.'
+          "We didn't hear anything. Move closer to the mic, check it's not muted, and try again."
         );
         return;
       }
@@ -2404,17 +2508,11 @@ export function Speaking() {
         return;
       }
 
-      // Wait for the last final transcript chunk
-      await new Promise((r) => setTimeout(r, 500));
-
-      const finalText = (speech.transcript || '').trim();
       const wordList = finalText.split(/\s+/).filter(Boolean);
 
-      // If speech recognition isn't available at all, we still let the user record
-      // but skip scoring — better than blocking them.
       if (!speech.supported) {
         setSubmitError(
-          'Recording saved, but live transcription isn\'t available in this browser — try Chrome, Edge, or Safari to get scored.'
+          "Recording saved, but live transcription isn't available in this browser. Try Chrome, Edge, or Safari (on iOS, use Safari, not Chrome) to get scored."
         );
         return;
       }
@@ -2422,7 +2520,7 @@ export function Speaking() {
       if (wordList.length < SCORING.minWords) {
         if (wordList.length === 0) {
           setSubmitError(
-            'We detected audio but couldn\'t transcribe any words. Speak more clearly or reduce background noise.'
+            "We heard your voice but couldn't transcribe any words. Try speaking closer to the mic, in a quieter room, and slightly slower."
           );
         } else {
           setSubmitError(
@@ -2443,7 +2541,6 @@ export function Speaking() {
           return;
         }
 
-        // Best-effort backend call — the client-side score is authoritative.
         let feedback = '';
         try {
           const promptId = `${catId}-${promptIndex}`;
@@ -2461,14 +2558,14 @@ export function Speaking() {
         setScoring(false);
       }
     } else {
-      // START: reset everything.
+      /* ---------- START ---------- */
       setResult(null);
       setFaults(null);
       setSubmitError(null);
       speech.reset();
 
-      // IMPORTANT: kick off speech recognition IN the user gesture, before any await.
-      // iOS Safari discards the gesture token after an await.
+      // Kick off speech recognition IN the user gesture, before any await.
+      // iOS Safari drops the gesture token once you yield to the event loop.
       if (speech.supported) {
         setSpeechActive(true);
         speech.startRecog();
@@ -2476,7 +2573,6 @@ export function Speaking() {
 
       const ok = await practiceRecorder.start();
       if (!ok) {
-        // Recorder failed — clean up speech too.
         setSpeechActive(false);
         speech.stopRecog();
       }
@@ -2524,7 +2620,7 @@ export function Speaking() {
         return;
       }
       if (captured.peak < SCORING.silencePeak) {
-        setConversationError('We didn\'t hear anything. Try again.');
+        setConversationError("We didn't hear anything. Try again.");
         return;
       }
 
@@ -2575,6 +2671,8 @@ export function Speaking() {
     (practiceRecorder.levelRef.current || 0) < SCORING.silencePeak;
 
   const practiceError = practiceRecorder.error || submitError;
+  const showTranscriptPanel =
+    practiceRecorder.recording || speech.transcript || speech.interim || result;
 
   return (
     <div className="ec-spk">
@@ -2673,7 +2771,7 @@ export function Speaking() {
                 </button>
               </div>
 
-              <Waveform active={practiceRecorder.recording} />
+              <Waveform active={practiceRecorder.recording} levelRef={practiceRecorder.levelRef} />
 
               {practiceRecorder.recording && (
                 <LiveLevelMeter levelRef={practiceRecorder.levelRef} recording={practiceRecorder.recording} />
@@ -2708,7 +2806,7 @@ export function Speaking() {
 
               {practiceError && <p className="ec-spk-error">{practiceError}</p>}
 
-              {(practiceRecorder.recording || speech.transcript || speech.interim) && (
+              {showTranscriptPanel && (
                 <div className="ec-spk-transcript">
                   <p className="ec-spk-transcript-label">
                     Live transcript {speech.supported ? '' : '(not supported in this browser)'}
@@ -2719,7 +2817,11 @@ export function Speaking() {
                       {speech.interim && <em> {speech.interim}</em>}
                     </p>
                   ) : (
-                    <p className="ec-spk-transcript-empty">Start speaking — your words will appear here.</p>
+                    <p className="ec-spk-transcript-empty">
+                      {practiceRecorder.recording
+                        ? 'Start speaking — your words will appear here.'
+                        : 'No speech captured this time.'}
+                    </p>
                   )}
                   <div className="ec-spk-transcript-meta">
                     <span>⏱ {formatTime(practiceRecorder.seconds)}</span>
@@ -2878,8 +2980,8 @@ export function Speaking() {
             {[
               { icon: '1', t: 'Find a quiet spot', d: 'Background noise hurts pronunciation accuracy.' },
               { icon: '2', t: 'Speak 45–90 seconds', d: 'Short answers cap your fluency score.' },
-              { icon: '3', t: 'Avoid filler words', d: '“Um”, “like”, “you know” are auto-detected.' },
-              { icon: '4', t: 'Use linking words', d: '“First…”, “However…”, “Because…”' },
+              { icon: '3', t: 'Avoid filler words', d: '"Um", "like", "you know" are auto-detected.' },
+              { icon: '4', t: 'Use linking words', d: '"First…", "However…", "Because…"' },
             ].map((tip) => (
               <div key={tip.icon} className="ec-spk-tip">
                 <span className="ec-spk-tip-icon">{tip.icon}</span>
