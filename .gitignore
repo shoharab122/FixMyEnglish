@@ -41,3 +41,11 @@ coach_pgdata/
 *.tmp
 *.swp
 *~
+
+# Editor and tool backups
+*.bak
+*.bak.*
+*.orig
+*.tmp
+*.swp
+*~
