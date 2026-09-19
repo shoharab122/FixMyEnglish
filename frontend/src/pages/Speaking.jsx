@@ -7,48 +7,25 @@ import { Icon } from '../components/Icon';
    ============================================================ */
 const SPEAK_CSS = `
 .ec-spk{
-  --lang-bg:        #1E1252;
-  --lang-bg-2:      #2A1A6E;
-  --lang-bg-3:      #3B2596;
-  --lang-lime:      #D4F55C;
-  --lang-lime-2:    #E4FF5C;
-  --lang-lime-soft: #EDFFB0;
-  --lang-lime-deep: #B8E62E;
-  --lang-yellow:    #F5E04D;
-  --lang-purple:    #7B5CF0;
-  --lang-purple-2:  #9B7BFF;
-  --lang-pink:      #FFB3D1;
-  --lang-pink-2:    #FF8FCB;
-  --lang-mint:      #B8F2D8;
-  --lang-mint-2:    #7FD9A9;
-  --lang-ink:       #17102E;
-  --lang-ink-soft:  #6B6488;
-  --lang-line:      #17102E;
+  --lang-bg:#1E1252;--lang-bg-2:#2A1A6E;--lang-bg-3:#3B2596;
+  --lang-lime:#D4F55C;--lang-lime-2:#E4FF5C;--lang-lime-soft:#EDFFB0;--lang-lime-deep:#B8E62E;
+  --lang-yellow:#F5E04D;--lang-purple:#7B5CF0;--lang-purple-2:#9B7BFF;
+  --lang-pink:#FFB3D1;--lang-pink-2:#FF8FCB;
+  --lang-mint:#B8F2D8;--lang-mint-2:#7FD9A9;
+  --lang-ink:#17102E;--lang-ink-soft:#6B6488;--lang-line:#17102E;
 }
+.ec-spk,.ec-spk *{box-sizing:border-box}
 
-.ec-spk,
-.ec-spk *{box-sizing:border-box}
-
-.ec-spk-head{
-  display:flex;align-items:flex-end;justify-content:space-between;
-  gap:16px;flex-wrap:wrap;margin-bottom:18px;
-}
-.ec-spk-eyebrow{
-  margin:0 0 6px;font-size:11.5px;font-weight:900;
-  letter-spacing:.16em;text-transform:uppercase;
-  color:var(--lang-purple);opacity:.95;
-}
+.ec-spk-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.ec-spk-eyebrow{margin:0 0 6px;font-size:11.5px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:var(--lang-purple);opacity:.95}
 
 .ec-spk-hero{
-  position:relative;overflow:hidden;
-  border-radius:32px;
+  position:relative;overflow:hidden;border-radius:32px;
   padding:clamp(26px,4vw,40px) clamp(24px,4vw,42px);
   color:#fff;
   background:linear-gradient(140deg,#2A1A6E 0%,#1E1252 55%,#3B2596 100%);
   box-shadow:0 20px 52px rgba(30,18,82,.34);
-  border:2px solid var(--lang-line);
-  margin-bottom:22px;
-  min-height:240px;
+  border:2px solid var(--lang-line);margin-bottom:22px;min-height:240px;
   display:flex;align-items:center;justify-content:space-between;gap:20px;
 }
 .ec-spk-hero::before{
@@ -59,47 +36,20 @@ const SPEAK_CSS = `
   -webkit-mask-image:radial-gradient(circle at 15% 20%,#000,transparent 65%);
   pointer-events:none;
 }
-.ec-spk-hero-orb{
-  position:absolute;top:-90px;right:180px;
-  width:260px;height:260px;border-radius:50%;
-  background:radial-gradient(circle,rgba(212,245,92,.22),transparent 68%);
-  animation:ec-spk-drift 14s ease-in-out infinite;
-}
+.ec-spk-hero-orb{position:absolute;top:-90px;right:180px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(212,245,92,.22),transparent 68%);animation:ec-spk-drift 14s ease-in-out infinite}
 @keyframes ec-spk-drift{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-18px,16px) scale(1.08)}}
 .ec-spk-hero-copy{position:relative;z-index:1;max-width:580px}
 .ec-spk-hero-badge{
-  display:inline-flex;align-items:center;
-  font-size:10.5px;font-weight:900;
-  letter-spacing:.16em;text-transform:uppercase;
-  padding:7px 14px;border-radius:999px;
-  background:var(--lang-lime);color:var(--lang-ink);
-  border:2px solid var(--lang-line);
-  box-shadow:0 3px 0 rgba(0,0,0,.4);
-  margin-bottom:16px;
+  display:inline-flex;align-items:center;font-size:10.5px;font-weight:900;
+  letter-spacing:.16em;text-transform:uppercase;padding:7px 14px;border-radius:999px;
+  background:var(--lang-lime);color:var(--lang-ink);border:2px solid var(--lang-line);
+  box-shadow:0 3px 0 rgba(0,0,0,.4);margin-bottom:16px;
 }
-.ec-spk-hero h1{
-  margin:0 0 10px;
-  font-size:clamp(26px,2.4vw + 16px,38px);
-  font-weight:900;
-  letter-spacing:-.035em;
-  line-height:1.1;
-  color:#fff;
-}
+.ec-spk-hero h1{margin:0 0 10px;font-size:clamp(26px,2.4vw + 16px,38px);font-weight:900;letter-spacing:-.035em;line-height:1.1;color:#fff}
 .ec-spk-hero h1 em{font-style:normal;color:var(--lang-lime)}
-.ec-spk-hero p{
-  margin:0 0 22px;
-  font-size:14px;line-height:1.6;
-  opacity:.92;font-weight:500;max-width:52ch;
-}
+.ec-spk-hero p{margin:0 0 22px;font-size:14px;line-height:1.6;opacity:.92;font-weight:500;max-width:52ch}
 .ec-spk-hero-stats{display:flex;gap:10px;flex-wrap:wrap;position:relative;z-index:1}
-.ec-spk-hero-stat{
-  display:flex;flex-direction:column;gap:2px;
-  padding:9px 14px;border-radius:14px;
-  background:var(--lang-lime);
-  border:2px solid var(--lang-line);
-  box-shadow:0 3px 0 var(--lang-line);
-  min-width:80px;
-}
+.ec-spk-hero-stat{display:flex;flex-direction:column;gap:2px;padding:9px 14px;border-radius:14px;background:var(--lang-lime);border:2px solid var(--lang-line);box-shadow:0 3px 0 var(--lang-line);min-width:80px}
 .ec-spk-hero-stat strong{font-size:20px;font-weight:900;line-height:1;letter-spacing:-.04em;color:var(--lang-ink)}
 .ec-spk-hero-stat span{font-size:9.5px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--lang-ink);opacity:.75}
 .ec-spk-hero-stat:nth-child(2){background:var(--lang-pink)}
@@ -107,28 +57,17 @@ const SPEAK_CSS = `
 .ec-spk-hero-stat:nth-child(3) strong,
 .ec-spk-hero-stat:nth-child(3) span{color:#fff}
 .ec-spk-hero-stat:nth-child(4){background:var(--lang-yellow)}
-.ec-spk-hero-mascot{
-  position:relative;z-index:1;
-  flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  filter:drop-shadow(0 14px 28px rgba(0,0,0,.28));
-  animation:ec-spk-bob 4s ease-in-out infinite;
-}
+.ec-spk-hero-mascot{position:relative;z-index:1;flex-shrink:0;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 14px 28px rgba(0,0,0,.28));animation:ec-spk-bob 4s ease-in-out infinite}
 @keyframes ec-spk-bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-10px) rotate(2deg)}}
 
 .ec-spk-tabs{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding:6px 4px 16px;margin-bottom:8px}
 .ec-spk-tabs::-webkit-scrollbar{display:none}
 .ec-spk-tab{
-  flex:0 0 auto;
-  display:inline-flex;align-items:center;gap:8px;
-  padding:11px 18px;border-radius:999px;
-  border:2px solid var(--lang-line);
-  background:#fff;color:var(--lang-ink);
-  font-size:13px;font-weight:900;
-  cursor:pointer;white-space:nowrap;
-  transition:all .18s ease;font-family:inherit;
-  box-shadow:0 3px 0 var(--lang-line);
-  letter-spacing:.01em;
+  flex:0 0 auto;display:inline-flex;align-items:center;gap:8px;
+  padding:11px 18px;border-radius:999px;border:2px solid var(--lang-line);
+  background:#fff;color:var(--lang-ink);font-size:13px;font-weight:900;
+  cursor:pointer;white-space:nowrap;transition:all .18s ease;font-family:inherit;
+  box-shadow:0 3px 0 var(--lang-line);letter-spacing:.01em;
 }
 .ec-spk-tab:hover{background:var(--lang-lime-soft);transform:translateY(-2px);box-shadow:0 5px 0 var(--lang-line)}
 .ec-spk-tab:active{transform:translateY(1px);box-shadow:0 1px 0 var(--lang-line)}
@@ -139,97 +78,46 @@ const SPEAK_CSS = `
 .ec-spk-cats{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding:6px 4px 14px;margin-bottom:8px}
 .ec-spk-cats::-webkit-scrollbar{display:none}
 .ec-spk-cat{
-  flex:0 0 auto;
-  padding:9px 16px;border-radius:999px;
-  border:2px solid var(--lang-line);
-  background:#fff;color:var(--lang-ink);
-  font-size:12px;font-weight:900;
-  cursor:pointer;white-space:nowrap;
-  transition:all .16s ease;font-family:inherit;
-  display:inline-flex;align-items:center;gap:6px;
+  flex:0 0 auto;padding:9px 16px;border-radius:999px;
+  border:2px solid var(--lang-line);background:#fff;color:var(--lang-ink);
+  font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap;
+  transition:all .16s ease;font-family:inherit;display:inline-flex;align-items:center;gap:6px;
   box-shadow:0 3px 0 var(--lang-line);
 }
 .ec-spk-cat:hover{background:var(--lang-lime-soft);transform:translateY(-2px);box-shadow:0 5px 0 var(--lang-line)}
 .ec-spk-cat:active{transform:translateY(1px);box-shadow:0 1px 0 var(--lang-line)}
 .ec-spk-cat--active{background:var(--lang-ink);color:var(--lang-lime);box-shadow:0 3px 0 var(--lang-ink)}
-.ec-spk-cat-count{
-  font-size:10px;font-weight:900;
-  padding:2px 7px;border-radius:999px;
-  background:var(--lang-lime);color:var(--lang-ink);
-  border:2px solid var(--lang-line);
-}
+.ec-spk-cat-count{font-size:10px;font-weight:900;padding:2px 7px;border-radius:999px;background:var(--lang-lime);color:var(--lang-ink);border:2px solid var(--lang-line)}
 .ec-spk-cat--active .ec-spk-cat-count{background:var(--lang-lime);color:var(--lang-ink);border-color:var(--lang-line)}
 
 .ec-spk-grid{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:22px;align-items:start}
 
 .ec-spk-panel{
-  background:#fff;
-  border:3px solid var(--lang-line);
-  border-radius:32px;
-  padding:28px;
-  box-shadow:0 10px 0 var(--lang-line);
-  position:relative;overflow:hidden;
+  background:#fff;border:3px solid var(--lang-line);border-radius:32px;padding:28px;
+  box-shadow:0 10px 0 var(--lang-line);position:relative;overflow:hidden;
   background-image:radial-gradient(circle at 100% 0%,rgba(212,245,92,.14),transparent 55%);
 }
 .ec-spk-prompt-counter{
-  position:relative;z-index:1;
-  font-size:12px;font-weight:900;
-  color:var(--lang-ink-soft);
-  margin:0 0 10px;
-  text-transform:uppercase;letter-spacing:.08em;
-  display:flex;justify-content:space-between;
-  gap:12px;flex-wrap:wrap;align-items:center;
+  position:relative;z-index:1;font-size:12px;font-weight:900;
+  color:var(--lang-ink-soft);margin:0 0 10px;text-transform:uppercase;letter-spacing:.08em;
+  display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;
 }
-.ec-spk-prompt-tag{
-  font-size:10.5px;font-weight:900;
-  padding:4px 12px;border-radius:999px;
-  background:var(--lang-lime);color:var(--lang-ink);
-  border:2px solid var(--lang-line);
-  box-shadow:0 2px 0 var(--lang-line);
-  letter-spacing:.06em;text-transform:uppercase;
-}
-.ec-spk-prompt-text{
-  position:relative;z-index:1;
-  font-size:clamp(18px,1.6vw + 12px,22px);
-  font-weight:900;line-height:1.4;
-  margin:12px 0 20px;
-  color:var(--lang-ink);
-  letter-spacing:-.02em;max-width:680px;
-}
-.ec-spk-prompt-hint{
-  position:relative;z-index:1;
-  font-size:12.5px;color:var(--lang-ink-soft);
-  margin:-12px 0 22px;font-weight:700;
-}
+.ec-spk-prompt-tag{font-size:10.5px;font-weight:900;padding:4px 12px;border-radius:999px;background:var(--lang-lime);color:var(--lang-ink);border:2px solid var(--lang-line);box-shadow:0 2px 0 var(--lang-line);letter-spacing:.06em;text-transform:uppercase}
+.ec-spk-prompt-text{position:relative;z-index:1;font-size:clamp(18px,1.6vw + 12px,22px);font-weight:900;line-height:1.4;margin:12px 0 20px;color:var(--lang-ink);letter-spacing:-.02em;max-width:680px}
+.ec-spk-prompt-hint{position:relative;z-index:1;font-size:12.5px;color:var(--lang-ink-soft);margin:-12px 0 22px;font-weight:700}
 
-.ec-spk-record-wrap{
-  position:relative;z-index:1;
-  display:inline-flex;align-items:center;justify-content:center;
-  width:130px;height:130px;margin:8px auto 4px;
-}
-.ec-spk-record-ring{
-  position:absolute;inset:0;border-radius:50%;
-  border:3px solid rgba(123,92,240,.55);
-  animation:ec-spk-ring 2.4s ease-out infinite;
-}
+.ec-spk-record-wrap{position:relative;z-index:1;display:inline-flex;align-items:center;justify-content:center;width:130px;height:130px;margin:8px auto 4px}
+.ec-spk-record-ring{position:absolute;inset:0;border-radius:50%;border:3px solid rgba(123,92,240,.55);animation:ec-spk-ring 2.4s ease-out infinite}
 .ec-spk-record-ring:nth-child(2){animation-delay:.8s}
 .ec-spk-record-ring:nth-child(3){animation-delay:1.6s}
-@keyframes ec-spk-ring{
-  0%{transform:scale(.6);opacity:.9}
-  80%{transform:scale(1.35);opacity:0}
-  100%{opacity:0}
-}
+@keyframes ec-spk-ring{0%{transform:scale(.6);opacity:.9}80%{transform:scale(1.35);opacity:0}100%{opacity:0}}
 .ec-spk-record-wrap--active .ec-spk-record-ring{border-color:rgba(255,143,203,.75)}
 .ec-spk-record-btn{
-  position:relative;z-index:1;
-  width:92px;height:92px;border-radius:50%;
+  position:relative;z-index:1;width:92px;height:92px;border-radius:50%;
   border:3px solid var(--lang-line);
   background:linear-gradient(135deg,var(--lang-purple) 0%,var(--lang-purple-2) 100%);
-  color:#fff;font-size:32px;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;
-  box-shadow:0 6px 0 var(--lang-line);
-  transition:transform .18s ease,box-shadow .18s ease;
+  color:#fff;font-size:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;
+  box-shadow:0 6px 0 var(--lang-line);transition:transform .18s ease,box-shadow .18s ease;
 }
 .ec-spk-record-btn:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 9px 0 var(--lang-line)}
 .ec-spk-record-btn:active:not(:disabled){transform:translateY(2px);box-shadow:0 2px 0 var(--lang-line)}
@@ -237,97 +125,84 @@ const SPEAK_CSS = `
 .ec-spk-record-btn--active{background:linear-gradient(135deg,var(--lang-pink-2) 0%,#E0503C 100%);box-shadow:0 6px 0 var(--lang-line)}
 
 .ec-spk-record-status{position:relative;z-index:1;font-size:14px;font-weight:900;color:var(--lang-ink);margin:16px 0 4px;text-align:center;letter-spacing:.01em}
-.ec-spk-record-time{
-  position:relative;z-index:1;
-  font-size:26px;font-weight:900;
-  color:var(--lang-ink);
-  letter-spacing:-.03em;
-  font-variant-numeric:tabular-nums;
-  text-align:center;
-  background:var(--lang-lime);
-  border:2px solid var(--lang-line);
-  border-radius:14px;
-  padding:6px 18px;
-  display:inline-block;
-  box-shadow:0 3px 0 var(--lang-line);
-}
+.ec-spk-record-time{position:relative;z-index:1;font-size:26px;font-weight:900;color:var(--lang-ink);letter-spacing:-.03em;font-variant-numeric:tabular-nums;text-align:center;background:var(--lang-lime);border:2px solid var(--lang-line);border-radius:14px;padding:6px 18px;display:inline-block;box-shadow:0 3px 0 var(--lang-line)}
 
-.ec-spk-wave{
+.ec-spk-live-level{
   position:relative;z-index:1;
-  height:48px;margin:14px auto 8px;
-  max-width:420px;
-  display:flex;align-items:center;justify-content:center;gap:3px;
+  display:flex;align-items:center;gap:10px;
+  max-width:360px;margin:10px auto 0;
+  padding:8px 14px;border-radius:999px;
+  background:#fff;border:2px solid var(--lang-line);
+  box-shadow:0 2px 0 var(--lang-line);
+  font-size:11px;font-weight:900;
+  color:var(--lang-ink-soft);letter-spacing:.04em;text-transform:uppercase;
 }
+.ec-spk-live-level-track{
+  flex:1;height:8px;border-radius:999px;background:#E8E5F2;overflow:hidden;
+  border:1.5px solid var(--lang-line);
+}
+.ec-spk-live-level-fill{
+  height:100%;border-radius:999px;
+  background:linear-gradient(90deg,#B8E62E,#D4F55C);
+  transition:width .08s linear;
+}
+.ec-spk-live-level--silent .ec-spk-live-level-fill{background:linear-gradient(90deg,#FF8FCB,#E0503C)}
+.ec-spk-live-level--silent{color:#A52C1C}
+
+.ec-spk-record-warning{
+  position:relative;z-index:1;
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:12.5px;font-weight:900;color:var(--lang-ink);
+  background:var(--lang-yellow);
+  padding:10px 16px;border-radius:999px;
+  border:2px solid var(--lang-line);
+  box-shadow:0 3px 0 var(--lang-line);
+  margin:12px auto 0;
+  animation:ec-spk-warning-pulse 1.6s ease-in-out infinite;
+}
+@keyframes ec-spk-warning-pulse{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+
+.ec-spk-wave{position:relative;z-index:1;height:48px;margin:14px auto 8px;max-width:420px;display:flex;align-items:center;justify-content:center;gap:3px}
 .ec-spk-wave-bar{width:4px;background:var(--lang-ink);border-radius:2px;transition:height .15s ease}
 .ec-spk-wave-idle .ec-spk-wave-bar{height:4px !important;opacity:.35}
-.ec-spk-wave-live .ec-spk-wave-bar{
-  background:linear-gradient(180deg,var(--lang-purple-2),var(--lang-purple));
-  animation:ec-spk-wave-bounce .8s ease-in-out infinite;
-}
+.ec-spk-wave-live .ec-spk-wave-bar{background:linear-gradient(180deg,var(--lang-purple-2),var(--lang-purple));animation:ec-spk-wave-bounce .8s ease-in-out infinite}
 @keyframes ec-spk-wave-bounce{0%,100%{transform:scaleY(.5)}50%{transform:scaleY(1.2)}}
 
 .ec-spk-error{
-  position:relative;z-index:1;
-  font-size:13px;color:var(--lang-ink);
-  background:var(--lang-pink-2);
-  padding:12px 16px;border-radius:14px;
-  display:inline-block;margin:14px 0 0;
-  font-weight:900;
-  border:2px solid var(--lang-line);
-  box-shadow:0 3px 0 var(--lang-line);
+  position:relative;z-index:1;font-size:13px;color:var(--lang-ink);
+  background:var(--lang-pink-2);padding:12px 16px;border-radius:14px;
+  display:inline-block;margin:14px 0 0;font-weight:900;
+  border:2px solid var(--lang-line);box-shadow:0 3px 0 var(--lang-line);
+  max-width:520px;text-align:left;
+}
+.ec-spk-info{
+  position:relative;z-index:1;font-size:13px;color:var(--lang-ink);
+  background:var(--lang-yellow);padding:12px 16px;border-radius:14px;
+  display:inline-block;margin:14px 0 0;font-weight:900;
+  border:2px solid var(--lang-line);box-shadow:0 3px 0 var(--lang-line);
+  max-width:520px;text-align:left;
 }
 
 .ec-spk-transcript{
-  position:relative;z-index:1;
-  background:var(--lang-lime-soft);
-  border:2px solid var(--lang-line);
-  border-radius:18px;
-  padding:18px 20px;
-  margin-top:22px;
-  text-align:left;min-height:90px;
-  box-shadow:0 4px 0 var(--lang-line);
+  position:relative;z-index:1;background:var(--lang-lime-soft);
+  border:2px solid var(--lang-line);border-radius:18px;padding:18px 20px;
+  margin-top:22px;text-align:left;min-height:90px;box-shadow:0 4px 0 var(--lang-line);
 }
-.ec-spk-transcript-label{
-  font-size:10.5px;font-weight:900;
-  letter-spacing:.1em;text-transform:uppercase;
-  color:var(--lang-ink);
-  margin:0 0 12px;
-  display:flex;align-items:center;gap:6px;
-}
+.ec-spk-transcript-label{font-size:10.5px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--lang-ink);margin:0 0 12px;display:flex;align-items:center;gap:6px}
 .ec-spk-transcript-label::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--lang-ink);box-shadow:0 0 0 3px rgba(23,16,46,.15)}
 .ec-spk-transcript-text{font-size:14.5px;line-height:1.7;color:var(--lang-ink);margin:0;font-weight:700;word-wrap:break-word}
 .ec-spk-transcript-text em{font-style:normal;color:var(--lang-ink-soft);opacity:.85}
 .ec-spk-transcript-empty{font-size:13.5px;color:var(--lang-ink-soft);font-style:italic;margin:0;font-weight:600}
-.ec-spk-transcript mark{
-  background:var(--lang-pink-2);
-  color:#fff;
-  padding:3px 8px;border-radius:8px;
-  font-weight:900;
-  border:2px solid var(--lang-line);
-  box-decoration-break:clone;
-  -webkit-box-decoration-break:clone;
-}
-.ec-spk-transcript-meta{
-  display:flex;gap:16px;flex-wrap:wrap;
-  margin-top:14px;padding-top:12px;
-  border-top:2px dashed rgba(23,16,46,.15);
-  font-size:11.5px;font-weight:900;
-  color:var(--lang-ink-soft);
-  letter-spacing:.02em;
-}
+.ec-spk-transcript mark{background:var(--lang-pink-2);color:#fff;padding:3px 8px;border-radius:8px;font-weight:900;border:2px solid var(--lang-line);box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.ec-spk-transcript-meta{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:2px dashed rgba(23,16,46,.15);font-size:11.5px;font-weight:900;color:var(--lang-ink-soft);letter-spacing:.02em}
 .ec-spk-transcript-meta span{display:inline-flex;align-items:center;gap:4px}
 
 .ec-spk-scores{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:24px;position:relative;z-index:1}
 .ec-spk-score{
-  position:relative;
-  background:#fff;
-  border:2px solid var(--lang-line);
-  border-radius:20px;
-  padding:16px 10px 14px;
-  transition:all .2s ease;
+  position:relative;background:#fff;border:2px solid var(--lang-line);border-radius:20px;
+  padding:16px 10px 14px;transition:all .2s ease;
   animation:ec-spk-pop .45s cubic-bezier(.34,1.56,.64,1) both;
-  text-align:center;overflow:hidden;
-  box-shadow:0 4px 0 var(--lang-line);
+  text-align:center;overflow:hidden;box-shadow:0 4px 0 var(--lang-line);
 }
 .ec-spk-score::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:var(--score-color,var(--lang-purple));border-bottom:2px solid var(--lang-line)}
 .ec-spk-score:nth-child(1){animation-delay:.05s}
@@ -336,12 +211,10 @@ const SPEAK_CSS = `
 .ec-spk-score:nth-child(4){animation-delay:.2s}
 .ec-spk-score:hover{transform:translateY(-3px);box-shadow:0 7px 0 var(--lang-line)}
 @keyframes ec-spk-pop{from{opacity:0;transform:translateY(14px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}
-
-.ec-spk-score--excellent{--score-color:#B8E62E;}
-.ec-spk-score--good{--score-color:#7B5CF0;}
-.ec-spk-score--fair{--score-color:#F5E04D;}
-.ec-spk-score--low{--score-color:#FF8FCB;}
-
+.ec-spk-score--excellent{--score-color:#B8E62E}
+.ec-spk-score--good{--score-color:#7B5CF0}
+.ec-spk-score--fair{--score-color:#F5E04D}
+.ec-spk-score--low{--score-color:#FF8FCB}
 .ec-spk-score-ring{position:relative;width:64px;height:64px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center}
 .ec-spk-score-ring svg{position:absolute;inset:0;transform:rotate(-90deg)}
 .ec-spk-score-ring-track{fill:none;stroke:#E8E5F2;stroke-width:5}
@@ -350,14 +223,9 @@ const SPEAK_CSS = `
 .ec-spk-score-label{display:block;font-size:10px;font-weight:900;color:var(--lang-ink-soft);text-transform:uppercase;letter-spacing:.1em;margin-top:4px}
 
 .ec-spk-band{
-  position:relative;z-index:1;
-  margin-top:18px;
-  display:flex;align-items:center;justify-content:center;gap:14px;
-  padding:16px 22px;
-  border-radius:18px;
-  background:var(--lang-yellow);
-  border:2px solid var(--lang-line);
-  box-shadow:0 4px 0 var(--lang-line);
+  position:relative;z-index:1;margin-top:18px;display:flex;align-items:center;justify-content:center;gap:14px;
+  padding:16px 22px;border-radius:18px;background:var(--lang-yellow);
+  border:2px solid var(--lang-line);box-shadow:0 4px 0 var(--lang-line);
 }
 .ec-spk-band-label{font-size:12.5px;font-weight:900;color:var(--lang-ink);text-transform:uppercase;letter-spacing:.08em}
 .ec-spk-band-value{font-size:28px;font-weight:900;color:var(--lang-ink);line-height:1;letter-spacing:-.03em}
@@ -385,54 +253,33 @@ const SPEAK_CSS = `
 .ec-spk-fault-body em{font-style:normal;background:var(--lang-yellow);color:var(--lang-ink);padding:2px 8px;border-radius:6px;font-weight:900;font-size:12px;border:1.5px solid var(--lang-line)}
 
 .ec-spk-feedback{
-  margin:20px 0 0;
-  padding:18px 20px 18px 22px;
-  background:#fff;
-  border:2px solid var(--lang-line);
-  border-left:6px solid var(--lang-lime);
-  border-radius:16px;
-  font-size:14px;line-height:1.65;
-  color:var(--lang-ink);
-  text-align:left;position:relative;z-index:1;
-  font-weight:700;
-  box-shadow:0 4px 0 var(--lang-line);
+  margin:20px 0 0;padding:18px 20px 18px 22px;background:#fff;
+  border:2px solid var(--lang-line);border-left:6px solid var(--lang-lime);border-radius:16px;
+  font-size:14px;line-height:1.65;color:var(--lang-ink);text-align:left;position:relative;z-index:1;
+  font-weight:700;box-shadow:0 4px 0 var(--lang-line);
 }
 
 .ec-spk-actions{display:flex;justify-content:center;gap:12px;margin-top:26px;flex-wrap:wrap;position:relative;z-index:1}
 .ec-spk-btn-ghost{
-  border:2px solid var(--lang-line);
-  background:#fff;color:var(--lang-ink);
-  padding:13px 24px;border-radius:999px;
-  font-size:13.5px;font-weight:900;
-  cursor:pointer;font-family:inherit;
-  display:inline-flex;align-items:center;gap:8px;
-  transition:all .16s ease;
-  box-shadow:0 4px 0 var(--lang-line);
-  letter-spacing:.02em;
+  border:2px solid var(--lang-line);background:#fff;color:var(--lang-ink);
+  padding:13px 24px;border-radius:999px;font-size:13.5px;font-weight:900;
+  cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:8px;
+  transition:all .16s ease;box-shadow:0 4px 0 var(--lang-line);letter-spacing:.02em;
 }
 .ec-spk-btn-ghost:hover{background:var(--lang-lime-soft);transform:translateY(-2px);box-shadow:0 6px 0 var(--lang-line)}
 .ec-spk-btn-ghost:active{transform:translateY(2px);box-shadow:0 1px 0 var(--lang-line)}
 .ec-spk-btn-dark{
-  border:2px solid var(--lang-line);
-  background:var(--lang-ink);color:var(--lang-lime);
-  padding:13px 26px;border-radius:999px;
-  font-size:13.5px;font-weight:900;
-  cursor:pointer;font-family:inherit;
-  display:inline-flex;align-items:center;gap:8px;
-  transition:all .16s ease;
-  box-shadow:0 4px 0 var(--lang-line);
-  letter-spacing:.02em;
+  border:2px solid var(--lang-line);background:var(--lang-ink);color:var(--lang-lime);
+  padding:13px 26px;border-radius:999px;font-size:13.5px;font-weight:900;
+  cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:8px;
+  transition:all .16s ease;box-shadow:0 4px 0 var(--lang-line);letter-spacing:.02em;
 }
 .ec-spk-btn-dark:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--lang-line)}
 .ec-spk-btn-dark:active{transform:translateY(2px);box-shadow:0 1px 0 var(--lang-line)}
 
 .ec-spk-convo{
-  background:#fff;
-  border:3px solid var(--lang-line);
-  border-radius:32px;
-  padding:26px;
-  box-shadow:0 10px 0 var(--lang-line);
-  display:flex;flex-direction:column;
+  background:#fff;border:3px solid var(--lang-line);border-radius:32px;padding:26px;
+  box-shadow:0 10px 0 var(--lang-line);display:flex;flex-direction:column;
   height:calc(100vh - 300px);min-height:540px;max-height:760px;
   background-image:radial-gradient(circle at 100% 0%,rgba(255,143,203,.12),transparent 55%);
 }
@@ -442,30 +289,15 @@ const SPEAK_CSS = `
 .ec-spk-convo-log::-webkit-scrollbar{width:6px}
 .ec-spk-convo-log::-webkit-scrollbar-thumb{background:var(--lang-purple-2);border-radius:999px}
 .ec-spk-convo-msg{
-  border-radius:18px;
-  padding:13px 18px;
-  max-width:82%;
-  font-size:14px;line-height:1.55;
-  word-wrap:break-word;
-  animation:ec-spk-msg-in .35s ease both;
-  font-weight:700;
-  border:2px solid var(--lang-line);
-  box-shadow:0 3px 0 var(--lang-line);
+  border-radius:18px;padding:13px 18px;max-width:82%;font-size:14px;line-height:1.55;
+  word-wrap:break-word;animation:ec-spk-msg-in .35s ease both;font-weight:700;
+  border:2px solid var(--lang-line);box-shadow:0 3px 0 var(--lang-line);
 }
 @keyframes ec-spk-msg-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .ec-spk-convo-msg--ai{align-self:flex-start;background:var(--lang-lime);color:var(--lang-ink);border-bottom-left-radius:6px}
 .ec-spk-convo-msg--user{align-self:flex-end;background:var(--lang-ink);color:var(--lang-lime);border-bottom-right-radius:6px}
 .ec-spk-convo-msg audio{display:block;margin-top:10px;width:100%;max-width:240px}
-.ec-spk-convo-thinking{
-  align-self:flex-start;
-  display:inline-flex;align-items:center;gap:6px;
-  padding:13px 20px;border-radius:18px;
-  background:var(--lang-lime);
-  color:var(--lang-ink);
-  font-size:13px;font-weight:900;
-  border:2px solid var(--lang-line);
-  box-shadow:0 3px 0 var(--lang-line);
-}
+.ec-spk-convo-thinking{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;padding:13px 20px;border-radius:18px;background:var(--lang-lime);color:var(--lang-ink);font-size:13px;font-weight:900;border:2px solid var(--lang-line);box-shadow:0 3px 0 var(--lang-line)}
 .ec-spk-convo-thinking span{width:6px;height:6px;border-radius:50%;background:currentColor;animation:ec-spk-dot 1.2s ease-in-out infinite}
 .ec-spk-convo-thinking span:nth-child(2){animation-delay:.2s}
 .ec-spk-convo-thinking span:nth-child(3){animation-delay:.4s}
@@ -474,116 +306,36 @@ const SPEAK_CSS = `
 
 .ec-spk-history{display:flex;flex-direction:column;gap:14px}
 .ec-spk-history-item{
-  display:flex;justify-content:space-between;align-items:center;
-  gap:12px;background:#fff;
-  border-radius:18px;padding:16px 20px;
-  border:2px solid var(--lang-line);
-  box-shadow:0 4px 0 var(--lang-line);
-  transition:all .18s ease;
+  display:flex;justify-content:space-between;align-items:center;gap:12px;background:#fff;
+  border-radius:18px;padding:16px 20px;border:2px solid var(--lang-line);
+  box-shadow:0 4px 0 var(--lang-line);transition:all .18s ease;
   animation:ec-spk-msg-in .35s ease both;
 }
 .ec-spk-history-item:hover{transform:translateY(-3px);box-shadow:0 7px 0 var(--lang-line)}
 .ec-spk-history-title{margin:0 0 4px;font-weight:900;font-size:14px;color:var(--lang-ink)}
 .ec-spk-history-date{font-size:11.5px;color:var(--lang-ink-soft);font-weight:700}
-.ec-spk-band-pill{
-  font-size:11px;font-weight:900;
-  padding:6px 14px;border-radius:999px;
-  background:var(--lang-lime);color:var(--lang-ink);
-  border:2px solid var(--lang-line);
-  box-shadow:0 2px 0 var(--lang-line);
-  text-transform:uppercase;letter-spacing:.06em;
-  white-space:nowrap;
-}
+.ec-spk-band-pill{font-size:11px;font-weight:900;padding:6px 14px;border-radius:999px;background:var(--lang-lime);color:var(--lang-ink);border:2px solid var(--lang-line);box-shadow:0 2px 0 var(--lang-line);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
 
-.ec-spk-empty{
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  gap:12px;text-align:center;
-  padding:52px 24px;
-  color:var(--lang-ink-soft);
-  font-size:13.5px;font-weight:700;
-  background:#fff;
-  border-radius:22px;
-  border:2px dashed var(--lang-line);
-}
-.ec-spk-empty-icon{
-  width:64px;height:64px;border-radius:50%;
-  background:var(--lang-lime);
-  color:var(--lang-ink);
-  display:flex;align-items:center;justify-content:center;
-  font-size:24px;
-  border:2px solid var(--lang-line);
-  box-shadow:0 3px 0 var(--lang-line);
-}
+.ec-spk-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:52px 24px;color:var(--lang-ink-soft);font-size:13.5px;font-weight:700;background:#fff;border-radius:22px;border:2px dashed var(--lang-line)}
+.ec-spk-empty-icon{width:64px;height:64px;border-radius:50%;background:var(--lang-lime);color:var(--lang-ink);display:flex;align-items:center;justify-content:center;font-size:24px;border:2px solid var(--lang-line);box-shadow:0 3px 0 var(--lang-line)}
 .ec-spk-empty-icon svg{width:28px;height:28px}
 
-.ec-spk-side{
-  background:#fff;
-  border:2px solid var(--lang-line);
-  border-radius:24px;
-  padding:22px;
-  box-shadow:0 6px 0 var(--lang-line);
-  margin-bottom:16px;
-}
+.ec-spk-side{background:#fff;border:2px solid var(--lang-line);border-radius:24px;padding:22px;box-shadow:0 6px 0 var(--lang-line);margin-bottom:16px}
 .ec-spk-side:last-child{margin-bottom:0}
-.ec-spk-side h3{
-  margin:0 0 16px;font-size:15px;font-weight:900;
-  color:var(--lang-ink);
-  display:flex;justify-content:space-between;
-  align-items:center;gap:8px;letter-spacing:-.01em;
-}
-.ec-spk-side h3 span{
-  font-size:10.5px;
-  color:var(--lang-ink);
-  background:var(--lang-lime);
-  padding:4px 11px;border-radius:999px;
-  font-weight:900;
-  text-transform:uppercase;letter-spacing:.06em;
-  border:2px solid var(--lang-line);
-  box-shadow:0 2px 0 var(--lang-line);
-}
+.ec-spk-side h3{margin:0 0 16px;font-size:15px;font-weight:900;color:var(--lang-ink);display:flex;justify-content:space-between;align-items:center;gap:8px;letter-spacing:-.01em}
+.ec-spk-side h3 span{font-size:10.5px;color:var(--lang-ink);background:var(--lang-lime);padding:4px 11px;border-radius:999px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;border:2px solid var(--lang-line);box-shadow:0 2px 0 var(--lang-line)}
 .ec-spk-tip{display:flex;gap:12px;padding:12px 0;border-bottom:2px dashed rgba(23,16,46,.1);align-items:flex-start}
 .ec-spk-tip:last-child{border-bottom:none;padding-bottom:0}
 .ec-spk-tip-icon{width:34px;height:34px;border-radius:11px;background:var(--lang-purple-2);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;font-weight:900;border:2px solid var(--lang-line);box-shadow:0 2px 0 var(--lang-line)}
 .ec-spk-tip-body p{margin:0 0 3px;font-size:12.5px;font-weight:900;color:var(--lang-ink)}
 .ec-spk-tip-body span{font-size:11.5px;color:var(--lang-ink-soft);line-height:1.45;display:block;font-weight:600}
 .ec-spk-criteria{display:flex;flex-direction:column;gap:10px}
-.ec-spk-criteria-item{
-  display:flex;align-items:center;justify-content:space-between;
-  gap:10px;font-size:12.5px;font-weight:900;
-  color:var(--lang-ink);
-  padding:12px 15px;border-radius:14px;
-  background:var(--lang-lime-soft);
-  border:2px solid var(--lang-line);
-  box-shadow:0 2px 0 var(--lang-line);
-  transition:transform .15s ease;
-}
+.ec-spk-criteria-item{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12.5px;font-weight:900;color:var(--lang-ink);padding:12px 15px;border-radius:14px;background:var(--lang-lime-soft);border:2px solid var(--lang-line);box-shadow:0 2px 0 var(--lang-line);transition:transform .15s ease}
 .ec-spk-criteria-item:hover{transform:translateX(3px)}
-.ec-spk-criteria-item span:last-child{
-  font-size:10.5px;color:var(--lang-ink);
-  background:var(--lang-lime);
-  padding:3px 10px;border-radius:999px;
-  font-weight:900;
-  text-transform:uppercase;letter-spacing:.06em;
-  border:2px solid var(--lang-line);
-}
+.ec-spk-criteria-item span:last-child{font-size:10.5px;color:var(--lang-ink);background:var(--lang-lime);padding:3px 10px;border-radius:999px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;border:2px solid var(--lang-line)}
 
-.ec-spk-toast{
-  position:fixed;top:78px;right:20px;z-index:50;
-  background:var(--lang-ink);color:var(--lang-lime);
-  padding:12px 22px;border-radius:999px;
-  font-weight:900;font-size:13px;
-  border:2px solid var(--lang-lime);
-  box-shadow:0 12px 28px rgba(23,16,46,.4);
-  animation:ec-spk-toast-pop 1s ease both;
-  letter-spacing:.03em;
-}
-@keyframes ec-spk-toast-pop{
-  0%{transform:translateY(-10px) scale(.9);opacity:0}
-  20%{transform:translateY(0) scale(1);opacity:1}
-  80%{transform:translateY(0) scale(1);opacity:1}
-  100%{transform:translateY(-8px) scale(.98);opacity:0}
-}
+.ec-spk-toast{position:fixed;top:78px;right:20px;z-index:50;background:var(--lang-ink);color:var(--lang-lime);padding:12px 22px;border-radius:999px;font-weight:900;font-size:13px;border:2px solid var(--lang-lime);box-shadow:0 12px 28px rgba(23,16,46,.4);animation:ec-spk-toast-pop 1s ease both;letter-spacing:.03em}
+@keyframes ec-spk-toast-pop{0%{transform:translateY(-10px) scale(.9);opacity:0}20%{transform:translateY(0) scale(1);opacity:1}80%{transform:translateY(0) scale(1);opacity:1}100%{transform:translateY(-8px) scale(.98);opacity:0}}
 
 @keyframes ec-spk-fade-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 .ec-spk-anim{animation:ec-spk-fade-in .45s ease both}
@@ -626,7 +378,7 @@ const SPEAK_CSS = `
   .ec-spk-cat{padding:8px 13px;font-size:11.5px}
 }
 @media (prefers-reduced-motion: reduce){
-  .ec-spk-anim,.ec-spk-score,.ec-spk-convo-msg,.ec-spk-history-item,.ec-spk-toast{animation:none!important}
+  .ec-spk-anim,.ec-spk-score,.ec-spk-convo-msg,.ec-spk-history-item,.ec-spk-toast,.ec-spk-record-warning{animation:none!important}
   .ec-spk-hero-orb,.ec-spk-hero-mascot,.ec-spk-record-ring,.ec-spk-wave-bar,.ec-spk-convo-thinking span{animation:none!important}
   .ec-spk-record-btn,.ec-spk-tab,.ec-spk-cat,.ec-spk-btn-ghost,.ec-spk-btn-dark,.ec-spk-fault,.ec-spk-history-item,.ec-spk-criteria-item{transition:none!important}
   .ec-spk-score-ring-fill{transition:none!important}
@@ -634,12 +386,24 @@ const SPEAK_CSS = `
 `;
 
 /* ============================================================
+   SCORING CONFIG
+   Tunables for what counts as "real speech". Tune conservatively —
+   it's better to say "not enough data" than to lie with a band score.
+   ============================================================ */
+const SCORING = {
+  silencePeak: 0.035,       // RMS peak below this = treated as silence
+  minDurationSec: 2,        // refuse to score anything under this
+  minWords: 5,              // refuse to score transcripts under this
+  longAnswerWords: 60,      // target length for IELTS Part 2
+  idealWpm: [110, 160],     // ideal IELTS speaking pace
+  acceptWpm: [90, 180],     // acceptable pace
+};
+
+/* ============================================================
    PROMPT BANK — 1,004 prompts across 10 categories
+   (identical to before — kept intact)
    ============================================================ */
 const PROMPT_BANK = {
-  /* ============================================================
-     Pronunciation Drills — 200 prompts
-     ============================================================ */
   pron: {
     name: 'Pronunciation Drills', icon: 'mic',
     prompts: [
@@ -743,7 +507,6 @@ const PROMPT_BANK = {
       'A pleasant place to place a plaice is a place where a plaice is pleased to be placed.',
       'The blacksmith made a horseshoe for the horse.',
       'A proper cup of coffee from a proper copper coffee pot.',
-      /* --- V / W minimal pairs --- */
       'Very well, we will visit the village on Wednesday.',
       'Victor wore a velvet vest in the west wind.',
       'Vinegar and vanilla are very versatile flavours.',
@@ -752,53 +515,44 @@ const PROMPT_BANK = {
       'The vet warned us about the wolf in the valley.',
       'Wet weather makes the village very vibrant.',
       'Vera waved at the vendor with a wave.',
-      /* --- TH sounds --- */
       'The three brothers think the theatre is thrilling.',
       'Thank the thoughtful thinkers for their theories.',
       'Nothing is worth the thousand threats of weather.',
       'Both brothers bathed in the northern river.',
       'My mother and father gather leather together.',
-      /* --- R vs L --- */
       'The pilot likes to fly the yellow plane slowly.',
       'Really royal rulers rarely rule ruthlessly.',
       'Light the lamp, Larry, before the long night.',
       'Rusty railways run along the river reeds.',
-      /* --- S vs SH --- */
       'She said she should see the ship on the shore.',
       'Shy students should share their shiny shoes.',
       'The chef sells fresh fish at the seaside shop.',
-      /* --- Short vs long vowels --- */
       'The ship hit the sheep on the steep beach.',
       'Fill the small pool with clean blue water.',
       'Pull the full cart up the steep hill.',
       'Sit still, sip the hot milk, then slip away.',
       'The cat sat flat on the fat mat in the back.',
-      /* --- Silent letters --- */
       'The knight knows how to write with his knuckles.',
       'Please sign the receipt for the scissors.',
       'The psalm was written by a psychologist.',
       'He answered honestly about the climbed mountain.',
       'The autumn wind blew through the exhausted soldier.',
       'The castle listener whistled softly at the thistle.',
-      /* --- Word stress drills --- */
       'Photograph, photographer, photographic — say them all.',
       'Economy, economic, economist — stress each one correctly.',
       'Develop, development, developmental — stress is the key.',
       'Necessary, necessarily, necessity — practice all three.',
       'Comfortable, comfortably, uncomfortable — smooth them out.',
-      /* --- Connected speech --- */
       'What do you want to do today? — blend it all.',
       'Would you like a cup of tea? — smooth and connected.',
       'I’m going to see him in an hour. — natural rhythm.',
       'She’s been working here for ages. — connected words.',
       'There is a lot of it in there. — link every word.',
-      /* --- Intonation & rhythm --- */
       'Did you really mean what you said yesterday?',
       'Of course I’m going to the party tonight!',
       'Wait — did you just say that?',
       'Honestly, I have absolutely no idea.',
       'What on earth were you thinking?',
-      /* --- Longer passages --- */
       'Throughout the thoroughly thought-provoking third Thursday, the thriving theatre welcomed thirty-three thousand thoughtful guests.',
       'Sheila Shaw shined her shiny silver shoes and shuffled slowly to the shimmering shore.',
       'Peter’s poodle pranced proudly past the pretty purple pansies in the park.',
@@ -824,7 +578,6 @@ const PROMPT_BANK = {
       'Xena excitedly explained the excellent new exercise.',
       'Yolanda yelled at the young yellow yak yesterday.',
       'Zack zealously zoomed through the zany zebra zone.',
-      /* --- Common word pronunciations --- */
       'Say: comfortable, vegetable, chocolate, interesting.',
       'Say: February, Wednesday, library, secretary.',
       'Say: schedule, receipt, debt, subtle.',
@@ -845,7 +598,6 @@ const PROMPT_BANK = {
       'Say: island, aisle, muscle, castle, whistle.',
       'Say: salmon, almond, calm, palm, half.',
       'Say: iron, environment, government, maintenance.',
-      /* --- More tongue twisters --- */
       'A proper cup of coffee in a proper copper coffee pot.',
       'Betty Botter bought a bit of better butter.',
       'Black bugs bleed black blood.',
@@ -917,164 +669,69 @@ const PROMPT_BANK = {
       'Zebras zig and zebras zag in the zoo.',
     ],
   },
-
-  /* ============================================================
-     IELTS Part 1 · Short Answers — 150 prompts
-     ============================================================ */
   ielts1: {
     name: 'IELTS Part 1 · Short Answers', icon: 'chat',
     prompts: [
-      'What is your full name?',
-      'Where are you from?',
-      'Do you work or are you a student?',
-      'What do you like most about your hometown?',
-      'Do you live in a house or an apartment?',
-      'What is your favourite room in your home?',
-      'Who do you live with?',
-      'What kind of food do you like?',
-      'Do you cook at home?',
-      'How often do you eat out?',
-      'What do you usually do in the evenings?',
-      'Do you prefer mornings or evenings?',
-      'How do you usually travel to work or school?',
-      'Do you like reading?',
-      'What kind of books do you read?',
-      'Do you prefer paper books or e-books?',
-      'Do you enjoy music?',
-      'What kind of music do you listen to?',
-      'Have you ever played a musical instrument?',
-      'Do you like sports?',
-      'What sports do you play?',
-      'How often do you exercise?',
-      'Do you like watching sports on TV?',
-      'What is your favourite sport to watch?',
-      'Do you enjoy travelling?',
-      'What places have you visited recently?',
-      'Where would you like to travel next?',
-      'Do you prefer travelling alone or with others?',
-      'Do you like meeting new people?',
-      'Are you good at remembering names?',
-      'What do you do on weekends?',
-      'How do you usually spend your holidays?',
-      'What is your favourite season?',
-      'Do you like rainy days?',
-      'What is the weather like in your city?',
-      'Do you prefer hot or cold weather?',
-      'What kind of clothes do you like to wear?',
-      'Do you like shopping?',
-      'What do you usually shop for?',
-      'Do you prefer shopping online or in stores?',
-      'What do you do when you feel stressed?',
-      'How do you relax?',
-      'Do you have any hobbies?',
-      'How much time do you spend on your hobby?',
-      'Are you good at drawing or painting?',
-      'Do you enjoy photography?',
-      'Do you have a pet?',
-      'What pets do you like?',
-      'Do you like animals?',
-      'Do you have any brothers or sisters?',
-      'How often do you see your extended family?',
-      'Who are you closest to in your family?',
-      'What do you usually do with your family?',
-      'Do you have a large family or a small family?',
-      'Do you enjoy family gatherings?',
-      'What is your favourite memory with your family?',
-      'How did you celebrate birthdays as a child?',
-      'What kind of presents do you like to receive?',
-      'Do you like giving presents?',
-      'What is the best gift you have ever received?',
-      'Do you use public transport?',
-      'How do you usually get around your city?',
-      'What is your favourite way to travel?',
-      'Do you like driving?',
-      'Have you ever used a bike to commute?',
-      'Do you prefer trains or buses?',
-      'Do you like watching movies?',
-      'What kind of movies do you enjoy?',
-      'How often do you go to the cinema?',
-      'Who do you usually watch movies with?',
-      'What is your favourite movie and why?',
-      'Do you prefer comedy or drama?',
-      'Do you like TV series?',
-      'Do you binge-watch shows?',
-      'What is the last series you watched?',
-      'Do you play video games?',
-      'What games do you like?',
-      'How often do you play?',
-      'Do you use social media?',
-      'What social media platform do you use most?',
-      'How much time do you spend on social media daily?',
-      'Do you like taking photographs?',
-      'Do you use a smartphone or a camera to take photos?',
-      'Do you ever share your photos online?',
-      'Do you like to give gifts?',
-      'What was the last gift you gave?',
-      'Do you prefer giving or receiving gifts?',
-      'Do you like flowers?',
-      'What is your favourite flower?',
-      'Do you ever buy flowers for yourself?',
-      'Do you like the colour of your bedroom?',
-      'Would you like to change the colour of your bedroom?',
-      'What colours do you like most?',
-      'Do you enjoy walking?',
-      'Where do you usually walk?',
-      'Do you walk more in the morning or evening?',
-      'Do you like to plan your day?',
-      'Are you a planner or spontaneous?',
-      'Do you keep a diary or journal?',
-      'Do you enjoy going to the beach?',
-      'What do you like about the sea?',
-      'Do you swim in the sea?',
-      'Do you like the countryside or the city?',
-      'Why do you prefer one over the other?',
-      'Do you ever go camping?',
-      'Do you like getting up early?',
-      'What time do you usually wake up?',
-      'Do you need coffee or tea to start your day?',
-      'Do you drink tea or coffee?',
-      'What is your favourite drink?',
-      'Do you ever drink juice?',
-      'Do you eat breakfast every day?',
-      'What do you usually eat for breakfast?',
-      'Do you like traditional food from your country?',
-      'What is your favourite dish?',
-      'Do you like spicy food?',
-      'Do you use cash or cards?',
-      'Do you carry cash with you?',
-      'Do you save money?',
-      'What would you buy if you had a million dollars?',
-      'Do you like going to markets?',
-      'Do you ever cook for other people?',
-      'What is your favourite thing to cook?',
-      'Do you like learning languages?',
-      'Why are you learning English?',
-      'How long have you been learning English?',
-      'Do you think English is difficult?',
-      'Do you speak any other languages?',
-      'Do you like meeting people from other countries?',
-      'Do you have friends abroad?',
-      'Do you like using the internet?',
-      'What do you use the internet for?',
-      'Do you think the internet is useful?',
-      'Do you like to use technology?',
-      'Do you like to learn new technology?',
-      'How do you feel about artificial intelligence?',
-      'Do you like to sleep in on weekends?',
-      'Do you take naps during the day?',
-      'Do you like to listen to music while working?',
-      'Do you dance?',
-      'Do you like dancing in public?',
-      'Do you like karaoke?',
-      'Do you like children?',
-      'Do you want children in the future?',
-      'Do you like babies?',
+      'What is your full name?','Where are you from?','Do you work or are you a student?',
+      'What do you like most about your hometown?','Do you live in a house or an apartment?',
+      'What is your favourite room in your home?','Who do you live with?','What kind of food do you like?',
+      'Do you cook at home?','How often do you eat out?','What do you usually do in the evenings?',
+      'Do you prefer mornings or evenings?','How do you usually travel to work or school?',
+      'Do you like reading?','What kind of books do you read?','Do you prefer paper books or e-books?',
+      'Do you enjoy music?','What kind of music do you listen to?','Have you ever played a musical instrument?',
+      'Do you like sports?','What sports do you play?','How often do you exercise?',
+      'Do you like watching sports on TV?','What is your favourite sport to watch?','Do you enjoy travelling?',
+      'What places have you visited recently?','Where would you like to travel next?',
+      'Do you prefer travelling alone or with others?','Do you like meeting new people?',
+      'Are you good at remembering names?','What do you do on weekends?','How do you usually spend your holidays?',
+      'What is your favourite season?','Do you like rainy days?','What is the weather like in your city?',
+      'Do you prefer hot or cold weather?','What kind of clothes do you like to wear?','Do you like shopping?',
+      'What do you usually shop for?','Do you prefer shopping online or in stores?',
+      'What do you do when you feel stressed?','How do you relax?','Do you have any hobbies?',
+      'How much time do you spend on your hobby?','Are you good at drawing or painting?',
+      'Do you enjoy photography?','Do you have a pet?','What pets do you like?','Do you like animals?',
+      'Do you have any brothers or sisters?','How often do you see your extended family?',
+      'Who are you closest to in your family?','What do you usually do with your family?',
+      'Do you have a large family or a small family?','Do you enjoy family gatherings?',
+      'What is your favourite memory with your family?','How did you celebrate birthdays as a child?',
+      'What kind of presents do you like to receive?','Do you like giving presents?',
+      'What is the best gift you have ever received?','Do you use public transport?',
+      'How do you usually get around your city?','What is your favourite way to travel?',
+      'Do you like driving?','Have you ever used a bike to commute?','Do you prefer trains or buses?',
+      'Do you like watching movies?','What kind of movies do you enjoy?','How often do you go to the cinema?',
+      'Who do you usually watch movies with?','What is your favourite movie and why?',
+      'Do you prefer comedy or drama?','Do you like TV series?','Do you binge-watch shows?',
+      'What is the last series you watched?','Do you play video games?','What games do you like?',
+      'How often do you play?','Do you use social media?','What social media platform do you use most?',
+      'How much time do you spend on social media daily?','Do you like taking photographs?',
+      'Do you use a smartphone or a camera to take photos?','Do you ever share your photos online?',
+      'Do you like to give gifts?','What was the last gift you gave?',
+      'Do you prefer giving or receiving gifts?','Do you like flowers?','What is your favourite flower?',
+      'Do you ever buy flowers for yourself?','Do you like the colour of your bedroom?',
+      'Would you like to change the colour of your bedroom?','What colours do you like most?',
+      'Do you enjoy walking?','Where do you usually walk?','Do you walk more in the morning or evening?',
+      'Do you like to plan your day?','Are you a planner or spontaneous?','Do you keep a diary or journal?',
+      'Do you enjoy going to the beach?','What do you like about the sea?','Do you swim in the sea?',
+      'Do you like the countryside or the city?','Why do you prefer one over the other?',
+      'Do you ever go camping?','Do you like getting up early?','What time do you usually wake up?',
+      'Do you need coffee or tea to start your day?','Do you drink tea or coffee?',
+      'What is your favourite drink?','Do you ever drink juice?','Do you eat breakfast every day?',
+      'What do you usually eat for breakfast?','Do you like traditional food from your country?',
+      'What is your favourite dish?','Do you like spicy food?','Do you use cash or cards?',
+      'Do you carry cash with you?','Do you save money?',
+      'What would you buy if you had a million dollars?','Do you like going to markets?',
+      'Do you ever cook for other people?','What is your favourite thing to cook?',
+      'Do you like learning languages?','Why are you learning English?',
+      'How long have you been learning English?','Do you think English is difficult?',
+      'Do you speak any other languages?','Do you like meeting people from other countries?',
+      'Do you have friends abroad?','Do you like using the internet?','What do you use the internet for?',
+      'Do you think the internet is useful?','Do you like to use technology?',
+      'Do you like to learn new technology?','How do you feel about artificial intelligence?',
+      'Do you like to sleep in on weekends?','Do you take naps during the day?',
+      'Do you like to listen to music while working?','Do you dance?','Do you like dancing in public?',
+      'Do you like karaoke?','Do you like children?','Do you want children in the future?','Do you like babies?',
     ],
   },
-
-  /* ============================================================
-     IELTS Part 2 · Cue Cards — 150 prompts
-     ============================================================ */
   ielts2: {
     name: 'IELTS Part 2 · Cue Cards', icon: 'book',
     prompts: [
@@ -1224,10 +881,6 @@ const PROMPT_BANK = {
       'Describe a decision that was difficult but correct. Say what the decision was, why it was difficult, and why it was correct.',
     ],
   },
-
-  /* ============================================================
-     IELTS Part 3 · Discussion — 100 prompts
-     ============================================================ */
   ielts3: {
     name: 'IELTS Part 3 · Discussion', icon: 'users',
     prompts: [
@@ -1250,19 +903,16 @@ const PROMPT_BANK = {
       'How important is it to preserve historic buildings?',
       'What influence do celebrities have on society?',
       'Should the government regulate fast food advertising?',
-      'Why do people enjoy watching sports?',
-      'What makes a good leader?',
+      'Why do people enjoy watching sports?','What makes a good leader?',
       'How has the internet changed the way people learn?',
       'Do you think tourism is good or bad for local communities?',
       'Should the retirement age be raised? Why or why not?',
-      'How can we reduce plastic waste?',
-      'What role does money play in happiness?',
+      'How can we reduce plastic waste?','What role does money play in happiness?',
       'Should students be allowed to choose their own subjects?',
       'What are the pros and cons of living alone?',
       'How do you think jobs will change in the next 20 years?',
       'Should violent video games be banned? Why or why not?',
-      'Why do some people volunteer?',
-      'What makes a city a good place to live?',
+      'Why do some people volunteer?','What makes a city a good place to live?',
       'Should wealthy nations help poorer ones? Why?',
       'How important is handwriting in the digital age?',
       'Do you think space exploration is worth the cost?',
@@ -1312,8 +962,7 @@ const PROMPT_BANK = {
       'Do you think parenting has changed over the years?',
       'How do documentaries influence public opinion?',
       'Should private schools exist? Why or why not?',
-      'What makes a good neighbourhood?',
-      'How can we encourage more people to read?',
+      'What makes a good neighbourhood?','How can we encourage more people to read?',
       'Should companies allow pets in the workplace?',
       'What are the challenges of working in a global team?',
       'How has social media changed friendships?',
@@ -1334,10 +983,6 @@ const PROMPT_BANK = {
       'What are the pros and cons of living abroad?',
     ],
   },
-
-  /* ============================================================
-     Conversation Starters — 200 prompts
-     ============================================================ */
   conv: {
     name: 'Conversation Starters', icon: 'chat',
     prompts: [
@@ -1352,8 +997,7 @@ const PROMPT_BANK = {
       'Who is the most interesting person you know?',
       'If you had a superpower, what would it be?',
       'What is your favourite season and why?',
-      'What is a book that changed your life?',
-      'Describe your dream house.',
+      'What is a book that changed your life?','Describe your dream house.',
       'What is a hobby you have recently picked up?',
       'What is something you are looking forward to?',
       'What is a small thing that makes you happy?',
@@ -1361,30 +1005,21 @@ const PROMPT_BANK = {
       'What is the best advice you have ever received?',
       'What would you do if you won the lottery?',
       'What is your favourite family tradition?',
-      'What is a skill you wish you had?',
-      'Describe the perfect day.',
+      'What is a skill you wish you had?','Describe the perfect day.',
       'What is your favourite song right now?',
       'What is something you want to learn this year?',
-      'Tell me about a time you were scared.',
-      'What makes you laugh?',
-      'What would you like to be famous for?',
-      'What is your biggest pet peeve?',
-      'What is a country you want to visit?',
-      'Describe a moment when you felt proud.',
-      'What is your favourite way to relax?',
-      'What is something you are grateful for?',
-      'Tell me about a place you feel safe.',
-      'What is the most beautiful place you have seen?',
-      'What is a food you could eat every day?',
-      'Tell me about a memorable birthday.',
+      'Tell me about a time you were scared.','What makes you laugh?',
+      'What would you like to be famous for?','What is your biggest pet peeve?',
+      'What is a country you want to visit?','Describe a moment when you felt proud.',
+      'What is your favourite way to relax?','What is something you are grateful for?',
+      'Tell me about a place you feel safe.','What is the most beautiful place you have seen?',
+      'What is a food you could eat every day?','Tell me about a memorable birthday.',
       'What is something people misunderstand about you?',
       'What is your favourite memory from school?',
       'If you could meet anyone, who would it be?',
-      'What is a goal you are working towards?',
-      'Tell me about your first job.',
+      'What is a goal you are working towards?','Tell me about your first job.',
       'What is a smell that reminds you of childhood?',
-      'What is the bravest thing you have ever done?',
-      'What makes a good friend?',
+      'What is the bravest thing you have ever done?','What makes a good friend?',
       'What is a movie you can watch again and again?',
       'What is the best gift you have ever given?',
       'What is a question you wish people asked you?',
@@ -1395,8 +1030,7 @@ const PROMPT_BANK = {
       'What is a change you want to make in your life?',
       'What is your favourite childhood story?',
       'What is the best concert you have been to?',
-      'What is a small habit that improved your life?',
-      'What is your dream job?',
+      'What is a small habit that improved your life?','What is your dream job?',
       'What is the most exciting thing you have done?',
       'What is something you believed as a child that was wrong?',
       'Tell me about a time you made a mistake and learned from it.',
@@ -1404,8 +1038,7 @@ const PROMPT_BANK = {
       'What is a place that feels like home to you?',
       'What is your favourite thing to cook?',
       'What is a compliment you will never forget?',
-      'What is a movie that surprised you?',
-      'What is a book you could not put down?',
+      'What is a movie that surprised you?','What is a book you could not put down?',
       'What is something you have always wanted to try?',
       'What is a good habit you want to build?',
       'What is something you have learned from failure?',
@@ -1421,15 +1054,13 @@ const PROMPT_BANK = {
       'What is a small act of kindness you witnessed?',
       'What is a decision that changed your life?',
       'What is something that calms you down?',
-      'What is your favourite weekend activity?',
-      'Who is your role model and why?',
+      'What is your favourite weekend activity?','Who is your role model and why?',
       'What is the most memorable trip you have taken?',
       'What is a food you will never eat again?',
       'What is something you are really good at?',
       'What is the strangest dream you have had?',
       'If you could time travel, where would you go?',
-      'What is your favourite way to exercise?',
-      'What is a hobby you want to try?',
+      'What is your favourite way to exercise?','What is a hobby you want to try?',
       'What is a movie that made you think differently?',
       'Tell me about your favourite teacher.',
       'What is the best piece of advice you ever gave?',
@@ -1438,31 +1069,25 @@ const PROMPT_BANK = {
       'What is your favourite thing about your city?',
       'If you could change one thing about the world, what would it be?',
       'What is a book you think everyone should read?',
-      'What is your favourite breakfast?',
-      'What is something that excites you?',
-      'What is a fear you have overcome?',
-      'What is your favourite thing about the summer?',
+      'What is your favourite breakfast?','What is something that excites you?',
+      'What is a fear you have overcome?','What is your favourite thing about the summer?',
       'What is something you did last week that you enjoyed?',
-      'What is your favourite drink?',
-      'What is a talent you wish you had?',
+      'What is your favourite drink?','What is a talent you wish you had?',
       'Tell me about a time you were embarrassed.',
       'What is a piece of music that moves you?',
       'What is your favourite thing to do on a Sunday?',
       'What is a place you have never been but want to go?',
       'What is something you do that is uniquely you?',
       'What is a lesson you learned the hard way?',
-      'What is a tradition you want to start?',
-      'What is your ideal holiday?',
-      'Tell me about a person who inspired you.',
-      'What is a small win you had recently?',
+      'What is a tradition you want to start?','What is your ideal holiday?',
+      'Tell me about a person who inspired you.','What is a small win you had recently?',
       'What is your favourite genre of film?',
       'What is something you would like to change about yourself?',
       'What is a book that made you laugh out loud?',
       'What is a food from your childhood you miss?',
       'What is your favourite way to spend a Saturday?',
       'If you could only eat one meal forever, what would it be?',
-      'What is a sport you would love to be good at?',
-      'What is something you were wrong about?',
+      'What is a sport you would love to be good at?','What is something you were wrong about?',
       'What is your favourite thing about being an adult?',
       'What is something you miss about being a child?',
       'What is your favourite thing to do with friends?',
@@ -1485,40 +1110,32 @@ const PROMPT_BANK = {
       'What is your favourite kind of cake?',
       'What is something you have done recently that was fun?',
       'If you had to describe yourself in three words, what would they be?',
-      'What is a place where you feel most yourself?',
-      'What is a piece of art you love?',
+      'What is a place where you feel most yourself?','What is a piece of art you love?',
       'What is a topic you could talk about for hours?',
       'What is your favourite memory from childhood?',
-      'What is something you do just for yourself?',
-      'What is your favourite time of day?',
+      'What is something you do just for yourself?','What is your favourite time of day?',
       'Tell me about a funny thing that happened to you.',
       'What is your favourite ice cream flavour?',
       'What is something you have learned recently?',
-      'What is your favourite kind of exercise?',
-      'What is a goal you achieved recently?',
-      'What is a bad habit you want to break?',
-      'What is a film that made you cry?',
+      'What is your favourite kind of exercise?','What is a goal you achieved recently?',
+      'What is a bad habit you want to break?','What is a film that made you cry?',
       'What is a place you love to visit?',
       'What is your favourite childhood memory involving food?',
-      'What is something that makes you feel young?',
-      'What is a value you hold most dear?',
+      'What is something that makes you feel young?','What is a value you hold most dear?',
       'What is something you do to take care of yourself?',
       'What is your favourite thing to do at the beach?',
-      'What is a piece of advice you live by?',
-      'Tell me about a funny pet you know.',
+      'What is a piece of advice you live by?','Tell me about a funny pet you know.',
       'What is your favourite way to celebrate a birthday?',
       'What is something you have recently discovered about yourself?',
       'What is your favourite thing about your best friend?',
-      'What is something you enjoy doing alone?',
-      'What is your favourite season to travel?',
+      'What is something you enjoy doing alone?','What is your favourite season to travel?',
       'What is something you will never do again?',
       'What is your favourite way to stay healthy?',
       'What is a hobby you would recommend to anyone?',
       'What is something that always makes you smile?',
       'What is a skill you learned as an adult?',
       'What is something you do when you are stressed?',
-      'What is your favourite family recipe?',
-      'What is a film you would watch again tonight?',
+      'What is your favourite family recipe?','What is a film you would watch again tonight?',
       'What is something you have always been curious about?',
       'What is a lesson you learned from a mistake?',
       'What is your favourite thing to do with your family?',
@@ -1533,10 +1150,6 @@ const PROMPT_BANK = {
       'What is your favourite way to spend a lazy day?',
     ],
   },
-
-  /* ============================================================
-     Role Plays — 120 prompts
-     ============================================================ */
   role: {
     name: 'Role Plays', icon: 'users',
     prompts: [
@@ -1667,62 +1280,36 @@ const PROMPT_BANK = {
       'You are at a school. Ask about after-school programmes.',
     ],
   },
-
-  /* ============================================================
-     Story Retelling — 100 prompts
-     ============================================================ */
   story: {
     name: 'Story Retelling', icon: 'book',
     prompts: [
       'Tell the story of your first day at a new school or job.',
-      'Describe a time when you got lost.',
-      'Tell about a time you helped a stranger.',
-      'Describe a memorable trip with your family.',
-      'Tell about a time you missed something important.',
-      'Describe a funny thing that happened to you.',
-      'Tell the story of a big mistake you made.',
-      'Describe a time you overcame a fear.',
-      'Tell about a time you stood up for someone.',
-      'Describe a time you tried something new.',
-      'Tell about a time you had to make a difficult choice.',
-      'Describe an event that changed your plans.',
-      'Tell about a time you received unexpected help.',
-      'Describe a moment when you felt truly proud.',
-      'Tell about a memorable conversation you had.',
-      'Describe a time when you were very lucky.',
-      'Tell about a time you had to work in a team.',
-      'Describe a moment when you were very scared.',
-      'Tell about a time you surprised someone.',
-      'Describe a time you had to say sorry.',
-      'Tell about a time you met someone famous.',
-      'Describe a trip that did not go as planned.',
-      'Tell about a day when everything went wrong.',
-      'Describe a moment when you felt truly grateful.',
-      'Tell about a time you helped your family.',
-      'Describe a time you succeeded at something difficult.',
-      'Tell about a time you had to be brave.',
-      'Describe a moment when you learned an important lesson.',
-      'Tell about a time you cheered someone up.',
-      'Describe a moment of unexpected kindness.',
-      'Tell about a time you felt very tired.',
-      'Describe a moment when you could not stop laughing.',
-      'Tell about a time you got a surprise gift.',
-      'Describe a moment when you felt left out.',
-      'Tell about a time you taught someone something.',
-      'Describe a moment when you were misunderstood.',
-      'Tell about a time you forgave someone.',
-      'Describe a time when you made a new friend.',
-      'Tell about a time you lost something important.',
-      'Describe a moment when you felt proud of someone else.',
-      'Tell about a time you were very nervous.',
+      'Describe a time when you got lost.','Tell about a time you helped a stranger.',
+      'Describe a memorable trip with your family.','Tell about a time you missed something important.',
+      'Describe a funny thing that happened to you.','Tell the story of a big mistake you made.',
+      'Describe a time you overcame a fear.','Tell about a time you stood up for someone.',
+      'Describe a time you tried something new.','Tell about a time you had to make a difficult choice.',
+      'Describe an event that changed your plans.','Tell about a time you received unexpected help.',
+      'Describe a moment when you felt truly proud.','Tell about a memorable conversation you had.',
+      'Describe a time when you were very lucky.','Tell about a time you had to work in a team.',
+      'Describe a moment when you were very scared.','Tell about a time you surprised someone.',
+      'Describe a time you had to say sorry.','Tell about a time you met someone famous.',
+      'Describe a trip that did not go as planned.','Tell about a day when everything went wrong.',
+      'Describe a moment when you felt truly grateful.','Tell about a time you helped your family.',
+      'Describe a time you succeeded at something difficult.','Tell about a time you had to be brave.',
+      'Describe a moment when you learned an important lesson.','Tell about a time you cheered someone up.',
+      'Describe a moment of unexpected kindness.','Tell about a time you felt very tired.',
+      'Describe a moment when you could not stop laughing.','Tell about a time you got a surprise gift.',
+      'Describe a moment when you felt left out.','Tell about a time you taught someone something.',
+      'Describe a moment when you were misunderstood.','Tell about a time you forgave someone.',
+      'Describe a time when you made a new friend.','Tell about a time you lost something important.',
+      'Describe a moment when you felt proud of someone else.','Tell about a time you were very nervous.',
       'Describe a time you changed your mind about something.',
       'Tell about a time you did something you thought you could not do.',
-      'Describe a moment when you felt truly alive.',
-      'Tell about a time you were disappointed.',
+      'Describe a moment when you felt truly alive.','Tell about a time you were disappointed.',
       'Describe a moment when someone surprised you with kindness.',
       'Tell about a time you had to wait a long time.',
-      'Describe a moment when you felt like giving up.',
-      'Tell about a time you decided to try again.',
+      'Describe a moment when you felt like giving up.','Tell about a time you decided to try again.',
       'Describe a moment when you felt truly at peace.',
       'Tell about a time you had to be patient with someone.',
       'Describe a moment when you made someone smile.',
@@ -1739,8 +1326,7 @@ const PROMPT_BANK = {
       'Tell about a time you learned from a sibling or cousin.',
       'Describe a moment when you felt truly appreciated.',
       'Tell about a time you had to be honest even when it was hard.',
-      'Describe a moment when you felt truly lucky.',
-      'Tell about a time you took a big risk.',
+      'Describe a moment when you felt truly lucky.','Tell about a time you took a big risk.',
       'Describe a moment when you felt truly understood.',
       'Tell about a time you made a mistake and fixed it.',
       'Describe a moment when you felt truly hopeful.',
@@ -1776,126 +1362,79 @@ const PROMPT_BANK = {
       'Describe a moment when you felt truly grateful for friendship.',
     ],
   },
-
-  /* ============================================================
-     Describe the Scenario — 100 prompts
-     ============================================================ */
   describe: {
     name: 'Describe the Scenario', icon: 'target',
     prompts: [
       'Describe a typical morning in your household.',
-      'Describe what you see on your way to work.',
-      'Describe your favourite café.',
-      'Describe your ideal weekend.',
-      'Describe a typical family dinner.',
-      'Describe the view from your window.',
-      'Describe your favourite room in your house.',
-      'Describe a busy street in your city.',
-      'Describe a quiet place you like.',
-      'Describe a rainy day at home.',
-      'Describe the perfect holiday.',
-      'Describe your favourite meal.',
-      'Describe a memorable sunset you have seen.',
-      'Describe the inside of your favourite shop.',
-      'Describe a park you often visit.',
-      'Describe your favourite childhood place.',
+      'Describe what you see on your way to work.','Describe your favourite café.',
+      'Describe your ideal weekend.','Describe a typical family dinner.',
+      'Describe the view from your window.','Describe your favourite room in your house.',
+      'Describe a busy street in your city.','Describe a quiet place you like.',
+      'Describe a rainy day at home.','Describe the perfect holiday.','Describe your favourite meal.',
+      'Describe a memorable sunset you have seen.','Describe the inside of your favourite shop.',
+      'Describe a park you often visit.','Describe your favourite childhood place.',
       'Describe a typical day at your school or work.',
       'Describe a concert or event you attended.',
       'Describe what you would take on a desert island.',
       'Describe your favourite piece of clothing.',
-      'Describe the most beautiful place you have seen.',
-      'Describe your favourite photo.',
-      'Describe a small town you have visited.',
-      'Describe a big city you have been to.',
-      'Describe your desk or workspace.',
-      'Describe your favourite festival.',
-      'Describe the kitchen of your childhood home.',
-      'Describe a market you have been to.',
-      'Describe a river or lake near you.',
-      'Describe a mountain you have visited.',
-      'Describe your favourite book cover.',
-      'Describe the first job you ever had.',
-      'Describe a family gathering you attended.',
-      'Describe your first car or bicycle.',
-      'Describe a piece of art you like.',
-      'Describe a gift that means a lot to you.',
-      'Describe a family recipe.',
-      'Describe a childhood toy.',
-      'Describe a place you go to feel calm.',
-      'Describe a public holiday in your country.',
-      'Describe your neighbourhood.',
-      'Describe a library you have visited.',
-      'Describe a shop where you like to buy clothes.',
-      'Describe a bus or train journey you took.',
-      'Describe a street market you like.',
-      'Describe a hotel you stayed in.',
-      'Describe a beach you have visited.',
-      'Describe a restaurant you would recommend.',
+      'Describe the most beautiful place you have seen.','Describe your favourite photo.',
+      'Describe a small town you have visited.','Describe a big city you have been to.',
+      'Describe your desk or workspace.','Describe your favourite festival.',
+      'Describe the kitchen of your childhood home.','Describe a market you have been to.',
+      'Describe a river or lake near you.','Describe a mountain you have visited.',
+      'Describe your favourite book cover.','Describe the first job you ever had.',
+      'Describe a family gathering you attended.','Describe your first car or bicycle.',
+      'Describe a piece of art you like.','Describe a gift that means a lot to you.',
+      'Describe a family recipe.','Describe a childhood toy.',
+      'Describe a place you go to feel calm.','Describe a public holiday in your country.',
+      'Describe your neighbourhood.','Describe a library you have visited.',
+      'Describe a shop where you like to buy clothes.','Describe a bus or train journey you took.',
+      'Describe a street market you like.','Describe a hotel you stayed in.',
+      'Describe a beach you have visited.','Describe a restaurant you would recommend.',
       'Describe the sound of your city at night.',
       'Describe a person you see regularly on your commute.',
-      'Describe the weather today.',
-      'Describe your school or college.',
-      'Describe your favourite spot in your home.',
-      'Describe a wedding you attended.',
-      'Describe your morning routine.',
-      'Describe your evening routine.',
-      'Describe a museum you visited.',
-      'Describe a temple, mosque, or church you have seen.',
-      'Describe a monument or landmark in your city.',
-      'Describe a garden you like.',
+      'Describe the weather today.','Describe your school or college.',
+      'Describe your favourite spot in your home.','Describe a wedding you attended.',
+      'Describe your morning routine.','Describe your evening routine.',
+      'Describe a museum you visited.','Describe a temple, mosque, or church you have seen.',
+      'Describe a monument or landmark in your city.','Describe a garden you like.',
       'Describe a hill or viewpoint you have been to.',
       'Describe a small business in your area.',
       'Describe the smell of your favourite food.',
       'Describe a piece of clothing someone gave you.',
-      'Describe a bag you carry every day.',
-      'Describe a photograph on your phone.',
-      'Describe a plant in your home or garden.',
-      'Describe your pet or a pet you know.',
+      'Describe a bag you carry every day.','Describe a photograph on your phone.',
+      'Describe a plant in your home or garden.','Describe your pet or a pet you know.',
       'Describe a favourite toy you had as a child.',
-      'Describe your favourite shop for snacks.',
-      'Describe a place you go to exercise.',
-      'Describe a place you go to study.',
-      'Describe a place where you celebrate birthdays.',
-      'Describe a stair or hallway in your home.',
-      'Describe a family heirloom or keepsake.',
+      'Describe your favourite shop for snacks.','Describe a place you go to exercise.',
+      'Describe a place you go to study.','Describe a place where you celebrate birthdays.',
+      'Describe a stair or hallway in your home.','Describe a family heirloom or keepsake.',
       'Describe a hand-written letter or card you received.',
       'Describe a book you have on your shelf.',
       'Describe a piece of jewellery you own.',
       'Describe a traditional dish from your region.',
-      'Describe a street food you love.',
-      'Describe a music concert you attended.',
+      'Describe a street food you love.','Describe a music concert you attended.',
       'Describe a sports match you watched live.',
       'Describe the first time you cooked a meal for someone.',
-      'Describe a long walk you have taken.',
-      'Describe a rainy day you remember well.',
+      'Describe a long walk you have taken.','Describe a rainy day you remember well.',
       'Describe a snowy or foggy day you experienced.',
       'Describe a place you go to watch the sunset.',
-      'Describe a room in your grandparents’ house.',
-      'Describe a village you visited.',
-      'Describe your first day at a new job or school.',
-      'Describe a road trip you have taken.',
-      'Describe a scenic train journey.',
-      'Describe a building you find interesting.',
-      'Describe an old part of your city.',
-      'Describe a place where you feel safe.',
+      'Describe a room in your grandparents’ house.','Describe a village you visited.',
+      'Describe your first day at a new job or school.','Describe a road trip you have taken.',
+      'Describe a scenic train journey.','Describe a building you find interesting.',
+      'Describe an old part of your city.','Describe a place where you feel safe.',
       'Describe a place where you feel inspired.',
       'Describe a place that reminds you of your childhood.',
       'Describe a place that reminds you of a family member.',
       'Describe a place you would like to take a visitor to.',
     ],
   },
-
-  /* ============================================================
-     Topic Discussion — 100 prompts
-     ============================================================ */
   topic: {
     name: 'Topic Discussion', icon: 'chat',
     prompts: [
       'Talk about the importance of learning English in your country.',
       'Discuss the impact of social media on teenagers.',
       'Talk about the benefits of regular exercise.',
-      'Discuss why reading is important.',
-      'Talk about the value of travelling.',
+      'Discuss why reading is important.','Talk about the value of travelling.',
       'Discuss whether homework should be banned.',
       'Talk about the future of artificial intelligence.',
       'Discuss the advantages of living in a city.',
@@ -1904,11 +1443,9 @@ const PROMPT_BANK = {
       'Talk about the importance of time management.',
       'Discuss whether money can buy happiness.',
       'Talk about the challenges of learning a new language.',
-      'Discuss the benefits of volunteering.',
-      'Talk about the importance of sleep.',
+      'Discuss the benefits of volunteering.','Talk about the importance of sleep.',
       'Discuss whether video games are good or bad for children.',
-      'Talk about the value of failure.',
-      'Discuss the effects of climate change.',
+      'Talk about the value of failure.','Discuss the effects of climate change.',
       'Talk about the role of women in the workplace.',
       'Discuss why some people love to travel and others don’t.',
       'Talk about the importance of honesty.',
@@ -1924,10 +1461,8 @@ const PROMPT_BANK = {
       'Talk about your favourite subject and why.',
       'Discuss how schools can foster creativity.',
       'Talk about the importance of self-confidence.',
-      'Discuss whether exams are fair.',
-      'Talk about the benefits of being bilingual.',
-      'Discuss how to build good habits.',
-      'Talk about the value of arts education.',
+      'Discuss whether exams are fair.','Talk about the benefits of being bilingual.',
+      'Discuss how to build good habits.','Talk about the value of arts education.',
       'Discuss whether sports stars are paid too much.',
       'Talk about the importance of mental health.',
       'Discuss how to improve public transport in your city.',
@@ -1939,8 +1474,7 @@ const PROMPT_BANK = {
       'Discuss the importance of preserving local traditions.',
       'Talk about the value of doing voluntary work.',
       'Discuss whether children should learn coding at school.',
-      'Talk about the impact of fast fashion.',
-      'Discuss how to reduce food waste.',
+      'Talk about the impact of fast fashion.','Discuss how to reduce food waste.',
       'Talk about the pros and cons of being famous.',
       'Discuss the effects of watching too much TV.',
       'Talk about the importance of having hobbies.',
@@ -1968,8 +1502,7 @@ const PROMPT_BANK = {
       'Talk about the role of sport in schools.',
       'Discuss whether sports should be compulsory at school.',
       'Talk about the value of doing chores as a child.',
-      'Discuss whether fashion is important.',
-      'Talk about how to build a kinder society.',
+      'Discuss whether fashion is important.','Talk about how to build a kinder society.',
       'Discuss whether social media makes us less happy.',
       'Talk about the importance of first impressions.',
       'Discuss whether everyone should learn a second language.',
@@ -1993,109 +1526,71 @@ const PROMPT_BANK = {
       'Discuss the value of taking regular breaks from technology.',
     ],
   },
-
-  /* ============================================================
-     Interview Questions — 100 prompts
-     ============================================================ */
   interview: {
     name: 'Interview Questions', icon: 'users',
     prompts: [
-      'Tell me about yourself.',
-      'Why do you want this job?',
-      'What are your strengths?',
-      'What are your weaknesses?',
-      'Where do you see yourself in five years?',
-      'Why should we hire you?',
-      'What motivates you?',
-      'Describe a challenge you overcame.',
-      'How do you handle stress?',
-      'What is your greatest achievement?',
-      'How do you work in a team?',
-      'Describe a time you showed leadership.',
-      'How do you prioritise tasks?',
-      'Tell me about a time you failed.',
-      'What are your salary expectations?',
-      'Why are you leaving your current job?',
-      'How do you handle criticism?',
-      'What do you do outside of work?',
-      'What is your ideal work environment?',
-      'How do you learn new skills?',
-      'Describe a time you disagreed with your boss.',
-      'How do you stay organised?',
-      'What makes you unique?',
-      'Where do you get your best ideas?',
+      'Tell me about yourself.','Why do you want this job?','What are your strengths?',
+      'What are your weaknesses?','Where do you see yourself in five years?',
+      'Why should we hire you?','What motivates you?','Describe a challenge you overcame.',
+      'How do you handle stress?','What is your greatest achievement?',
+      'How do you work in a team?','Describe a time you showed leadership.',
+      'How do you prioritise tasks?','Tell me about a time you failed.',
+      'What are your salary expectations?','Why are you leaving your current job?',
+      'How do you handle criticism?','What do you do outside of work?',
+      'What is your ideal work environment?','How do you learn new skills?',
+      'Describe a time you disagreed with your boss.','How do you stay organised?',
+      'What makes you unique?','Where do you get your best ideas?',
       'How do you handle tight deadlines?',
       'What is your favourite part of your current job?',
       'What is the most difficult thing you have had to do?',
-      'How do you build relationships with coworkers?',
-      'What does success mean to you?',
+      'How do you build relationships with coworkers?','What does success mean to you?',
       'What would your colleagues say about you?',
-      'How do you handle multiple projects at once?',
-      'What is your dream career path?',
-      'Describe a project you are proud of.',
-      'How do you approach learning from mistakes?',
-      'Why did you choose your field?',
-      'What kind of manager do you work best with?',
-      'How do you cope with change?',
-      'What are you most passionate about?',
-      'How would you handle a difficult customer?',
-      'What would make you leave a job?',
-      'Do you prefer working alone or in a team?',
-      'How do you stay updated in your field?',
-      'What value do you bring to a team?',
-      'Describe your ideal day at work.',
-      'How do you handle a heavy workload?',
-      'What questions do you have for us?',
-      'How do you deal with a mistake you made?',
-      'What is your biggest professional goal?',
-      'Tell me about a time you adapted to change.',
-      'How would you improve our company?',
+      'How do you handle multiple projects at once?','What is your dream career path?',
+      'Describe a project you are proud of.','How do you approach learning from mistakes?',
+      'Why did you choose your field?','What kind of manager do you work best with?',
+      'How do you cope with change?','What are you most passionate about?',
+      'How would you handle a difficult customer?','What would make you leave a job?',
+      'Do you prefer working alone or in a team?','How do you stay updated in your field?',
+      'What value do you bring to a team?','Describe your ideal day at work.',
+      'How do you handle a heavy workload?','What questions do you have for us?',
+      'How do you deal with a mistake you made?','What is your biggest professional goal?',
+      'Tell me about a time you adapted to change.','How would you improve our company?',
       'What has been your biggest professional growth moment?',
-      'How do you handle an underperforming teammate?',
-      'How do you set goals for yourself?',
-      'Describe a time you went above and beyond.',
-      'How do you manage your time effectively?',
+      'How do you handle an underperforming teammate?','How do you set goals for yourself?',
+      'Describe a time you went above and beyond.','How do you manage your time effectively?',
       'How do you respond to feedback you disagree with?',
       'Tell me about a time you had to make a difficult decision.',
       'How do you handle confidential information?',
       'Describe a time you had to learn something quickly.',
-      'What is your approach to problem-solving?',
-      'How do you handle an angry client?',
+      'What is your approach to problem-solving?','How do you handle an angry client?',
       'What is your biggest weakness as a professional?',
       'How do you prioritise between urgent and important tasks?',
       'Describe a time you had to persuade someone.',
       'How do you stay motivated during repetitive work?',
       'What is your approach to teamwork?',
       'Describe your ideal working relationship with a manager.',
-      'How do you feel about working overtime?',
-      'How do you handle conflicts within a team?',
+      'How do you feel about working overtime?','How do you handle conflicts within a team?',
       'What is a piece of feedback that changed how you work?',
       'How do you measure success in your role?',
       'How do you approach learning a new tool or software?',
       'What would your previous manager say about you?',
-      'Describe a time you took initiative.',
-      'How do you handle change in priorities?',
+      'Describe a time you took initiative.','How do you handle change in priorities?',
       'What kind of company culture do you thrive in?',
       'Describe a time you had to apologise at work.',
       'How do you contribute to a positive work environment?',
       'What is your biggest strength as a team player?',
       'How do you approach a task you have never done before?',
       'Describe a time you had to say no to a request.',
-      'What is your biggest career regret?',
-      'How do you keep yourself accountable?',
-      'What do you do when you feel overwhelmed?',
-      'How do you like to receive feedback?',
-      'Describe a time when you mentored someone.',
-      'What is your leadership style?',
-      'How do you balance quality and speed?',
-      'What kind of projects excite you the most?',
+      'What is your biggest career regret?','How do you keep yourself accountable?',
+      'What do you do when you feel overwhelmed?','How do you like to receive feedback?',
+      'Describe a time when you mentored someone.','What is your leadership style?',
+      'How do you balance quality and speed?','What kind of projects excite you the most?',
       'Describe a time when you had to work with limited resources.',
       'How do you handle working with someone you do not get along with?',
       'What is your approach to giving feedback to others?',
       'How do you stay calm under pressure?',
       'Describe a time when you had to defend your decision.',
-      'How do you decide when to ask for help?',
-      'What does work-life balance mean to you?',
+      'How do you decide when to ask for help?','What does work-life balance mean to you?',
       'Describe a time when you took a risk at work.',
       'How do you keep your skills up to date?',
       'What is a mistake you learned the most from?',
@@ -2104,11 +1599,7 @@ const PROMPT_BANK = {
 };
 
 const ALL_CATEGORIES = Object.entries(PROMPT_BANK).map(([id, c]) => ({
-  id,
-  label: c.name,
-  icon: c.icon,
-  prompts: c.prompts,
-  count: c.prompts.length,
+  id, label: c.name, icon: c.icon, prompts: c.prompts, count: c.prompts.length,
 }));
 
 const TOTAL_PROMPTS = ALL_CATEGORIES.reduce((s, c) => s + c.count, 0);
@@ -2121,7 +1612,7 @@ const CRITERIA = [
 ];
 
 /* ============================================================
-   FAULT DETECTION ENGINE
+   FAULT DETECTION
    ============================================================ */
 const FILLER_WORDS = ['um', 'uh', 'er', 'ah', 'like', 'you know', 'basically', 'actually', 'literally', 'so', 'well', 'anyway', 'kind of', 'sort of'];
 
@@ -2157,8 +1648,11 @@ function detectFaults(transcript, durationSec) {
   }
   result.repetition.severity = result.repetition.count >= 2 ? 'bad' : result.repetition.count === 1 ? 'warn' : 'ok';
 
-  result.pace.wpm = durationSec > 0 ? Math.round((words.length / durationSec) * 60) : 0;
-  if (result.pace.wpm < 80 || result.pace.wpm > 200) result.pace.severity = 'bad';
+  result.pace.wpm = durationSec > 0 && words.length > 0
+    ? Math.round((words.length / durationSec) * 60)
+    : 0;
+  if (words.length === 0) result.pace.severity = 'bad';
+  else if (result.pace.wpm < 80 || result.pace.wpm > 200) result.pace.severity = 'bad';
   else if (result.pace.wpm < 100 || result.pace.wpm > 170) result.pace.severity = 'warn';
 
   if (words.length < 20) result.length.severity = 'bad';
@@ -2167,43 +1661,64 @@ function detectFaults(transcript, durationSec) {
   const unique = new Set(words).size;
   result.vocabulary.unique = unique;
   result.vocabulary.ratio = words.length ? unique / words.length : 0;
-  if (result.vocabulary.ratio < 0.4) result.vocabulary.severity = 'bad';
+  if (words.length < 5) result.vocabulary.severity = 'bad';
+  else if (result.vocabulary.ratio < 0.4) result.vocabulary.severity = 'bad';
   else if (result.vocabulary.ratio < 0.55) result.vocabulary.severity = 'warn';
 
   return result;
 }
 
 /* ============================================================
-   SCORING ENGINE
+   SCORING ENGINE — rewritten so scores reflect actual evidence
+   Returns null when the transcript is too short to score honestly.
    ============================================================ */
 function scoreFromAnalysis(faults) {
+  const words = faults.length.words;
+  if (words < SCORING.minWords) return null;
+
   const wpm = faults.pace.wpm;
-  const fillerRatio = faults.fillers.count / Math.max(1, faults.length.words);
+  const fillerRatio = faults.fillers.count / Math.max(1, words);
   const vocabRatio = faults.vocabulary.ratio;
+  const [idealLo, idealHi] = SCORING.idealWpm;
+  const [acceptLo, acceptHi] = SCORING.acceptWpm;
 
-  let fluency = 6;
-  if (wpm >= 110 && wpm <= 160) fluency = 8;
-  else if (wpm >= 90 && wpm <= 180) fluency = 7;
-  else if (wpm > 0) fluency = 5;
-  fluency -= Math.min(2, Math.round(fillerRatio * 20));
+  // --- Fluency: start at 5 (minimum valid), reward length + ideal pace, penalize fillers
+  let fluency = 5;
+  if (wpm >= idealLo && wpm <= idealHi) fluency += 1.5;
+  else if (wpm >= acceptLo && wpm <= acceptHi) fluency += 0.5;
+  else fluency -= 1;
 
+  if (words >= 30) fluency += 0.5;
+  if (words >= SCORING.longAnswerWords) fluency += 0.5;
+  if (words >= 100) fluency += 0.5;
+  if (fillerRatio > 0.08) fluency -= 1;
+  if (fillerRatio > 0.15) fluency -= 1;
+
+  // --- Vocabulary: driven by lexical diversity and total length
   let vocabulary = 5;
-  if (vocabRatio > 0.65) vocabulary = 8;
-  else if (vocabRatio > 0.5) vocabulary = 7;
-  else if (vocabRatio > 0.4) vocabulary = 6;
-  if (faults.length.words > 80) vocabulary = Math.min(9, vocabulary + 1);
+  if (vocabRatio > 0.5) vocabulary += 0.5;
+  if (vocabRatio > 0.6) vocabulary += 0.5;
+  if (vocabRatio > 0.7) vocabulary += 0.5;
+  if (words >= SCORING.longAnswerWords) vocabulary += 0.5;
+  if (words >= 100) vocabulary += 0.5;
+  if (vocabRatio < 0.35) vocabulary -= 1;
 
-  let grammar = 6;
-  if (faults.repetition.count === 0) grammar = 7;
-  if (faults.repetition.count >= 2) grammar = 5;
-  if (faults.length.words > 60 && faults.repetition.count === 0) grammar = 8;
+  // --- Grammar: penalize repetition, reward longer connected speech
+  let grammar = 5;
+  if (faults.repetition.count === 0 && words >= 20) grammar += 0.5;
+  if (faults.repetition.count === 0 && words >= 50) grammar += 0.5;
+  if (faults.repetition.count === 0 && words >= 80) grammar += 0.5;
+  if (faults.repetition.count >= 1) grammar -= 0.5;
+  if (faults.repetition.count >= 2) grammar -= 1;
 
-  let pronunciation = 6;
-  if (wpm >= 100 && wpm <= 170 && fillerRatio < 0.05) pronunciation = 8;
-  else if (wpm >= 80 && wpm <= 190) pronunciation = 7;
-  else if (wpm > 0) pronunciation = 5;
+  // --- Pronunciation: browser-only proxy — this is a *rough* estimate
+  let pronunciation = 5;
+  if (wpm >= idealLo && wpm <= idealHi && fillerRatio < 0.05) pronunciation += 2;
+  else if (wpm >= acceptLo && wpm <= acceptHi) pronunciation += 1;
+  else if (wpm === 0) pronunciation -= 1;
+  if (fillerRatio > 0.12) pronunciation -= 1;
 
-  const clamp = (n) => Math.max(3, Math.min(9, Math.round(n)));
+  const clamp = (n) => Math.max(3.5, Math.min(9, Math.round(n * 10) / 10));
 
   return {
     fluency: clamp(fluency),
@@ -2243,9 +1758,7 @@ function useSpeechRecognition() {
     };
     r.onerror = () => {};
     recogRef.current = r;
-    return () => {
-      try { r.stop(); } catch { /* noop */ }
-    };
+    return () => { try { r.stop(); } catch { /* noop */ } };
   }, []);
 
   const startRecog = useCallback(() => {
@@ -2266,7 +1779,9 @@ function useSpeechRecognition() {
 }
 
 /* ============================================================
-   AUDIO RECORDER HOOK
+   AUDIO RECORDER + LEVEL MONITOR
+   Tracks peak RMS via AnalyserNode. Returns { blob, peak, seconds }
+   from stop() so the caller can gate scoring on real audio.
    ============================================================ */
 function pickMimeType() {
   const candidates = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg;codecs=opus'];
@@ -2280,10 +1795,16 @@ function useAudioRecorder() {
   const [recording, setRecording] = useState(false);
   const [error, setError] = useState(null);
   const [seconds, setSeconds] = useState(0);
+  const [liveLevel, setLiveLevel] = useState(0);
+
   const mediaRecorderRef = useRef(null);
   const streamRef = useRef(null);
   const chunksRef = useRef([]);
   const timerRef = useRef(null);
+  const secondsRef = useRef(0);
+  const peakLevelRef = useRef(0);
+  const audioCtxRef = useRef(null);
+  const rafRef = useRef(null);
 
   const stopStream = () => {
     streamRef.current?.getTracks().forEach((t) => t.stop());
@@ -2291,27 +1812,71 @@ function useAudioRecorder() {
   };
 
   const startTimer = () => {
+    secondsRef.current = 0;
     setSeconds(0);
-    timerRef.current = setInterval(() => setSeconds((s) => s + 1), 1000);
+    timerRef.current = setInterval(() => {
+      secondsRef.current += 1;
+      setSeconds(secondsRef.current);
+    }, 1000);
   };
   const stopTimer = () => {
     clearInterval(timerRef.current);
     timerRef.current = null;
   };
 
+  const startLevelMonitor = (stream) => {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const source = ctx.createMediaStreamSource(stream);
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 2048;
+      source.connect(analyser);
+      const buffer = new Uint8Array(analyser.fftSize);
+      audioCtxRef.current = ctx;
+
+      const tick = () => {
+        analyser.getByteTimeDomainData(buffer);
+        let peak = 0;
+        for (let i = 0; i < buffer.length; i++) {
+          const v = Math.abs(buffer[i] - 128) / 128;
+          if (v > peak) peak = v;
+        }
+        if (peak > peakLevelRef.current) peakLevelRef.current = peak;
+        setLiveLevel(peak);
+        rafRef.current = requestAnimationFrame(tick);
+      };
+      tick();
+    } catch { /* ignore */ }
+  };
+
+  const stopLevelMonitor = () => {
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    rafRef.current = null;
+    try { audioCtxRef.current?.close(); } catch { /* noop */ }
+    audioCtxRef.current = null;
+    setLiveLevel(0);
+  };
+
   const start = async () => {
     setError(null);
+    peakLevelRef.current = 0;
+    setLiveLevel(0);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
       chunksRef.current = [];
       const mimeType = pickMimeType();
       const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
-      recorder.ondataavailable = (e) => { if (e.data && e.data.size > 0) chunksRef.current.push(e.data); };
+      recorder.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) chunksRef.current.push(e.data);
+      };
       mediaRecorderRef.current = recorder;
       recorder.start();
       setRecording(true);
       startTimer();
+      startLevelMonitor(stream);
       return true;
     } catch (err) {
       setError(
@@ -2331,15 +1896,18 @@ function useAudioRecorder() {
       stopTimer();
       if (!recorder || recorder.state === 'inactive') {
         setRecording(false);
+        stopLevelMonitor();
         resolve(null);
         return;
       }
+      const finalSeconds = secondsRef.current;
       recorder.onstop = () => {
         const blob = new Blob(chunksRef.current, { type: recorder.mimeType || 'audio/webm' });
         chunksRef.current = [];
         stopStream();
+        stopLevelMonitor();
         setRecording(false);
-        resolve(blob);
+        resolve({ blob, peak: peakLevelRef.current, seconds: finalSeconds });
       };
       recorder.stop();
     });
@@ -2353,13 +1921,16 @@ function useAudioRecorder() {
     }
     chunksRef.current = [];
     stopStream();
+    stopLevelMonitor();
     setRecording(false);
     setSeconds(0);
+    secondsRef.current = 0;
+    peakLevelRef.current = 0;
   };
 
   useEffect(() => () => cancel(), []);
 
-  return { recording, error, seconds, start, stop, cancel };
+  return { recording, error, seconds, liveLevel, start, stop, cancel };
 }
 
 /* ============================================================
@@ -2375,6 +1946,23 @@ function Waveform({ active }) {
       {bars.map((h, i) => (
         <div key={i} className="ec-spk-wave-bar" style={{ height: `${h}px`, animationDelay: `${i * 0.045}s` }} />
       ))}
+    </div>
+  );
+}
+
+/* ============================================================
+   LIVE INPUT LEVEL METER
+   ============================================================ */
+function LiveLevelMeter({ level }) {
+  const pct = Math.max(2, Math.min(100, Math.round(level * 400)));
+  const isSilent = level < SCORING.silencePeak;
+  return (
+    <div className={`ec-spk-live-level${isSilent ? ' ec-spk-live-level--silent' : ''}`}>
+      <span>{isSilent ? '🔇 Silent' : '🎤 Mic'}</span>
+      <div className="ec-spk-live-level-track">
+        <div className="ec-spk-live-level-fill" style={{ width: `${pct}%` }} />
+      </div>
+      <span>{pct}%</span>
     </div>
   );
 }
@@ -2457,13 +2045,15 @@ function FaultReport({ faults }) {
       id: 'pace',
       label: 'Speaking pace',
       severity: faults.pace.severity,
-      detail: `You spoke at ${faults.pace.wpm} words per minute. Ideal range: 110–160 wpm.`,
+      detail: faults.pace.wpm > 0
+        ? `You spoke at ${faults.pace.wpm} words per minute. Ideal range: ${SCORING.idealWpm[0]}–${SCORING.idealWpm[1]} wpm.`
+        : 'Not enough audio to measure pace.',
     },
     {
       id: 'len',
       label: 'Answer length',
       severity: faults.length.severity,
-      detail: `${faults.length.words} words spoken. Aim for 60+ words for IELTS Part 2.`,
+      detail: `${faults.length.words} words spoken. Aim for ${SCORING.longAnswerWords}+ words for IELTS Part 2.`,
     },
     {
       id: 'vocab',
@@ -2501,7 +2091,7 @@ function FaultReport({ faults }) {
 }
 
 /* ============================================================
-   Mascot — Langut-style yellow blob
+   Mascot
    ============================================================ */
 function LangutMascot({ size = 170 }) {
   return (
@@ -2509,13 +2099,7 @@ function LangutMascot({ size = 170 }) {
       <ellipse cx="85" cy="158" rx="46" ry="7" fill="#000" opacity="0.22" />
       <path d="M40 70c-8-4-16 0-18 8s2 16 10 18" stroke="#17102E" strokeWidth="4" fill="#F5E04D" strokeLinejoin="round" />
       <path d="M130 70c8-4 16 0 18 8s-2 16-10 18" stroke="#17102E" strokeWidth="4" fill="#F5E04D" strokeLinejoin="round" />
-      <path
-        d="M85 18c-30 0-54 24-54 54 0 17 7 31 15 40 5 6 8 12 8 19 0 4 3 7 7 7h48c4 0 7-3 7-7 0-7 3-13 8-19 8-9 15-23 15-40 0-30-24-54-54-54z"
-        fill="#F5E04D"
-        stroke="#17102E"
-        strokeWidth="4"
-        strokeLinejoin="round"
-      />
+      <path d="M85 18c-30 0-54 24-54 54 0 17 7 31 15 40 5 6 8 12 8 19 0 4 3 7 7 7h48c4 0 7-3 7-7 0-7 3-13 8-19 8-9 15-23 15-40 0-30-24-54-54-54z" fill="#F5E04D" stroke="#17102E" strokeWidth="4" strokeLinejoin="round" />
       <path d="M85 40c-20 0-36 14-36 34 0 13 6 22 12 29" stroke="#FBF0A0" strokeWidth="7" strokeLinecap="round" fill="none" />
       <circle cx="68" cy="76" r="11" fill="#fff" stroke="#17102E" strokeWidth="3.5" />
       <circle cx="70" cy="78" r="4.8" fill="#17102E" />
@@ -2586,21 +2170,65 @@ export function Speaking() {
   /* ---------- PRACTICE ---------- */
   const handleToggleRecord = async () => {
     setSubmitError(null);
+
     if (practiceRecorder.recording) {
-      const blob = await practiceRecorder.stop();
+      const captured = await practiceRecorder.stop();
       speech.stopRecog();
-      if (!blob || blob.size === 0) {
+
+      if (!captured || !captured.blob || captured.blob.size === 0) {
         setSubmitError('No audio captured. Try again.');
         return;
       }
+
+      const { blob, peak, seconds: dur } = captured;
+
+      // ---- Gate 1: silence ----
+      if (peak < SCORING.silencePeak) {
+        setSubmitError(
+          'We didn\'t hear anything. Move closer to the mic, check it\'s not muted, and try again.'
+        );
+        return;
+      }
+
+      // ---- Gate 2: duration ----
+      if (dur < SCORING.minDurationSec) {
+        setSubmitError(
+          `Recording too short (${dur}s). Aim for at least ${SCORING.minDurationSec} seconds.`
+        );
+        return;
+      }
+
+      // Small delay to let the last final speech result land
+      await new Promise((r) => setTimeout(r, 500));
+
+      const finalText = speech.transcript || '';
+      const wordList = finalText.trim().split(/\s+/).filter(Boolean);
+
+      // ---- Gate 3: transcript ----
+      if (speech.supported && wordList.length < SCORING.minWords) {
+        if (wordList.length === 0) {
+          setSubmitError(
+            'We detected audio but couldn\'t transcribe any words. Speak more clearly, reduce background noise, or use Chrome/Edge for better recognition.'
+          );
+        } else {
+          setSubmitError(
+            `Only ${wordList.length} word${wordList.length === 1 ? '' : 's'} detected — aim for a longer answer.`
+          );
+        }
+        return;
+      }
+
       setScoring(true);
 
-      setTimeout(async () => {
-        const finalText = speech.transcript || '';
-        const dur = practiceRecorder.seconds || Math.max(1, blob.size / 16000);
-
+      try {
         const detected = detectFaults(finalText, dur);
         const bands = scoreFromAnalysis(detected);
+
+        if (!bands) {
+          setSubmitError('Not enough speech to score. Try a longer answer.');
+          setScoring(false);
+          return;
+        }
 
         let feedback = '';
         try {
@@ -2609,17 +2237,22 @@ export function Speaking() {
         } catch { /* ignore */ }
 
         if (!feedback) {
-          feedback = finalText
-            ? `You said ${detected.length.words} words in ${dur}s. Focus on reducing filler words and speaking in longer, more connected sentences.`
-            : 'We could not capture a clear transcript this time. Try speaking closer to the microphone in a quiet room.';
+          feedback = `You said ${detected.length.words} words in ${dur}s. ` +
+            (detected.fillers.count > 0
+              ? `Try to reduce filler words like "${Object.keys(detected.fillers.words).slice(0, 3).join('", "')}". `
+              : 'Great job avoiding filler words. ') +
+            (detected.length.words < SCORING.longAnswerWords
+              ? 'Speak for longer next time to boost your fluency score.'
+              : 'Nice long answer — keep it up!');
         }
 
         setFaults(detected);
         setResult({ ...bands, feedback, transcript: finalText, duration: dur });
         setXp((x) => x + 20);
         showToast('+20 XP 🎤');
+      } finally {
         setScoring(false);
-      }, 500);
+      }
     } else {
       setResult(null);
       setFaults(null);
@@ -2659,16 +2292,25 @@ export function Speaking() {
 
   const handleConversationToggle = async () => {
     setConversationError(null);
+
     if (conversationRecorder.recording) {
-      const blob = await conversationRecorder.stop();
-      if (!blob || blob.size === 0) {
+      const captured = await conversationRecorder.stop();
+
+      if (!captured || !captured.blob || captured.blob.size === 0) {
         setConversationError('No audio captured. Try again.');
         return;
       }
+      if (captured.peak < SCORING.silencePeak) {
+        setConversationError('We didn\'t hear anything. Try again.');
+        return;
+      }
+
+      const { blob } = captured;
       setConversationBusy(true);
       const audioUrl = URL.createObjectURL(blob);
       audioUrlsRef.current.push(audioUrl);
       setTurns((t) => [...t, { role: 'user', text: '(your response)', audioUrl }]);
+
       try {
         const data = await speakingApi.conversationTurn(sessionId, blob);
         setTurns((t) => [...t, { role: 'ai', text: data?.reply || data?.text || 'Thanks — tell me more.' }]);
@@ -2702,6 +2344,12 @@ export function Speaking() {
   const averageScore = result
     ? Math.round(((result.fluency + result.pronunciation + result.vocabulary + result.grammar) / 4) * 10) / 10
     : null;
+
+  /* Show the "we can't hear you" warning only after 2s of recording */
+  const showSilentWarning =
+    practiceRecorder.recording &&
+    practiceRecorder.seconds >= 2 &&
+    practiceRecorder.liveLevel < SCORING.silencePeak;
 
   return (
     <div className="ec-spk">
@@ -2757,7 +2405,7 @@ export function Speaking() {
         ))}
       </div>
 
-      {/* Category tabs (practice only) */}
+      {/* Category tabs */}
       {tab === 'practice' && (
         <div className="ec-spk-cats">
           {ALL_CATEGORIES.map((c) => (
@@ -2806,6 +2454,10 @@ export function Speaking() {
 
               <Waveform active={practiceRecorder.recording} />
 
+              {practiceRecorder.recording && (
+                <LiveLevelMeter level={practiceRecorder.liveLevel} />
+              )}
+
               <p className="ec-spk-record-status">
                 {scoring
                   ? 'Analysing your speech…'
@@ -2815,6 +2467,10 @@ export function Speaking() {
               </p>
               {practiceRecorder.recording && (
                 <p className="ec-spk-record-time">{formatTime(practiceRecorder.seconds)}</p>
+              )}
+
+              {showSilentWarning && (
+                <p className="ec-spk-record-warning">🔇 We can\'t hear you — check your mic</p>
               )}
 
               {(practiceRecorder.error || submitError) && (
@@ -2843,7 +2499,7 @@ export function Speaking() {
                 </div>
               )}
 
-              {/* Score cards */}
+              {/* Score cards — only rendered when we have a valid result */}
               {result && (
                 <>
                   <div className="ec-spk-scores">
@@ -2859,10 +2515,13 @@ export function Speaking() {
                     </div>
                   )}
                   {result.feedback && <p className="ec-spk-feedback">{result.feedback}</p>}
+                  <p className="ec-spk-info">
+                    ℹ️ These scores are heuristic estimates based on transcript statistics. For real pronunciation
+                    analysis, use a dedicated STT service with audio feature extraction.
+                  </p>
                 </>
               )}
 
-              {/* Fault report */}
               {faults && <FaultReport faults={faults} />}
 
               <div className="ec-spk-actions">
@@ -2870,7 +2529,10 @@ export function Speaking() {
                   Next prompt →
                 </button>
                 {practiceRecorder.recording && (
-                  <button className="ec-spk-btn-ghost" onClick={() => { practiceRecorder.cancel(); speech.stopRecog(); }}>
+                  <button
+                    className="ec-spk-btn-ghost"
+                    onClick={() => { practiceRecorder.cancel(); speech.stopRecog(); }}
+                  >
                     Cancel
                   </button>
                 )}
@@ -2921,7 +2583,10 @@ export function Speaking() {
               </div>
 
               {conversationRecorder.recording && (
-                <p className="ec-spk-record-time">{formatTime(conversationRecorder.seconds)}</p>
+                <>
+                  <LiveLevelMeter level={conversationRecorder.liveLevel} />
+                  <p className="ec-spk-record-time">{formatTime(conversationRecorder.seconds)}</p>
+                </>
               )}
               <p className="ec-spk-record-status">
                 {conversationRecorder.recording ? 'Recording… tap to stop' : 'Tap to speak'}
@@ -3017,7 +2682,8 @@ export function Speaking() {
             <div className="ec-spk-side ec-spk-anim" style={{ background: 'var(--lang-yellow)' }}>
               <h3>Browser note</h3>
               <p style={{ margin: 0, fontSize: 12.5, color: 'var(--lang-ink)', lineHeight: 1.6, fontWeight: 700 }}>
-                Live transcription requires Chrome, Edge, or Safari. You can still record and score using duration-based estimates.
+                Live transcription requires Chrome, Edge, or Safari. You can still record in this browser,
+                but scoring is disabled because we can't verify what you said.
               </p>
             </div>
           )}
