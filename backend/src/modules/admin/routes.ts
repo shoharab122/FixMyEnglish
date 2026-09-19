@@ -496,7 +496,7 @@ router.patch('/purchases/:id/refund', requireSuperAdmin, async (req, res, next) 
 /* ══════════════════════════════════════════════════════
    ANNOUNCEMENTS (superadmin)
    ══════════════════════════════════════════════════════ */
-router.get('/announcements', async (_req, res, next) => {
+router.get('/announcements', requireSuperAdmin, async (_req, res, next) => {
   try { res.json(await prisma.announcement.findMany({ orderBy: { createdAt: 'desc' } })); } catch (e) { next(e); }
 });
 router.post('/announcements', requireSuperAdmin, async (req, res, next) => {
@@ -519,7 +519,7 @@ router.delete('/announcements/:id', requireSuperAdmin, async (req, res, next) =>
 /* ══════════════════════════════════════════════════════
    FEATURE FLAGS (superadmin)
    ══════════════════════════════════════════════════════ */
-router.get('/feature-flags', async (_req, res, next) => {
+router.get('/feature-flags', requireSuperAdmin, async (_req, res, next) => {
   try { res.json(await prisma.featureFlag.findMany({ orderBy: { key: 'asc' } })); } catch (e) { next(e); }
 });
 router.post('/feature-flags', requireSuperAdmin, async (req, res, next) => {

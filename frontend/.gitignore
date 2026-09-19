@@ -22,3 +22,19 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+node_modules/
+.env
+.env.*
+!.env.example
+dist/
+build/
+.DS_Store
+*.log
+
+# Editor and tool backups
+*.bak
+*.bak.*
+*.orig
+*.tmp
+*.swp
+*~

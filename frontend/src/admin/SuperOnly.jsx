@@ -1,14 +1,33 @@
 import { useAuth } from '../context/AuthContext';
 
-export function SuperOnly({ children }) {
+/**
+ * Role gate.
+ * - Default: allow admin + superadmin.
+ * - `superOnly`: allow superadmin only.
+ */
+export function SuperOnly({ children, superOnly = false, fallback }) {
   const { user } = useAuth();
-  if (user?.role !== 'superadmin') {
+  const role = user?.role;
+
+  const ok = superOnly
+    ? role === 'superadmin'
+    : role === 'admin' || role === 'superadmin';
+
+  if (!ok) {
     return (
-      <div className="ec-admin-role-gate">
-        <h3>🔒 Superadmin only</h3>
-        <p>This section controls money and permissions. Only a superadmin can access it.</p>
-      </div>
+      fallback ?? (
+        <div className="ec-admin-role-gate">
+          <h3>🔒 {superOnly ? 'Superadmin only' : 'Admin access required'}</h3>
+          <p>
+            {superOnly
+              ? 'Only a superadmin can perform this action.'
+              : 'You need an admin account to view this section.'}
+          </p>
+        </div>
+      )
     );
   }
   return children;
 }
+
+export default SuperOnly;

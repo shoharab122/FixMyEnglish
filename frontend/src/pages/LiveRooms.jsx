@@ -1862,8 +1862,16 @@ export function LiveRooms() {
 
   useEffect(() => {
     liveRoomsApi.upcoming()
-      .then((r) => setRooms(r?.length ? r : FALLBACK_ROOMS))
-      .catch(() => setRooms(FALLBACK_ROOMS));
+      .then((list) => {
+        // eslint-disable-next-line no-console
+        console.log('[LiveRooms] rooms loaded:', list?.length, list);
+        setRooms(Array.isArray(list) && list.length > 0 ? list : FALLBACK_ROOMS);
+      })
+      .catch((err) => {
+        // eslint-disable-next-line no-console
+        console.warn('[LiveRooms] API failed, using fallback:', err);
+        setRooms(FALLBACK_ROOMS);
+      });
   }, []);
 
   const openLobby = (room) => {
@@ -1956,6 +1964,8 @@ export function LiveRooms() {
     if (tab === 'upcoming') return !r.live;
     return true;
   });
+  // eslint-disable-next-line no-console
+  console.log('[LiveRooms] tab:', tab, 'rooms:', rooms.length, 'visible:', visibleRooms.length);
 
   /* ============================================================
      ZOOM EMBEDDED VIEW
@@ -2171,7 +2181,7 @@ export function LiveRooms() {
           </div>
         ) : (
           visibleRooms.map((r, i) => {
-            const pct = Math.min(100, Math.round((r.joined / r.seats) * 100));
+            const pct = Math.min(100, Math.max(0, Math.round(((r.joined ?? 0) / Math.max(1, r.seats ?? 1)) * 100)));
             const almostFull = pct > 80;
             return (
               <div
@@ -2195,9 +2205,9 @@ export function LiveRooms() {
                         </span>
                       )}
                       <span className="ec-live-chip">{r.level}</span>
-                      {r.zoomMeetingId && (
+                      {r.meetLink && (
                         <span className="ec-live-chip ec-live-chip--zoom">
-                          <IcoCamOn /> Zoom
+                          <IcoCamOn /> {r.meetProvider === 'zoom' ? 'Zoom' : r.meetProvider === 'teams' ? 'Teams' : 'Google Meet'}
                         </span>
                       )}
                     </div>
@@ -2208,26 +2218,39 @@ export function LiveRooms() {
                   <div className="ec-live-fill-bar">
                     <div className="ec-live-fill" style={{ width: `${pct}%` }} />
                   </div>
-                  <span className="ec-live-fill-pct">{r.joined}/{r.seats}</span>
+                  <span className="ec-live-fill-pct">{r.joined ?? 0}/{r.seats ?? 0}</span>
                 </div>
 
                 <div className="ec-live-card-meta">
-                  <span><Icon name="users" /> {r.seats - r.joined} seats left</span>
-                  <span><Icon name="calendar" /> {r.duration}</span>
+                  <span><Icon name="users" /> {(r.seats ?? 0) - (r.joined ?? 0)} seats left</span>
+                  <span><Icon name="calendar" /> {r.duration ?? r.durationMins ?? 60} min</span>
                   <span><Icon name="target" /> Auto-scored</span>
                 </div>
 
                 <div className="ec-live-sep" />
 
                 <div className="ec-live-actions">
-                  <button
-                    className="ec-live-btn ec-live-btn--zoom"
-                    onClick={() => joinLiveClass(r)}
-                    disabled={!!connectingRoom}
-                  >
-                    <IcoCamOn />
-                    {connectingRoom?.id === r.id ? 'Connecting…' : 'Join Live Class'}
-                  </button>
+                  {r.meetLink ? (
+                    <a
+                      href={r.meetLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="ec-live-btn ec-live-btn--zoom"
+                      style={{ textDecoration: 'none' }}
+                    >
+                      <IcoCamOn />
+                      Join on {r.meetProvider === 'zoom' ? 'Zoom' : r.meetProvider === 'teams' ? 'Teams' : 'Google Meet'}
+                    </a>
+                  ) : (
+                    <button
+                      className="ec-live-btn ec-live-btn--zoom"
+                      onClick={() => joinLiveClass(r)}
+                      disabled={!!connectingRoom}
+                    >
+                      <IcoCamOn />
+                      {connectingRoom?.id === r.id ? 'Connecting…' : 'Join Live Class'}
+                    </button>
+                  )}
                   <button className="ec-live-btn ec-live-btn--ghost" onClick={() => openLobby(r)}>
                     <IcoUsers /> Lobby
                   </button>

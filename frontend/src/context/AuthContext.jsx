@@ -56,6 +56,31 @@ export function AuthProvider({ children }) {
     return () => { cancelled = true; };
   }, []);
 
+  /* Re-fetch current user from the backend (tier/role can change from admin) */
+  const refreshUser = useCallback(async () => {
+    try {
+      const { api } = await import('../api/client');
+      const { data } = await api.get('/api/auth/me');
+      if (data) {
+        setUser({
+          id: data.id,
+          name: data.name,
+          tier: data.tier,
+          role: data.role ?? 'user',
+        });
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  /* Refresh on window focus so tier/role changes propagate without logout */
+  useEffect(() => {
+    const onFocus = () => refreshUser();
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
+  }, [refreshUser]);
+
   const login = useCallback(async (email, password) => {
     const data = await authApi.login(email, password);
     setAccessToken(data.accessToken);
@@ -85,7 +110,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider value={{
-      user, loading, login, register, continueAsGuest, logout,
+      user, loading, login, register, continueAsGuest, logout, refreshUser,
       isPremium: user?.tier === 'premium',
       isGuest: user?.tier === 'guest',
       isAuthenticated: !!user,
