@@ -495,3 +495,75 @@ model AuditLog {
   @@index([createdAt])
   @@index([actorId])
 }
+
+
+// ============================================================
+// EXAM PAPERS - admin-published, learner-facing
+// ============================================================
+
+model ExamPaper {
+  id           String    @id @default(cuid())
+  title        String
+  classLevel   String
+  paper        String
+  board        String
+  year         Int?
+  durationMins Int       @default(180)
+  totalMarks   Int       @default(100)
+  status       String    @default("draft")
+  instructions String?
+  launchedAt   DateTime?
+  endedAt      DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  sections     ExamPaperSection[]
+  attempts     ExamPaperAttempt[]
+
+  @@index([status])
+  @@index([classLevel])
+}
+
+model ExamPaperSection {
+  id           String   @id @default(cuid())
+  paperId      String
+  paper        ExamPaper @relation(fields: [paperId], references: [id], onDelete: Cascade)
+  name         String
+  marks        Int      @default(0)
+  instructions String?
+  orderIndex   Int      @default(0)
+
+  questions    ExamPaperQuestion[]
+
+  @@index([paperId])
+}
+
+model ExamPaperQuestion {
+  id          String   @id @default(cuid())
+  sectionId   String
+  section     ExamPaperSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  prompt      String
+  options     String[]
+  answer      String
+  marks       Int      @default(1)
+  explanation String?
+  orderIndex  Int      @default(0)
+
+  @@index([sectionId])
+}
+
+model ExamPaperAttempt {
+  id          String    @id @default(cuid())
+  paperId     String
+  paper       ExamPaper @relation(fields: [paperId], references: [id], onDelete: Cascade)
+  userId      String?
+  userName    String?
+  startedAt   DateTime  @default(now())
+  submittedAt DateTime?
+  score       Int?
+  total       Int?
+  answers     Json?
+
+  @@index([paperId])
+  @@index([userId])
+}
