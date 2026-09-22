@@ -108,6 +108,17 @@ const IcoWarn = () => (
     <path d="M12 10v4M12 17.5v.01" />
   </svg>
 );
+const IcoTrophy = () => (
+  <svg viewBox="0 0 24 24" width="20" height="20" {...SVG}>
+    <path d="M8 4h8v6a4 4 0 0 1-8 0V4Z" />
+    <path d="M5 4h3v4a3 3 0 0 1-3-3V4ZM19 4h-3v4a3 3 0 0 0 3-3V4ZM9 20h6M12 14v6" />
+  </svg>
+);
+const IcoSparkle = () => (
+  <svg viewBox="0 0 24 24" width="20" height="20" {...SVG}>
+    <path d="M12 3v6M12 15v6M3 12h6M15 12h6M5.6 5.6l4.2 4.2M14.2 14.2l4.2 4.2M18.4 5.6l-4.2 4.2M9.8 14.2l-4.2 4.2" />
+  </svg>
+);
 
 /* ============================================================
    Mascot — Langut yellow blob
@@ -144,7 +155,7 @@ function LangutMascot({ size = 180 }) {
 }
 
 /* ============================================================
-   MAIN STYLES — Langut-inspired with enhanced animations
+   MAIN STYLES — Vibrant Langut palette
    ============================================================ */
 const LIVE_CSS = `
 /* ============================================================
@@ -164,10 +175,13 @@ const LIVE_CSS = `
   --lang-lime-soft: #EDFFB0;
   --lang-lime-deep: #B8E62E;
   --lang-yellow:    #F5E04D;
+  --lang-yellow-2:  #FFEC7A;
   --lang-purple:    #7B5CF0;
   --lang-purple-2:  #9B7BFF;
+  --lang-purple-3:  #6B48E8;
   --lang-pink:      #FFB3D1;
   --lang-pink-2:    #FF8FCB;
+  --lang-pink-3:    #FF69B4;
   --lang-mint:      #B8F2D8;
   --lang-mint-2:    #7FD9A9;
   --lang-ink:       #17102E;
@@ -183,7 +197,7 @@ const LIVE_CSS = `
 .ec-exam *{box-sizing:border-box}
 
 /* ============================================================
-   NEW: List view hero with mascot
+   HERO
    ============================================================ */
 .ec-live-hero{
   position:relative;overflow:hidden;
@@ -235,7 +249,7 @@ const LIVE_CSS = `
   color:#fff;
 }
 .ec-live-hero h1 em{
-  font-style:normal;color:var(--lang-lime);
+  font-style:normal;
   background:linear-gradient(180deg,#E4FF5C 0%,#B8E62E 100%);
   -webkit-background-clip:text;
   background-clip:text;
@@ -281,15 +295,13 @@ const LIVE_CSS = `
   50%{transform:translateY(-10px) rotate(2deg)}
 }
 
-/* Floating sparkles around the mascot */
 .ec-live-hero-sparkle{
   position:absolute;
   width:14px;height:14px;
   pointer-events:none;
   animation:ec-lr-sparkle 3s ease-in-out infinite;
 }
-.ec-live-hero-sparkle::before,
-.ec-live-hero-sparkle::after{
+.ec-live-hero-sparkle::before{
   content:'';position:absolute;inset:0;
   background:currentColor;
   clip-path:polygon(50% 0,55% 45%,100% 50%,55% 55%,50% 100%,45% 55%,0 50%,45% 45%);
@@ -303,7 +315,7 @@ const LIVE_CSS = `
 }
 
 /* ============================================================
-   HEADING (kept for backwards compat)
+   HEADING (backwards compat)
    ============================================================ */
 .ec-live-head{margin-bottom:22px}
 .ec-live-eyebrow{
@@ -313,7 +325,7 @@ const LIVE_CSS = `
 }
 
 /* ============================================================
-   TABS — with spring indicator
+   TABS — colorful with spring feel
    ============================================================ */
 .ec-live-tabs{
   display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;
@@ -377,7 +389,7 @@ const LIVE_CSS = `
 }
 
 /* ============================================================
-   STATS ROW — with shimmer
+   STATS ROW
    ============================================================ */
 .ec-live-stats{
   display:grid;grid-template-columns:repeat(4,1fr);
@@ -427,10 +439,10 @@ const LIVE_CSS = `
   transition:transform .3s cubic-bezier(.34,1.56,.64,1);
 }
 .ec-live-stat:hover .ec-live-stat-icon{transform:scale(1.08) rotate(-5deg)}
-.ec-live-stat-icon--lime   {background:var(--lang-lime);     color:var(--lang-ink)}
-.ec-live-stat-icon--yellow {background:var(--lang-yellow);   color:var(--lang-ink)}
-.ec-live-stat-icon--purple {background:var(--lang-purple-2); color:#fff}
-.ec-live-stat-icon--pink   {background:var(--lang-pink-2);   color:#fff}
+.ec-live-stat-icon--lime   {background:linear-gradient(160deg,#E4FF5C,#B8E62E);color:var(--lang-ink)}
+.ec-live-stat-icon--yellow {background:linear-gradient(160deg,#FFEC7A,#F5E04D);color:var(--lang-ink)}
+.ec-live-stat-icon--purple {background:linear-gradient(160deg,#9B7BFF,#7B5CF0);color:#fff}
+.ec-live-stat-icon--pink   {background:linear-gradient(160deg,#FFB3D1,#FF8FCB);color:#fff}
 .ec-live-stat-value{
   font-size:24px;font-weight:900;color:var(--lang-ink);
   line-height:1;letter-spacing:-.035em;
@@ -442,7 +454,7 @@ const LIVE_CSS = `
 }
 
 /* ============================================================
-   ROOMS LIST — staggered entrance
+   ROOMS LIST
    ============================================================ */
 .ec-live-list{display:flex;flex-direction:column;gap:16px}
 
@@ -484,17 +496,8 @@ const LIVE_CSS = `
   margin:0 0 12px;font-size:17px;font-weight:900;
   color:var(--lang-ink);line-height:1.3;
   letter-spacing:-.02em;
-  transition:background-position .6s ease;
-  background:linear-gradient(90deg,var(--lang-ink) 0%,var(--lang-ink) 50%,#7B5CF0 75%,var(--lang-ink) 100%);
-  background-size:220% 100%;
-  background-position:0% 0;
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
 }
-.ec-live-card:hover .ec-live-title{background-position:-100% 0}
 
-/* Badges */
 .ec-live-badge{
   position:relative;
   display:inline-flex;align-items:center;gap:6px;
@@ -549,15 +552,15 @@ const LIVE_CSS = `
   font-size:10.5px;font-weight:900;
   letter-spacing:.06em;text-transform:uppercase;
   padding:4px 11px;border-radius:999px;
-  background:var(--lang-purple-2);color:#fff;
+  background:linear-gradient(160deg,#9B7BFF,#7B5CF0);color:#fff;
   border:2px solid var(--lang-line);
   box-shadow:0 2px 0 var(--lang-line);
   transition:transform .2s cubic-bezier(.34,1.56,.64,1);
 }
 .ec-live-chip:hover{transform:translateY(-2px) scale(1.05)}
-.ec-live-chip--zoom{background:#0B5FFF;color:#fff}
+.ec-live-chip--zoom{background:linear-gradient(160deg,#4A9FFF,#0B5FFF);color:#fff}
 
-/* Fill bar with animated shine */
+/* Fill bar */
 .ec-live-fill-row{
   display:flex;align-items:center;gap:12px;
   margin-bottom:16px;
@@ -609,7 +612,7 @@ const LIVE_CSS = `
 }
 
 /* ============================================================
-   BUTTONS
+   BUTTONS — VIBRANT & COLORFUL
    ============================================================ */
 .ec-live-actions{
   display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:10px;
@@ -623,15 +626,16 @@ const LIVE_CSS = `
   cursor:pointer;white-space:nowrap;min-height:46px;
   transition:transform .22s cubic-bezier(.34,1.56,.64,1),
              box-shadow .18s ease,
-             background .2s ease;
+             filter .2s ease;
   letter-spacing:.02em;
   box-shadow:0 4px 0 var(--lang-line);
   overflow:hidden;
+  text-decoration:none;
 }
 .ec-live-btn::before{
   content:'';position:absolute;top:0;bottom:0;left:-30%;
   width:30%;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);
   transform:translateX(0);
   transition:transform .6s ease;
   pointer-events:none;
@@ -641,6 +645,7 @@ const LIVE_CSS = `
 .ec-live-btn:hover:not(:disabled){
   transform:translateY(-3px);
   box-shadow:0 7px 0 var(--lang-line);
+  filter:brightness(1.05);
 }
 .ec-live-btn:hover:not(:disabled) svg{transform:scale(1.15)}
 .ec-live-btn:active:not(:disabled){
@@ -652,11 +657,43 @@ const LIVE_CSS = `
   box-shadow:0 4px 0 var(--lang-line);
 }
 
-.ec-live-btn--primary{background:var(--lang-purple);color:#fff}
-.ec-live-btn--zoom{background:var(--lang-ink);color:var(--lang-lime)}
-.ec-live-btn--dark{background:var(--lang-purple-2);color:#fff}
-.ec-live-btn--ghost{background:#fff;color:var(--lang-ink)}
-.ec-live-btn--ghost:hover:not(:disabled){background:var(--lang-lime-soft)}
+/* Vibrant color variants */
+.ec-live-btn--primary{
+  background:linear-gradient(160deg,#E4FF5C 0%,#B8E62E 100%);
+  color:var(--lang-ink);
+}
+.ec-live-btn--zoom{
+  background:linear-gradient(160deg,#4A9FFF 0%,#0B5FFF 100%);
+  color:#fff;
+  box-shadow:0 4px 0 var(--lang-line),0 8px 20px rgba(11,95,255,.28);
+}
+.ec-live-btn--zoom:hover:not(:disabled){
+  box-shadow:0 7px 0 var(--lang-line),0 12px 26px rgba(11,95,255,.36);
+}
+.ec-live-btn--dark{
+  background:linear-gradient(160deg,#9B7BFF 0%,#7B5CF0 100%);
+  color:#fff;
+  box-shadow:0 4px 0 var(--lang-line),0 8px 20px rgba(123,92,240,.28);
+}
+.ec-live-btn--dark:hover:not(:disabled){
+  box-shadow:0 7px 0 var(--lang-line),0 12px 26px rgba(123,92,240,.36);
+}
+.ec-live-btn--ghost{
+  background:linear-gradient(160deg,#FFD9EC 0%,#FF8FCB 100%);
+  color:var(--lang-ink);
+}
+.ec-live-btn--ghost:hover:not(:disabled){
+  background:linear-gradient(160deg,#FFB3D1 0%,#FF69B4 100%);
+  color:#fff;
+}
+.ec-live-btn--yellow{
+  background:linear-gradient(160deg,#FFEC7A 0%,#F5E04D 100%);
+  color:var(--lang-ink);
+}
+.ec-live-btn--pink{
+  background:linear-gradient(160deg,#FFB3D1 0%,#FF69B4 100%);
+  color:#fff;
+}
 
 /* ============================================================
    CONNECTING OVERLAY
@@ -706,7 +743,7 @@ const LIVE_CSS = `
 .ec-connect-error{
   display:flex;align-items:flex-start;gap:10px;
   margin-top:18px;padding:12px 16px;border-radius:14px;
-  background:var(--lang-pink-2);color:#fff;font-size:12.5px;
+  background:linear-gradient(160deg,#FFB3D1,#FF8FCB);color:#fff;font-size:12.5px;
   font-weight:900;text-align:left;line-height:1.5;
   border:2px solid var(--lang-line);
   box-shadow:0 3px 0 var(--lang-line);
@@ -715,7 +752,7 @@ const LIVE_CSS = `
 .ec-connect-error svg{flex-shrink:0;margin-top:1px}
 
 /* ============================================================
-   ZOOM EMBED (dark)
+   ZOOM EMBED
    ============================================================ */
 .ec-zoom-embed{
   position:fixed;inset:0;z-index:9999;
@@ -746,8 +783,14 @@ const LIVE_CSS = `
   transform:translateY(-2px);
 }
 .ec-zoom-embed-btn:active{transform:scale(.96)}
-.ec-zoom-embed-btn--danger{background:var(--lang-pink-2);border-color:var(--lang-pink-2);color:#fff}
-.ec-zoom-embed-btn--danger:hover{background:#ff77bf;border-color:#ff77bf}
+.ec-zoom-embed-btn--danger{
+  background:linear-gradient(160deg,#FFB3D1,#FF69B4);
+  border-color:#FF69B4;color:#fff;
+}
+.ec-zoom-embed-btn--danger:hover{
+  background:linear-gradient(160deg,#FF8FCB,#FF44A0);
+  border-color:#FF44A0;
+}
 .ec-zoom-embed-container{flex:1;position:relative;background:#0B0D12;min-height:0}
 .ec-zoom-embed-container > div{width:100%!important;height:100%!important}
 .ec-zoom-embed-fallback{
@@ -757,7 +800,7 @@ const LIVE_CSS = `
 }
 .ec-zoom-embed-fallback-icon{
   width:72px;height:72px;border-radius:50%;
-  background:var(--lang-pink-2);color:#fff;
+  background:linear-gradient(160deg,#FFB3D1,#FF69B4);color:#fff;
   display:flex;align-items:center;justify-content:center;
   border:3px solid var(--lang-line);
   box-shadow:0 4px 0 rgba(0,0,0,.5);
@@ -793,7 +836,13 @@ const LIVE_CSS = `
   margin:0 0 10px;font-size:clamp(24px,2.2vw + 14px,32px);
   font-weight:900;color:#fff;letter-spacing:-.035em;line-height:1.15;
 }
-.ec-lobby-hero h1 em{font-style:normal;color:var(--lang-lime)}
+.ec-lobby-hero h1 em{
+  font-style:normal;
+  background:linear-gradient(180deg,#E4FF5C 0%,#B8E62E 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
 .ec-lobby-hero p{
   margin:0;font-size:14px;line-height:1.6;
   opacity:.92;max-width:540px;font-weight:500;
@@ -815,7 +864,7 @@ const LIVE_CSS = `
 .ec-lobby-hero-stat{
   display:flex;flex-direction:column;gap:2px;
   padding:9px 14px;border-radius:14px;
-  background:var(--lang-lime);color:var(--lang-ink);
+  background:linear-gradient(160deg,#E4FF5C,#B8E62E);color:var(--lang-ink);
   border:2px solid var(--lang-line);
   box-shadow:0 3px 0 var(--lang-line);
   min-width:86px;
@@ -831,8 +880,8 @@ const LIVE_CSS = `
   font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;
   font-weight:900;opacity:.75;
 }
-.ec-lobby-hero-stat:nth-child(2){background:var(--lang-pink)}
-.ec-lobby-hero-stat:nth-child(3){background:var(--lang-purple-2)}
+.ec-lobby-hero-stat:nth-child(2){background:linear-gradient(160deg,#FFB3D1,#FF8FCB)}
+.ec-lobby-hero-stat:nth-child(3){background:linear-gradient(160deg,#9B7BFF,#7B5CF0);color:#fff}
 .ec-lobby-hero-stat:nth-child(3) strong,
 .ec-lobby-hero-stat:nth-child(3) span{color:#fff}
 
@@ -886,17 +935,19 @@ const LIVE_CSS = `
 .ec-guest-input::placeholder{color:var(--lang-ink-soft);font-weight:500}
 .ec-guest-btn{
   border:2px solid var(--lang-line);
-  background:var(--lang-lime);color:var(--lang-ink);
+  background:linear-gradient(160deg,#E4FF5C 0%,#B8E62E 100%);
+  color:var(--lang-ink);
   padding:13px 20px;border-radius:999px;
   font-size:13.5px;font-weight:900;
   cursor:pointer;font-family:inherit;
-  transition:transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .18s ease;
-  box-shadow:0 4px 0 var(--lang-line);
+  transition:transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .18s ease,filter .2s ease;
+  box-shadow:0 4px 0 var(--lang-line),0 8px 18px rgba(212,245,92,.35);
   letter-spacing:.03em;
 }
 .ec-guest-btn:hover:not(:disabled){
   transform:translateY(-3px);
-  box-shadow:0 7px 0 var(--lang-line);
+  box-shadow:0 7px 0 var(--lang-line),0 12px 26px rgba(212,245,92,.5);
+  filter:brightness(1.05);
 }
 .ec-guest-btn:active:not(:disabled){
   transform:translateY(2px);
@@ -928,7 +979,7 @@ const LIVE_CSS = `
   box-shadow:0 2px 0 var(--lang-line);
 }
 .ec-lb-row:nth-child(1) .ec-lb-rank{
-  background:var(--lang-yellow);
+  background:linear-gradient(160deg,#FFEC7A,#F5E04D);
   animation:ec-lr-trophy-spin 4s ease-in-out infinite;
 }
 @keyframes ec-lr-trophy-spin{
@@ -936,10 +987,10 @@ const LIVE_CSS = `
   50%{transform:rotate(8deg) scale(1.1)}
 }
 .ec-lb-row:nth-child(2) .ec-lb-rank{background:#E8E5F2;color:var(--lang-ink)}
-.ec-lb-row:nth-child(3) .ec-lb-rank{background:var(--lang-pink);color:var(--lang-ink)}
+.ec-lb-row:nth-child(3) .ec-lb-rank{background:linear-gradient(160deg,#FFB3D1,#FF8FCB);color:var(--lang-ink)}
 .ec-lb-avatar{
   width:34px;height:34px;border-radius:12px;
-  background:var(--lang-purple-2);color:#fff;
+  background:linear-gradient(160deg,#9B7BFF,#7B5CF0);color:#fff;
   flex-shrink:0;display:flex;align-items:center;justify-content:center;
   font-size:13px;font-weight:900;
   border:2px solid var(--lang-line);
@@ -954,7 +1005,7 @@ const LIVE_CSS = `
 .ec-lb-xp{
   font-size:12px;font-weight:900;
   color:var(--lang-ink);
-  background:var(--lang-lime);
+  background:linear-gradient(160deg,#E4FF5C,#B8E62E);
   padding:3px 10px;border-radius:999px;
   border:2px solid var(--lang-line);
   box-shadow:0 2px 0 var(--lang-line);
@@ -998,7 +1049,7 @@ const LIVE_CSS = `
 .ec-class-rec{
   display:inline-flex;align-items:center;gap:6px;
   font-size:11px;font-weight:900;
-  color:#fff;background:var(--lang-pink-2);
+  color:#fff;background:linear-gradient(160deg,#FFB3D1,#FF69B4);
   padding:4px 10px;border-radius:999px;
   border:2px solid var(--lang-line);
   box-shadow:0 2px 0 rgba(0,0,0,.4);
@@ -1073,7 +1124,7 @@ const LIVE_CSS = `
 
 .ec-class-avatar{
   width:70px;height:70px;border-radius:50%;
-  background:linear-gradient(135deg,#8B6BFF 0%,#7B5CF0 100%);
+  background:linear-gradient(135deg,#9B7BFF 0%,#7B5CF0 100%);
   display:flex;align-items:center;justify-content:center;
   color:#fff;font-size:26px;font-weight:900;
   border:2px solid var(--lang-line);
@@ -1082,7 +1133,7 @@ const LIVE_CSS = `
 }
 .ec-class-tile:hover .ec-class-avatar{transform:scale(1.05)}
 .ec-class-tile--speaking .ec-class-avatar{
-  background:linear-gradient(135deg,#D4F55C 0%,#B8E62E 100%);
+  background:linear-gradient(135deg,#E4FF5C 0%,#B8E62E 100%);
   color:var(--lang-ink);
   box-shadow:0 0 0 4px rgba(212,245,92,.3),0 4px 0 rgba(0,0,0,.5);
   animation:ec-lr-avatar-bounce 1.6s ease-in-out infinite;
@@ -1144,14 +1195,14 @@ const LIVE_CSS = `
 }
 .ec-class-ctrl:hover{background:rgba(255,255,255,.22);transform:scale(1.08)}
 .ec-class-ctrl:active{transform:scale(.92)}
-.ec-class-ctrl--off{background:var(--lang-pink-2);color:#fff}
-.ec-class-ctrl--off:hover{background:#ff77bf}
+.ec-class-ctrl--off{background:linear-gradient(160deg,#FFB3D1,#FF69B4);color:#fff}
+.ec-class-ctrl--off:hover{background:linear-gradient(160deg,#FF8FCB,#FF44A0)}
 .ec-class-ctrl--end{
-  background:var(--lang-pink-2);color:#fff;
+  background:linear-gradient(160deg,#FFB3D1,#FF69B4);color:#fff;
   width:auto;padding:0 26px;border-radius:999px;
   gap:8px;font-size:13px;font-weight:900;
 }
-.ec-class-ctrl--end:hover{background:#ff77bf}
+.ec-class-ctrl--end:hover{background:linear-gradient(160deg,#FF8FCB,#FF44A0)}
 .ec-class-ctrl svg{width:20px;height:20px}
 .ec-class-ctrl-label{display:none}
 
@@ -1227,7 +1278,7 @@ const LIVE_CSS = `
 .ec-class-chat-input::placeholder{color:rgba(255,255,255,.4)}
 .ec-class-chat-send{
   border:none;
-  background:var(--lang-lime);color:var(--lang-ink);
+  background:linear-gradient(160deg,#E4FF5C,#B8E62E);color:var(--lang-ink);
   width:40px;height:40px;border-radius:12px;
   display:flex;align-items:center;justify-content:center;
   cursor:pointer;flex-shrink:0;
@@ -1235,7 +1286,7 @@ const LIVE_CSS = `
   border:2px solid var(--lang-line);
   box-shadow:0 2px 0 var(--lang-line);
 }
-.ec-class-chat-send:hover{background:var(--lang-lime-2);transform:translateY(-2px) scale(1.05)}
+.ec-class-chat-send:hover{background:linear-gradient(160deg,#D4F55C,#A8D61E);transform:translateY(-2px) scale(1.05)}
 .ec-class-chat-send:active{transform:translateY(0) scale(.95)}
 
 /* ============================================================
@@ -1265,7 +1316,7 @@ const LIVE_CSS = `
 .ec-exam-timer{
   display:inline-flex;align-items:center;gap:7px;
   padding:8px 16px;border-radius:999px;
-  background:var(--lang-lime);color:var(--lang-ink);
+  background:linear-gradient(160deg,#E4FF5C,#B8E62E);color:var(--lang-ink);
   font-size:13px;font-weight:900;
   border:2px solid var(--lang-line);
   box-shadow:0 3px 0 var(--lang-line);
@@ -1273,9 +1324,9 @@ const LIVE_CSS = `
   letter-spacing:.02em;
   transition:background .3s ease,color .3s ease;
 }
-.ec-exam-timer--warn{background:var(--lang-yellow);color:var(--lang-ink)}
+.ec-exam-timer--warn{background:linear-gradient(160deg,#FFEC7A,#F5E04D);color:var(--lang-ink)}
 .ec-exam-timer--danger{
-  background:var(--lang-pink-2);color:#fff;
+  background:linear-gradient(160deg,#FFB3D1,#FF69B4);color:#fff;
   animation:ec-exam-warn 1.5s ease-in-out infinite;
 }
 @keyframes ec-exam-warn{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.7;transform:scale(1.03)}}
@@ -1331,7 +1382,7 @@ const LIVE_CSS = `
   font-size:11px;font-weight:900;letter-spacing:.1em;
   text-transform:uppercase;
   color:var(--lang-ink);
-  background:var(--lang-lime);
+  background:linear-gradient(160deg,#E4FF5C,#B8E62E);
   display:inline-block;padding:6px 13px;border-radius:999px;
   border:2px solid var(--lang-line);
   box-shadow:0 2px 0 var(--lang-line);
@@ -1373,7 +1424,7 @@ const LIVE_CSS = `
   box-shadow:0 1px 0 var(--lang-line);
 }
 .ec-exam-option--selected{
-  background:var(--lang-lime);
+  background:linear-gradient(160deg,#E4FF5C,#B8E62E);
   color:var(--lang-ink);
   font-weight:900;
   animation:ec-lr-selected-pop .4s cubic-bezier(.34,1.56,.64,1);
@@ -1430,10 +1481,22 @@ const LIVE_CSS = `
   box-shadow:0 1px 0 var(--lang-line);
 }
 .ec-exam-nav-btn:disabled{opacity:.4;cursor:not-allowed}
-.ec-exam-nav-btn--primary{background:var(--lang-ink);color:var(--lang-lime)}
-.ec-exam-nav-btn--primary:hover:not(:disabled){background:var(--lang-ink);color:var(--lang-lime)}
-.ec-exam-nav-btn--submit{background:var(--lang-purple);color:#fff}
-.ec-exam-nav-btn--submit:hover:not(:disabled){background:#6b4be0;color:#fff}
+.ec-exam-nav-btn--primary{
+  background:linear-gradient(160deg,#9B7BFF,#7B5CF0);
+  color:#fff;
+}
+.ec-exam-nav-btn--primary:hover:not(:disabled){
+  background:linear-gradient(160deg,#8B6BFF,#6B48E8);
+  color:#fff;
+}
+.ec-exam-nav-btn--submit{
+  background:linear-gradient(160deg,#E4FF5C,#B8E62E);
+  color:var(--lang-ink);
+}
+.ec-exam-nav-btn--submit:hover:not(:disabled){
+  background:linear-gradient(160deg,#D4F55C,#A8D61E);
+  color:var(--lang-ink);
+}
 
 .ec-exam-palette{
   display:flex;gap:8px;overflow-x:auto;
@@ -1467,7 +1530,7 @@ const LIVE_CSS = `
   transform:translateY(-3px);
   box-shadow:0 4px 0 var(--lang-line);
 }
-.ec-exam-palette-dot--answered{background:var(--lang-lime);color:var(--lang-ink)}
+.ec-exam-palette-dot--answered{background:linear-gradient(160deg,#E4FF5C,#B8E62E);color:var(--lang-ink)}
 .ec-exam-palette-dot--active{
   background:var(--lang-ink);
   color:var(--lang-lime);
@@ -1494,7 +1557,7 @@ const LIVE_CSS = `
 }
 .ec-exam-modal-icon{
   width:72px;height:72px;border-radius:50%;
-  background:var(--lang-lime);color:var(--lang-ink);
+  background:linear-gradient(160deg,#E4FF5C,#B8E62E);color:var(--lang-ink);
   display:flex;align-items:center;justify-content:center;
   margin:0 auto 18px;
   border:2px solid var(--lang-line);
@@ -1540,14 +1603,22 @@ const LIVE_CSS = `
   box-shadow:0 4px 0 var(--lang-line);
   letter-spacing:.03em;
 }
-.ec-exam-modal-actions .ghost{background:#fff;color:var(--lang-ink)}
+.ec-exam-modal-actions .ghost{
+  background:linear-gradient(160deg,#FFD9EC,#FF8FCB);
+  color:var(--lang-ink);
+}
 .ec-exam-modal-actions .ghost:hover{
-  background:var(--lang-lime-soft);
+  background:linear-gradient(160deg,#FFB3D1,#FF69B4);
+  color:#fff;
   transform:translateY(-3px);
   box-shadow:0 7px 0 var(--lang-line);
 }
-.ec-exam-modal-actions .primary{background:var(--lang-lime);color:var(--lang-ink)}
+.ec-exam-modal-actions .primary{
+  background:linear-gradient(160deg,#E4FF5C,#B8E62E);
+  color:var(--lang-ink);
+}
 .ec-exam-modal-actions .primary:hover{
+  background:linear-gradient(160deg,#D4F55C,#A8D61E);
   transform:translateY(-3px);
   box-shadow:0 7px 0 var(--lang-line);
 }
@@ -1591,9 +1662,11 @@ const LIVE_CSS = `
   box-shadow:0 3px 0 var(--lang-line);
   animation:ec-lr-pop .5s cubic-bezier(.34,1.56,.64,1) both;
 }
-.ec-exam-result-score div:nth-child(1){animation-delay:.15s}
-.ec-exam-result-score div:nth-child(2){animation-delay:.25s}
-.ec-exam-result-score div:nth-child(3){animation-delay:.35s}
+.ec-exam-result-score div:nth-child(1){animation-delay:.15s;background:linear-gradient(160deg,#E4FF5C,#B8E62E)}
+.ec-exam-result-score div:nth-child(2){animation-delay:.25s;background:linear-gradient(160deg,#FFB3D1,#FF8FCB)}
+.ec-exam-result-score div:nth-child(3){animation-delay:.35s;background:linear-gradient(160deg,#9B7BFF,#7B5CF0);color:#fff}
+.ec-exam-result-score div:nth-child(3) strong{color:#fff}
+.ec-exam-result-score div:nth-child(3) span{color:rgba(255,255,255,.75)}
 .ec-exam-result-score strong{
   display:block;font-size:24px;font-weight:900;
   color:var(--lang-ink);line-height:1;margin-bottom:6px;
@@ -1818,10 +1891,7 @@ function openInNewTab(url) {
 
 function loadScript(src) {
   return new Promise((resolve, reject) => {
-    if (document.querySelector(`script[data-src="${src}"]`)) {
-      resolve();
-      return;
-    }
+    if (document.querySelector(`script[data-src="${src}"]`)) { resolve(); return; }
     const s = document.createElement('script');
     s.src = src;
     s.async = true;
@@ -1967,9 +2037,7 @@ export function LiveRooms() {
   // eslint-disable-next-line no-console
   console.log('[LiveRooms] tab:', tab, 'rooms:', rooms.length, 'visible:', visibleRooms.length);
 
-  /* ============================================================
-     ZOOM EMBEDDED VIEW
-     ============================================================ */
+  /* ZOOM EMBEDDED VIEW */
   if (zoomInfo) {
     return (
       <ZoomEmbedView
@@ -1979,9 +2047,7 @@ export function LiveRooms() {
     );
   }
 
-  /* ============================================================
-     LIVE CLASS VIEW
-     ============================================================ */
+  /* LIVE CLASS VIEW */
   if (view === 'class' && activeRoom) {
     return (
       <LiveClassView
@@ -1991,9 +2057,7 @@ export function LiveRooms() {
     );
   }
 
-  /* ============================================================
-     EXAM VIEW
-     ============================================================ */
+  /* EXAM VIEW */
   if (view === 'exam' && activeRoom) {
     return (
       <ExamView
@@ -2003,9 +2067,7 @@ export function LiveRooms() {
     );
   }
 
-  /* ============================================================
-     LOBBY VIEW
-     ============================================================ */
+  /* LOBBY VIEW */
   if (view === 'lobby' && activeRoom) {
     const pct = Math.min(100, Math.round((activeRoom.joined / activeRoom.seats) * 100));
 
@@ -2094,14 +2156,11 @@ export function LiveRooms() {
     );
   }
 
-  /* ============================================================
-     LIST VIEW (default)
-     ============================================================ */
+  /* LIST VIEW (default) */
   return (
     <>
       <style>{LIVE_CSS}</style>
 
-      {/* NEW: Hero with mascot */}
       <div className="ec-live-hero ec-live-anim">
         <div className="ec-live-hero-orb" aria-hidden="true" />
         <div className="ec-live-hero-copy">
@@ -2128,7 +2187,6 @@ export function LiveRooms() {
         </div>
       </div>
 
-      {/* Stats */}
       <div className="ec-live-stats">
         <div className="ec-live-stat">
           <span className="ec-live-stat-icon ec-live-stat-icon--lime"><IcoCamOn /></span>
@@ -2152,7 +2210,6 @@ export function LiveRooms() {
         </div>
       </div>
 
-      {/* Tabs */}
       <div className="ec-live-tabs" role="tablist">
         {[
           { id: 'all',      label: 'All rooms', icon: <Icon name="grid" /> },
@@ -2173,7 +2230,6 @@ export function LiveRooms() {
         ))}
       </div>
 
-      {/* Rooms */}
       <div className="ec-live-list">
         {visibleRooms.length === 0 ? (
           <div className="ec-lobby-card" style={{ textAlign: 'center', padding: '52px 24px', color: 'var(--lang-ink-soft)', borderStyle: 'dashed' }}>
@@ -2236,7 +2292,6 @@ export function LiveRooms() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="ec-live-btn ec-live-btn--zoom"
-                      style={{ textDecoration: 'none' }}
                     >
                       <IcoCamOn />
                       Join on {r.meetProvider === 'zoom' ? 'Zoom' : r.meetProvider === 'teams' ? 'Teams' : 'Google Meet'}
@@ -2330,9 +2385,7 @@ function ZoomEmbedView({ info, onExit }) {
         const zoom = window.ZoomMtgEmbedded || window.ZoomMtg;
         if (!zoom) throw new Error('Zoom SDK failed to load');
 
-        const client = zoom.createClient
-          ? zoom.createClient()
-          : new zoom.ZoomMtg();
+        const client = zoom.createClient ? zoom.createClient() : new zoom.ZoomMtg();
         clientRef.current = client;
 
         await client.init({
@@ -2341,9 +2394,7 @@ function ZoomEmbedView({ info, onExit }) {
           customize: {
             video: {
               isResizable: true,
-              viewSizes: {
-                default: { width: 1000, height: 600 },
-              },
+              viewSizes: { default: { width: 1000, height: 600 } },
             },
           },
         });
@@ -2395,9 +2446,7 @@ function ZoomEmbedView({ info, onExit }) {
             Zoom
           </span>
           <span className="ec-zoom-embed-bar-title">{info.room.title}</span>
-          <span className="ec-zoom-embed-bar-sub">
-            Meeting · {info.meetingNumber}
-          </span>
+          <span className="ec-zoom-embed-bar-sub">Meeting · {info.meetingNumber}</span>
         </div>
         <div className="ec-zoom-embed-bar-right">
           {info.joinUrl && (
@@ -2492,9 +2541,7 @@ function LiveClassView({ room, onLeave }) {
     setDraft('');
   };
 
-  const participants = CLASS_PARTICIPANTS.map((p) =>
-    p.self ? { ...p, mic, cam } : p
-  );
+  const participants = CLASS_PARTICIPANTS.map((p) => p.self ? { ...p, mic, cam } : p);
   const visible = participants.slice(0, 6);
 
   return (
@@ -2562,22 +2609,22 @@ function LiveClassView({ room, onLeave }) {
       </div>
 
       <div className="ec-class-bottom">
-        <button className={`ec-class-ctrl${mic ? '' : ' ec-class-ctrl--off'}`} onClick={() => setMic((v) => !v)} aria-label={mic ? 'Mute' : 'Unmute'} title={mic ? 'Mute' : 'Unmute'}>
+        <button className={`ec-class-ctrl${mic ? '' : ' ec-class-ctrl--off'}`} onClick={() => setMic((v) => !v)} aria-label={mic ? 'Mute' : 'Unmute'}>
           {mic ? <IcoMicOn /> : <IcoMicOff />}
         </button>
-        <button className={`ec-class-ctrl${cam ? '' : ' ec-class-ctrl--off'}`} onClick={() => setCam((v) => !v)} aria-label={cam ? 'Camera off' : 'Camera on'} title={cam ? 'Turn camera off' : 'Turn camera on'}>
+        <button className={`ec-class-ctrl${cam ? '' : ' ec-class-ctrl--off'}`} onClick={() => setCam((v) => !v)} aria-label={cam ? 'Camera off' : 'Camera on'}>
           {cam ? <IcoCamOn /> : <IcoCamOff />}
         </button>
-        <button className={`ec-class-ctrl${sharing ? ' ec-class-ctrl--off' : ''}`} onClick={() => setSharing((v) => !v)} aria-label="Share screen" title="Share screen">
+        <button className={`ec-class-ctrl${sharing ? ' ec-class-ctrl--off' : ''}`} onClick={() => setSharing((v) => !v)} aria-label="Share screen">
           <IcoShare />
         </button>
-        <button className="ec-class-ctrl" onClick={() => setChatOpen((v) => !v)} aria-label="Chat" title="Chat">
+        <button className="ec-class-ctrl" onClick={() => setChatOpen((v) => !v)} aria-label="Chat">
           <IcoChat />
         </button>
-        <button className="ec-class-ctrl" aria-label="Participants" title="Participants">
+        <button className="ec-class-ctrl" aria-label="Participants">
           <IcoUsers />
         </button>
-        <button className="ec-class-ctrl ec-class-ctrl--end" onClick={onLeave} aria-label="Leave class" title="Leave">
+        <button className="ec-class-ctrl ec-class-ctrl--end" onClick={onLeave} aria-label="Leave class">
           <IcoEnd />
           <span className="ec-class-ctrl-label">Leave</span>
         </button>
