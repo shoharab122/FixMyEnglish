@@ -4,7 +4,7 @@ import { Icon } from '../components/Icon';
 
 const VOCAB_CSS = `
 /* ============================================================
-   VOCABULARY — Langut-inspired
+   VOCABULARY — Langut-inspired (fully mobile-optimised)
    Deep purple + lime-yellow + chunky black outlines.
    ============================================================ */
 
@@ -28,25 +28,52 @@ const VOCAB_CSS = `
   --lang-line:      #17102E;
   --lang-radius:    26px;
   --lang-radius-sm: 18px;
+  --lang-safe:      env(safe-area-inset-bottom, 0px);
+  --lang-nav-h:     110px;
+
+  /* Prevent any child from pushing past the viewport */
+  width:100%;
+  max-width:100%;
+  overflow-x:hidden;
+  position:relative;
 }
 
 .ec-voc,
-.ec-voc *{box-sizing:border-box}
+.ec-voc *{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+  min-width:0;
+}
+.ec-voc button,
+.ec-voc input,
+.ec-voc [role="button"]{
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+.ec-voc input{font-size:16px}
+.ec-voc img,.ec-voc svg{max-width:100%;height:auto}
 
 /* ============================================================
    HEADING
    ============================================================ */
-.ec-voc-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px}
-.ec-voc-eyebrow{margin:0 0 6px;font-size:11.5px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:var(--lang-purple);opacity:.95}
+.ec-voc-head{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  gap:16px;flex-wrap:wrap;margin-bottom:20px;
+}
+.ec-voc-eyebrow{
+  margin:0 0 6px;font-size:11.5px;font-weight:900;
+  letter-spacing:.16em;text-transform:uppercase;
+  color:var(--lang-purple);opacity:.95;
+}
 
 /* ============================================================
-   HERO — deep purple with mascot + price-tag stats
+   HERO
    ============================================================ */
 .ec-voc-hero{
   position:relative;
   overflow:hidden;
   border-radius:32px;
-  padding:clamp(28px,4vw,44px) clamp(24px,4vw,44px);
+  padding:clamp(24px,4vw,44px) clamp(20px,4vw,44px);
   color:#fff;
   background:linear-gradient(140deg,#2A1A6E 0%,#1E1252 55%,#3B2596 100%);
   box-shadow:0 24px 60px rgba(30,18,82,.32);
@@ -57,6 +84,7 @@ const VOCAB_CSS = `
   align-items:center;
   justify-content:space-between;
   gap:20px;
+  max-width:100%;
 }
 .ec-voc-hero::before{
   content:'';position:absolute;inset:0;
@@ -71,6 +99,7 @@ const VOCAB_CSS = `
   width:240px;height:240px;border-radius:50%;
   background:radial-gradient(circle,rgba(212,245,92,.22),transparent 68%);
   animation:ec-voc-drift 14s ease-in-out infinite;
+  pointer-events:none;
 }
 .ec-voc-hero-orb--pink{
   top:auto;bottom:-100px;left:-60px;right:auto;
@@ -78,9 +107,12 @@ const VOCAB_CSS = `
   background:radial-gradient(circle,rgba(255,143,203,.24),transparent 70%);
   animation-delay:-6s;
 }
-@keyframes ec-voc-drift{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-18px,16px) scale(1.08)}}
+@keyframes ec-voc-drift{
+  0%,100%{transform:translate(0,0) scale(1)}
+  50%{transform:translate(-18px,16px) scale(1.08)}
+}
 
-.ec-voc-hero-copy{position:relative;z-index:2;max-width:560px}
+.ec-voc-hero-copy{position:relative;z-index:2;max-width:560px;min-width:0;flex:1 1 auto}
 .ec-voc-hero-badge{
   display:inline-flex;align-items:center;
   font-size:10.5px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;
@@ -89,14 +121,16 @@ const VOCAB_CSS = `
   margin-bottom:18px;
   border:2px solid var(--lang-ink);
   box-shadow:0 4px 0 rgba(23,16,46,.35);
+  max-width:100%;
 }
 .ec-voc-hero h1{
   margin:0 0 12px;
-  font-size:clamp(28px,2.6vw + 16px,42px);
+  font-size:clamp(24px,2.6vw + 16px,42px);
   font-weight:900;
   letter-spacing:-.035em;
   line-height:1.08;
   color:#fff;
+  word-break:break-word;
 }
 .ec-voc-hero h1 em{font-style:normal;color:var(--lang-lime);}
 .ec-voc-hero p{
@@ -105,8 +139,11 @@ const VOCAB_CSS = `
   opacity:.92;font-weight:500;max-width:52ch;
 }
 
-/* Price-tag style stat chips */
-.ec-voc-hero-stats{display:flex;gap:12px;flex-wrap:wrap;position:relative;z-index:2}
+.ec-voc-hero-stats{
+  display:flex;gap:12px;flex-wrap:wrap;
+  position:relative;z-index:2;
+  max-width:100%;
+}
 .ec-voc-hero-stat{
   display:flex;flex-direction:column;gap:2px;
   padding:10px 16px;
@@ -115,11 +152,12 @@ const VOCAB_CSS = `
   border:2px solid var(--lang-ink);
   box-shadow:0 4px 0 var(--lang-ink);
   min-width:86px;
+  min-width:0;
+  flex:0 1 auto;
 }
 .ec-voc-hero-stat strong{
   font-size:22px;font-weight:900;line-height:1;
-  letter-spacing:-.04em;
-  color:var(--lang-ink);
+  letter-spacing:-.04em;color:var(--lang-ink);
 }
 .ec-voc-hero-stat span{
   font-size:10px;font-weight:900;letter-spacing:.1em;
@@ -131,24 +169,31 @@ const VOCAB_CSS = `
 .ec-voc-hero-stat:nth-child(3) span{color:#fff;}
 .ec-voc-hero-stat:nth-child(4){background:var(--lang-yellow);}
 
-/* Mascot blob (right side of hero) */
 .ec-voc-hero-mascot{
   position:relative;z-index:2;
   flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
   filter:drop-shadow(0 14px 28px rgba(0,0,0,.28));
   animation:ec-voc-bob 4s ease-in-out infinite;
+  pointer-events:none;
 }
-@keyframes ec-voc-bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-10px) rotate(2deg)}}
+@keyframes ec-voc-bob{
+  0%,100%{transform:translateY(0) rotate(-2deg)}
+  50%{transform:translateY(-10px) rotate(2deg)}
+}
 
 /* ============================================================
    MODE TABS — chunky pills
    ============================================================ */
 .ec-voc-tabs{
   display:flex;gap:10px;
-  overflow-x:auto;scroll-snap-type:x mandatory;
+  overflow-x:auto;overflow-y:hidden;
+  scroll-snap-type:x proximity;
   scrollbar-width:none;
-  padding:6px 4px 18px;margin-bottom:6px;
+  -webkit-overflow-scrolling:touch;
+  padding:6px 2px 18px;
+  margin:0 0 6px;
+  max-width:100%;
 }
 .ec-voc-tabs::-webkit-scrollbar{display:none}
 .ec-voc-tab{
@@ -165,6 +210,7 @@ const VOCAB_CSS = `
   transition:all .18s ease;
   box-shadow:0 3px 0 var(--lang-line);
   letter-spacing:.01em;
+  min-height:44px;
 }
 .ec-voc-tab:hover{background:var(--lang-lime-soft);transform:translateY(-2px);box-shadow:0 5px 0 var(--lang-line)}
 .ec-voc-tab:active{transform:translateY(1px);box-shadow:0 1px 0 var(--lang-line)}
@@ -173,22 +219,40 @@ const VOCAB_CSS = `
   box-shadow:0 3px 0 var(--lang-ink);
 }
 .ec-voc-tab--active:hover{background:var(--lang-ink);color:var(--lang-lime)}
-.ec-voc-tab svg{width:16px;height:16px}
+.ec-voc-tab svg{width:16px;height:16px;flex-shrink:0}
 
 /* ============================================================
-   GRID
+   GRID — desktop: content + sidebar
    ============================================================ */
-.ec-voc-grid{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:clamp(20px,3vw,28px);align-items:start}
+.ec-voc-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 330px;
+  gap:clamp(20px,3vw,28px);
+  align-items:start;
+  width:100%;
+  max-width:100%;
+}
+.ec-voc-grid > section,
+.ec-voc-grid > aside{
+  min-width:0;
+  max-width:100%;
+}
 
 /* ============================================================
-   FLASHCARDS — chunky borders, dark outline
+   FLASHCARDS
    ============================================================ */
-.ec-flash-wrap{perspective:1600px;min-height:320px;margin-bottom:22px}
+.ec-flash-wrap{
+  perspective:1600px;
+  min-height:320px;
+  margin-bottom:22px;
+  max-width:100%;
+}
 .ec-flash{
   position:relative;width:100%;height:320px;
   transform-style:preserve-3d;
   transition:transform .8s cubic-bezier(.2,1,.3,1);
   cursor:pointer;
+  max-width:100%;
 }
 .ec-flash[data-flipped="true"]{transform:rotateY(180deg)}
 .ec-flash-face{
@@ -199,6 +263,7 @@ const VOCAB_CSS = `
   align-items:center;justify-content:center;gap:16px;
   border:3px solid var(--lang-line);
   box-shadow:0 10px 0 var(--lang-line);
+  overflow:hidden;
 }
 .ec-flash-front{
   background:#fff;
@@ -230,6 +295,7 @@ const VOCAB_CSS = `
   font-size:clamp(32px,4.4vw + 14px,50px);
   font-weight:900;letter-spacing:-.04em;line-height:1.05;
   margin:0;color:var(--lang-ink);
+  word-break:break-word;overflow-wrap:anywhere;
 }
 .ec-flash-back .ec-flash-word{
   font-size:clamp(20px,2.4vw + 12px,30px);
@@ -248,9 +314,10 @@ const VOCAB_CSS = `
   font-size:11px;font-weight:900;
   color:var(--lang-ink-soft);opacity:.65;
   letter-spacing:.1em;text-transform:uppercase;
+  white-space:nowrap;
 }
 .ec-flash-back .ec-flash-hint{color:rgba(255,255,255,.75)}
-.ec-flash-syn{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+.ec-flash-syn{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:6px;max-width:100%}
 .ec-flash-syn span{
   font-size:11.5px;font-weight:900;
   padding:5px 13px;border-radius:999px;
@@ -260,7 +327,7 @@ const VOCAB_CSS = `
 
 .ec-flash-counter{
   display:flex;align-items:center;justify-content:space-between;
-  gap:12px;margin-bottom:16px;
+  gap:12px;margin-bottom:16px;flex-wrap:wrap;
 }
 .ec-flash-counter-label{
   font-size:12.5px;font-weight:900;
@@ -280,8 +347,8 @@ const VOCAB_CSS = `
   box-shadow:0 0 0 3px rgba(212,245,92,.4);
 }
 
-/* ---------- Grade buttons — chunky pills ---------- */
-.ec-grade-row{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+/* ---------- Grade buttons ---------- */
+.ec-grade-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;width:100%}
 .ec-grade-btn{
   border:2px solid var(--lang-line);
   padding:15px 10px;
@@ -292,6 +359,8 @@ const VOCAB_CSS = `
   transition:all .15s ease;
   box-shadow:0 4px 0 var(--lang-line);
   min-height:56px;
+  min-width:0;
+  word-break:break-word;
 }
 .ec-grade-btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--lang-line)}
 .ec-grade-btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--lang-line)}
@@ -308,6 +377,10 @@ const VOCAB_CSS = `
   padding:28px;
   border:3px solid var(--lang-line);
   box-shadow:0 10px 0 var(--lang-line);
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  overflow:hidden;
 }
 .ec-quiz-top{
   display:flex;align-items:center;justify-content:space-between;
@@ -321,6 +394,7 @@ const VOCAB_CSS = `
   background:var(--lang-lime);color:var(--lang-ink);
   border:2px solid var(--lang-line);
   box-shadow:0 3px 0 var(--lang-line);
+  max-width:100%;
 }
 .ec-quiz-badge--blitz{
   background:var(--lang-pink-2);color:#fff;
@@ -342,12 +416,16 @@ const VOCAB_CSS = `
   transition:width .5s cubic-bezier(.22,1,.36,1);
 }
 .ec-quiz-question{
-  font-size:clamp(18px,1.3vw + 14px,22px);
+  font-size:clamp(17px,1.3vw + 14px,22px);
   font-weight:900;line-height:1.35;
   margin:0 0 22px;color:var(--lang-ink);
   letter-spacing:-.02em;
+  word-break:break-word;overflow-wrap:anywhere;
 }
-.ec-quiz-options{display:flex;flex-direction:column;gap:12px;margin-bottom:18px}
+.ec-quiz-options{
+  display:flex;flex-direction:column;gap:12px;margin-bottom:18px;
+  width:100%;max-width:100%;min-width:0;
+}
 .ec-quiz-option{
   display:flex;align-items:center;
   border:2px solid var(--lang-line);
@@ -358,6 +436,13 @@ const VOCAB_CSS = `
   transition:all .16s ease;
   font-family:inherit;
   box-shadow:0 4px 0 var(--lang-line);
+  min-height:52px;
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  word-break:break-word;overflow-wrap:anywhere;
+  white-space:normal;
+  line-height:1.35;
 }
 .ec-quiz-option:hover:not(:disabled){
   background:var(--lang-lime-soft);
@@ -393,9 +478,14 @@ const VOCAB_CSS = `
 /* ============================================================
    DICTIONARY
    ============================================================ */
-.ec-dict-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.ec-dict-bar{
+  display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;
+  width:100%;max-width:100%;
+}
 .ec-dict-search{
-  flex:1;min-width:200px;
+  flex:1 1 200px;
+  min-width:0;
+  max-width:100%;
   display:flex;align-items:center;gap:10px;
   background:#fff;
   border:2px solid var(--lang-line);
@@ -409,11 +499,13 @@ const VOCAB_CSS = `
   box-shadow:0 4px 0 var(--lang-line),0 0 0 4px rgba(212,245,92,.5);
 }
 .ec-dict-search input{
-  flex:1;border:none;outline:none;background:transparent;
-  font-size:14.5px;color:var(--lang-ink);
+  flex:1 1 auto;
+  min-width:0;
+  border:none;outline:none;background:transparent;
+  font-size:16px;color:var(--lang-ink);
   font-family:inherit;font-weight:700;
 }
-.ec-dict-search input::placeholder{font-weight:500;color:var(--lang-ink-soft)}
+.ec-dict-search input::placeholder{font-weight:500;color:var(--lang-ink-soft);text-overflow:ellipsis}
 .ec-dict-clear{
   border:2px solid var(--lang-line);
   background:var(--lang-lime);color:var(--lang-ink);
@@ -422,12 +514,18 @@ const VOCAB_CSS = `
   display:flex;align-items:center;justify-content:center;
   cursor:pointer;font-family:inherit;
   box-shadow:0 2px 0 var(--lang-line);
+  flex-shrink:0;
+  padding:0;
 }
 .ec-dict-clear:hover{transform:translateY(-1px);box-shadow:0 3px 0 var(--lang-line)}
 
 .ec-dict-filters{
-  display:flex;gap:8px;overflow-x:auto;
-  scrollbar-width:none;padding-bottom:8px;margin-bottom:16px;
+  display:flex;gap:8px;
+  overflow-x:auto;overflow-y:hidden;
+  scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+  padding-bottom:8px;margin-bottom:16px;
+  max-width:100%;
 }
 .ec-dict-filters::-webkit-scrollbar{display:none}
 .ec-dict-filter{
@@ -440,6 +538,7 @@ const VOCAB_CSS = `
   transition:all .16s ease;font-family:inherit;
   box-shadow:0 3px 0 var(--lang-line);
   letter-spacing:.02em;
+  min-height:40px;
 }
 .ec-dict-filter:hover{
   background:var(--lang-lime-soft);
@@ -451,7 +550,10 @@ const VOCAB_CSS = `
   box-shadow:0 3px 0 var(--lang-ink);
 }
 
-.ec-dict-list{display:flex;flex-direction:column;gap:14px}
+.ec-dict-list{
+  display:flex;flex-direction:column;gap:14px;
+  width:100%;max-width:100%;min-width:0;
+}
 .ec-dict-item{
   background:#fff;
   border:2px solid var(--lang-line);
@@ -459,18 +561,22 @@ const VOCAB_CSS = `
   padding:20px 22px;
   box-shadow:0 5px 0 var(--lang-line);
   transition:all .18s ease;
+  width:100%;max-width:100%;min-width:0;
+  overflow:hidden;
 }
 .ec-dict-item:hover{
   transform:translateY(-3px);
   box-shadow:0 8px 0 var(--lang-line);
 }
 .ec-dict-item-head{
-  display:flex;align-items:baseline;justify-content:space-between;
+  display:flex;align-items:flex-start;justify-content:space-between;
   gap:12px;margin-bottom:8px;flex-wrap:wrap;
 }
 .ec-dict-word{
   margin:0;font-size:19px;font-weight:900;
   color:var(--lang-ink);letter-spacing:-.02em;
+  word-break:break-word;overflow-wrap:anywhere;
+  min-width:0;
 }
 .ec-dict-pos{
   font-size:10.5px;font-weight:900;
@@ -480,16 +586,19 @@ const VOCAB_CSS = `
   border:2px solid var(--lang-line);
   box-shadow:0 2px 0 var(--lang-line);
   white-space:nowrap;
+  flex-shrink:0;
 }
 .ec-dict-meaning{
   margin:0 0 8px;font-size:14px;line-height:1.55;
   color:var(--lang-ink);font-weight:700;
+  word-break:break-word;
 }
 .ec-dict-example{
   margin:0 0 12px;font-size:13px;line-height:1.6;
   color:var(--lang-ink-soft);font-style:italic;font-weight:500;
+  word-break:break-word;
 }
-.ec-dict-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ec-dict-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;max-width:100%}
 .ec-dict-syn{
   font-size:11.5px;font-weight:900;
   padding:4px 11px;border-radius:999px;
@@ -508,11 +617,14 @@ const VOCAB_CSS = `
   border:2px solid var(--lang-line);
   background:#fff;
   font-size:16px;cursor:pointer;
-  padding:2px 8px;border-radius:10px;
+  padding:0;border-radius:10px;
   color:#C8C4D6;
   transition:all .16s ease;
   box-shadow:0 2px 0 var(--lang-line);
-  line-height:1.2;
+  line-height:1;
+  min-width:40px;
+  min-height:40px;
+  flex-shrink:0;
 }
 .ec-dict-star--on{
   color:var(--lang-ink);
@@ -526,6 +638,7 @@ const VOCAB_CSS = `
   font-size:14px;font-weight:700;
   background:#fff;border-radius:24px;
   border:2px dashed var(--lang-line);
+  width:100%;max-width:100%;
 }
 
 /* ============================================================
@@ -538,6 +651,8 @@ const VOCAB_CSS = `
   padding:22px;
   box-shadow:0 6px 0 var(--lang-line);
   margin-bottom:18px;
+  width:100%;max-width:100%;min-width:0;
+  overflow:hidden;
 }
 .ec-voc-card:last-child{margin-bottom:0}
 .ec-voc-card h3{
@@ -556,10 +671,12 @@ const VOCAB_CSS = `
   text-transform:uppercase;letter-spacing:.08em;
   border:2px solid var(--lang-line);
   box-shadow:0 2px 0 var(--lang-line);
+  flex-shrink:0;
 }
 .ec-voc-wod-word{
   font-size:28px;font-weight:900;margin:0 0 8px;
   color:var(--lang-ink);letter-spacing:-.035em;line-height:1.1;
+  word-break:break-word;
 }
 .ec-voc-wod-meaning{
   font-size:13.5px;color:var(--lang-ink-soft);
@@ -577,6 +694,7 @@ const VOCAB_CSS = `
   color:var(--lang-ink-soft);
   margin-bottom:10px;
   letter-spacing:.03em;text-transform:uppercase;
+  gap:8px;flex-wrap:wrap;
 }
 .ec-voc-xp-track{
   height:14px;border-radius:999px;
@@ -594,7 +712,7 @@ const VOCAB_CSS = `
   margin:0;font-weight:600;line-height:1.55;
 }
 
-.ec-voc-units{display:flex;flex-direction:column;gap:8px}
+.ec-voc-units{display:flex;flex-direction:column;gap:8px;max-width:100%}
 .ec-voc-unit-btn{
   display:flex;align-items:center;justify-content:space-between;
   gap:10px;padding:11px 14px;
@@ -602,9 +720,12 @@ const VOCAB_CSS = `
   border:2px solid var(--lang-line);
   background:#fff;color:var(--lang-ink);
   font-size:13px;font-weight:800;
-  cursor:pointer;font-family:inherit;width:100%;
+  cursor:pointer;font-family:inherit;
+  width:100%;max-width:100%;min-width:0;
   transition:all .15s ease;
   box-shadow:0 3px 0 var(--lang-line);
+  min-height:44px;
+  text-align:left;
 }
 .ec-voc-unit-btn:hover{
   background:var(--lang-lime-soft);
@@ -619,6 +740,7 @@ const VOCAB_CSS = `
   padding:3px 9px;border-radius:999px;
   background:var(--lang-lime);color:var(--lang-ink);
   border:2px solid var(--lang-line);
+  flex-shrink:0;
 }
 .ec-voc-unit-btn--active .ec-voc-unit-count{
   background:var(--lang-lime);color:var(--lang-ink);
@@ -632,6 +754,7 @@ const VOCAB_CSS = `
   border:2px solid var(--lang-line);
   box-shadow:0 3px 0 var(--lang-line);
   transition:all .15s ease;
+  min-width:0;
 }
 .ec-voc-reward:hover{transform:translateY(-1px)}
 .ec-voc-reward-icon{
@@ -651,6 +774,7 @@ const VOCAB_CSS = `
   padding:3px 10px;border-radius:999px;
   border:2px solid var(--lang-line);
   white-space:nowrap;
+  flex-shrink:0;
 }
 
 /* ============================================================
@@ -665,6 +789,8 @@ const VOCAB_CSS = `
   box-shadow:0 12px 28px rgba(23,16,46,.4);
   animation:ec-voc-toast-pop 1s ease both;
   letter-spacing:.03em;
+  pointer-events:none;
+  max-width:calc(100vw - 24px);
 }
 @keyframes ec-voc-toast-pop{
   0%{transform:translateY(-10px) scale(.9);opacity:0}
@@ -691,40 +817,236 @@ const VOCAB_CSS = `
 .ec-voc-shake{animation:ec-voc-shake .45s ease}
 
 /* ============================================================
-   RESPONSIVE
+   RESPONSIVE — Tablet
+   ============================================================ */
+@media (max-width:1024px){
+  .ec-voc-grid{grid-template-columns:minmax(0,1fr) 280px;gap:20px}
+}
+
+/* ============================================================
+   RESPONSIVE — Mobile (single column, no overflow)
    ============================================================ */
 @media (max-width:900px){
-  .ec-voc-grid{grid-template-columns:1fr;gap:22px}
-  .ec-voc-hero{flex-direction:column;align-items:flex-start;min-height:0}
-  .ec-voc-hero-mascot{position:absolute;right:16px;bottom:16px;transform:scale(.8);transform-origin:bottom right;animation:none}
+  .ec-voc-grid{
+    grid-template-columns:minmax(0,1fr);
+    gap:18px;
+    width:100%;
+    max-width:100%;
+  }
+  .ec-voc-grid > section,
+  .ec-voc-grid > aside{
+    min-width:0;
+    max-width:100%;
+    width:100%;
+  }
+  .ec-voc-hero{
+    flex-direction:column;
+    align-items:flex-start;
+    min-height:0;
+    padding:26px 22px;
+  }
+  .ec-voc-hero-mascot{
+    position:absolute;
+    right:14px;bottom:14px;
+    transform:scale(.72);
+    transform-origin:bottom right;
+    animation:none;
+    opacity:.95;
+    pointer-events:none;
+  }
+  .ec-voc-grid > aside{order:2}
+  .ec-voc-grid > section{order:1}
 }
+
 @media (max-width:720px){
-  .ec-voc-hero{padding:24px 22px;border-radius:26px}
-  .ec-voc-hero h1{font-size:26px}
-  .ec-voc-hero p{font-size:13.5px}
-  .ec-voc-hero-stats{gap:8px;margin-top:16px}
-  .ec-voc-hero-stat{padding:8px 12px;min-width:74px;border-radius:14px}
+  /* leave room for the app's bottom nav bar */
+  .ec-voc{
+    padding-bottom:calc(var(--lang-nav-h) + var(--lang-safe));
+  }
+
+  .ec-voc-head{margin-bottom:14px}
+  .ec-voc-eyebrow{font-size:10.5px;margin-bottom:4px}
+
+  .ec-voc-hero{
+    padding:22px 20px;
+    border-radius:24px;
+    margin-bottom:16px;
+    box-shadow:0 12px 30px rgba(30,18,82,.28);
+  }
+  .ec-voc-hero h1{font-size:24px;line-height:1.12}
+  .ec-voc-hero p{font-size:13.5px;margin-bottom:16px;max-width:100%}
+  .ec-voc-hero-badge{font-size:9.5px;padding:6px 11px;margin-bottom:12px}
+
+  /* 2x2 stat grid for mobile */
+  .ec-voc-hero-stats{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+    width:100%;
+    max-width:100%;
+    margin-top:4px;
+  }
+  .ec-voc-hero-stat{
+    padding:10px 12px;
+    min-width:0;
+    border-radius:14px;
+    box-shadow:0 3px 0 var(--lang-ink);
+  }
   .ec-voc-hero-stat strong{font-size:18px}
   .ec-voc-hero-stat span{font-size:9.5px}
-  .ec-flash-wrap{min-height:280px}
-  .ec-flash{height:280px}
-  .ec-flash-face{padding:24px;border-radius:26px}
-  .ec-flash-word{font-size:34px}
-  .ec-flash-sub{font-size:13px}
-  .ec-grade-row{grid-template-columns:1fr 1fr}
-  .ec-grade-btn{min-height:54px;font-size:13.5px}
-  .ec-quiz-card{padding:22px;border-radius:26px}
-  .ec-quiz-question{font-size:16px}
-  .ec-quiz-option{padding:14px 16px;font-size:14px;border-radius:16px}
-  .ec-dict-item{padding:16px 18px;border-radius:20px}
-  .ec-dict-word{font-size:17px}
-  .ec-voc-card{padding:18px;border-radius:22px}
   .ec-voc-hero-mascot{display:none}
+
+  /* Tabs: sticky — no negative margins (prevents overflow) */
+  .ec-voc-tabs{
+    position:sticky;
+    top:0;
+    z-index:20;
+    background:rgba(255,255,255,.94);
+    -webkit-backdrop-filter:blur(10px);
+    backdrop-filter:blur(10px);
+    margin:0;
+    padding:10px 0 12px;
+    border-bottom:2px solid rgba(23,16,46,.08);
+    width:100%;
+    max-width:100%;
+  }
+  .ec-voc-tab{
+    padding:10px 16px;
+    font-size:12.5px;
+    min-height:42px;
+    box-shadow:0 3px 0 var(--lang-line);
+  }
+
+  /* Flashcards */
+  .ec-flash-wrap{min-height:260px;margin-bottom:16px}
+  .ec-flash{height:260px}
+  .ec-flash-face{padding:22px 18px;border-radius:24px;gap:12px}
+  .ec-flash-word{font-size:clamp(26px,8vw,34px)}
+  .ec-flash-back .ec-flash-word{font-size:20px}
+  .ec-flash-sub{font-size:12.5px;line-height:1.5}
+  .ec-flash-back .ec-flash-sub{font-size:13px}
+  .ec-flash-pos{font-size:10px;padding:6px 12px}
+  .ec-flash-hint{font-size:10px;bottom:14px}
+
+  /* Grade buttons: 2 columns, compact */
+  .ec-grade-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .ec-grade-btn{
+    min-height:52px;
+    font-size:13px;
+    padding:12px 8px;
+    border-radius:16px;
+  }
+
+  /* Quiz / cards */
+  .ec-quiz-card{
+    padding:20px 18px;
+    border-radius:24px;
+    box-shadow:0 6px 0 var(--lang-line);
+  }
+  .ec-quiz-question{font-size:16px;line-height:1.4;margin-bottom:16px}
+  .ec-quiz-options{gap:10px;margin-bottom:14px}
+  .ec-quiz-option{
+    padding:14px 16px;
+    font-size:14px;
+    border-radius:16px;
+    min-height:50px;
+    box-shadow:0 3px 0 var(--lang-line);
+  }
+  .ec-quiz-option:hover:not(:disabled){transform:none;box-shadow:0 3px 0 var(--lang-line)}
+  .ec-quiz-option:active:not(:disabled){transform:translateY(2px);box-shadow:0 1px 0 var(--lang-line)}
+  .ec-quiz-top{gap:8px;margin-bottom:12px}
+  .ec-quiz-badge{font-size:10px;padding:6px 11px}
+  .ec-quiz-counter{font-size:11px}
+  .ec-quiz-progress{height:10px;margin-bottom:16px}
+  .ec-quiz-foot{font-size:11.5px;gap:6px}
+
+  /* Dictionary */
+  .ec-dict-bar{gap:8px}
+  .ec-dict-search{padding:11px 16px;border-radius:999px}
+  .ec-dict-search input{font-size:16px}
+  .ec-dict-filters{gap:6px;margin-bottom:12px;padding-right:2px}
+  .ec-dict-filter{padding:8px 13px;font-size:11.5px;min-height:38px}
+  .ec-dict-list{gap:10px}
+  .ec-dict-item{padding:16px 16px;border-radius:18px;box-shadow:0 4px 0 var(--lang-line)}
+  .ec-dict-item:hover{transform:none;box-shadow:0 4px 0 var(--lang-line)}
+  .ec-dict-item-head{margin-bottom:6px;gap:8px}
+  .ec-dict-word{font-size:17px}
+  .ec-dict-meaning{font-size:13.5px;margin-bottom:6px}
+  .ec-dict-example{font-size:12.5px;margin-bottom:10px}
+  .ec-dict-pos{font-size:10px;padding:3px 9px}
+  .ec-dict-syn,.ec-dict-unit{font-size:11px;padding:3px 9px}
+  .ec-dict-empty{padding:40px 18px;font-size:13px;border-radius:18px}
+
+  /* Sidebar cards */
+  .ec-voc-card{
+    padding:18px 16px;
+    border-radius:22px;
+    margin-bottom:14px;
+    box-shadow:0 5px 0 var(--lang-line);
+  }
+  .ec-voc-card h3{font-size:14px;margin-bottom:12px}
+  .ec-voc-wod-word{font-size:24px}
+  .ec-voc-wod-meaning{font-size:13px}
+  .ec-voc-wod-ex{font-size:12.5px}
+  .ec-voc-unit-btn{padding:10px 12px;font-size:12.5px;min-height:44px}
+  .ec-voc-units{gap:6px}
+
+  /* Toast */
+  .ec-voc-toast{
+    top:auto;
+    bottom:calc(var(--lang-nav-h) + var(--lang-safe) - 90px);
+    right:12px;
+    left:12px;
+    text-align:center;
+    padding:12px 18px;
+    font-size:13px;
+    max-width:calc(100vw - 24px);
+  }
 }
-@media (max-width:380px){
+
+@media (max-width:480px){
+  .ec-voc-hero h1{font-size:22px}
+  .ec-voc-hero p{font-size:13px}
   .ec-voc-hero-stat strong{font-size:16px}
-  .ec-flash-word{font-size:30px}
+  .ec-voc-hero-stat span{font-size:9px}
+
+  .ec-flash{height:240px}
+  .ec-flash-wrap{min-height:240px}
+  .ec-flash-word{font-size:26px}
+  .ec-flash-face{padding:18px 14px}
+
+  .ec-quiz-card{padding:16px 14px}
+  .ec-quiz-question{font-size:15px}
+  .ec-quiz-option{padding:13px 14px;font-size:13.5px}
+
+  .ec-grade-btn{font-size:12px;padding:10px 6px;min-height:48px}
+
+  .ec-voc-tab{padding:9px 14px;font-size:12px}
+  .ec-voc-tab svg{width:14px;height:14px}
+
+  .ec-dict-search{padding:10px 14px}
 }
+
+@media (max-width:380px){
+  .ec-voc-hero-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ec-voc-hero-stat strong{font-size:15px}
+  .ec-voc-hero-stat span{font-size:8.5px}
+  .ec-voc-hero h1{font-size:20px}
+  .ec-flash-word{font-size:22px}
+  .ec-flash-back .ec-flash-word{font-size:17px}
+  .ec-flash{height:220px}
+  .ec-flash-wrap{min-height:220px}
+  .ec-dict-word{font-size:16px}
+  .ec-quiz-question{font-size:14.5px}
+  .ec-quiz-option{font-size:13px;padding:12px 12px}
+}
+
+/* Landscape phones */
+@media (max-height:500px) and (orientation:landscape){
+  .ec-flash{height:220px}
+  .ec-flash-wrap{min-height:220px}
+}
+
 @media (prefers-reduced-motion: reduce){
   .ec-voc-anim,.ec-voc-pop,.ec-voc-shake,.ec-voc-toast{animation:none!important}
   .ec-voc-hero-orb{animation:none}
@@ -763,6 +1085,30 @@ const DICTIONARY = [
   { w:'warmth', pos:'noun', m:'kindness and affection', ex:'She greeted us with warmth.', syn:['affection','friendliness'], unit:1 },
   { w:'welcome', pos:'verb', m:'to greet someone in a friendly way', ex:'We welcomed the guests warmly.', syn:['greet','receive'], unit:1 },
   { w:'youth', pos:'noun', m:'the period of being young', ex:'He spent his youth in Dhaka.', syn:['adolescence','boyhood'], unit:1 },
+  { w:'acquaintance', pos:'noun', m:'a person you know slightly', ex:'He is just an acquaintance, not a close friend.', syn:['contact','associate'], unit:1 },
+  { w:'affectionate', pos:'adjective', m:'showing warmth and love', ex:'She is affectionate towards her siblings.', syn:['loving','tender'], unit:1 },
+  { w:'ally', pos:'noun', m:'a person who supports you', ex:'She has always been my closest ally.', syn:['supporter','partner'], unit:1 },
+  { w:'attachment', pos:'noun', m:'a feeling of love or loyalty', ex:'She has a deep attachment to her hometown.', syn:['bond','fondness'], unit:1 },
+  { w:'benevolent', pos:'adjective', m:'kind and generous', ex:'He is a benevolent grandfather.', syn:['kind','charitable'], unit:1 },
+  { w:'bicker', pos:'verb', m:'to argue about small things', ex:'The siblings bickered over the remote.', syn:['squabble','quarrel'], unit:1 },
+  { w:'confide', pos:'verb', m:'to tell someone a secret', ex:'She confided in her best friend.', syn:['disclose','entrust'], unit:1 },
+  { w:'considerate', pos:'adjective', m:'thinking of others’ feelings', ex:'He is always considerate of his parents.', syn:['thoughtful','caring'], unit:1 },
+  { w:'dependable', pos:'adjective', m:'able to be relied on', ex:'She is a dependable neighbour.', syn:['reliable','trustworthy'], unit:1 },
+  { w:'empathy', pos:'noun', m:'the ability to understand others’ feelings', ex:'A good friend shows empathy.', syn:['compassion','understanding'], unit:1 },
+  { w:'estranged', pos:'adjective', m:'no longer close or friendly', ex:'He became estranged from his cousin.', syn:['alienated','distant'], unit:1 },
+  { w:'fellowship', pos:'noun', m:'friendly companionship', ex:'The club offers a sense of fellowship.', syn:['camaraderie','companionship'], unit:1 },
+  { w:'foster', pos:'verb', m:'to encourage the growth of something', ex:'Parents foster confidence in children.', syn:['nurture','promote'], unit:1 },
+  { w:'genuine', pos:'adjective', m:'real and sincere', ex:'His concern for her was genuine.', syn:['authentic','true'], unit:1 },
+  { w:'kinship', pos:'noun', m:'a family relationship', ex:'They felt a sense of kinship despite living apart.', syn:['relation','connection'], unit:1 },
+  { w:'obligation', pos:'noun', m:'a duty to do something', ex:'She feels an obligation to visit her parents.', syn:['duty','responsibility'], unit:1 },
+  { w:'reconcile', pos:'verb', m:'to become friendly again after a quarrel', ex:'The brothers reconciled after years apart.', syn:['make peace','settle'], unit:1 },
+  { w:'reunion', pos:'noun', m:'a meeting of people after a separation', ex:'The family reunion was held in Sylhet.', syn:['gathering','get-together'], unit:1 },
+  { w:'sibling', pos:'noun', m:'a brother or sister', ex:'She has two siblings.', syn:['brother/sister','kin'], unit:1 },
+  { w:'solidarity', pos:'noun', m:'unity based on shared interests', ex:'The neighbours showed solidarity during the flood.', syn:['unity','support'], unit:1 },
+  { w:'tender', pos:'adjective', m:'gentle and kind', ex:'She gave her son a tender hug.', syn:['gentle','loving'], unit:1 },
+  { w:'thoughtful', pos:'adjective', m:'showing care for others', ex:'It was a thoughtful gift.', syn:['considerate','caring'], unit:1 },
+  { w:'unconditional', pos:'adjective', m:'without limits or conditions', ex:'A mother’s love is often unconditional.', syn:['absolute','unreserved'], unit:1 },
+  { w:'vow', pos:'noun', m:'a serious promise', ex:'They exchanged marriage vows.', syn:['pledge','oath'], unit:1 },
 
   /* ---------- Unit 2: Education ---------- */
   { w:'academic', pos:'adjective', m:'related to education or study', ex:'Her academic results are excellent.', syn:['scholarly','educational'], unit:2 },
@@ -790,6 +1136,30 @@ const DICTIONARY = [
   { w:'successful', pos:'adjective', m:'achieving your goals', ex:'She is a successful doctor.', syn:['triumphant','prosperous'], unit:2 },
   { w:'tutor', pos:'noun', m:'a private teacher', ex:'Her tutor helped her with maths.', syn:['instructor','coach'], unit:2 },
   { w:'wisdom', pos:'noun', m:'good judgement based on experience', ex:'Age brings wisdom.', syn:['insight','sagacity'], unit:2 },
+  { w:'analyse', pos:'verb', m:'to examine something in detail', ex:'Students must analyse the poem carefully.', syn:['examine','study'], unit:2 },
+  { w:'apprentice', pos:'noun', m:'a person learning a trade', ex:'He worked as an apprentice carpenter.', syn:['trainee','learner'], unit:2 },
+  { w:'aptitude', pos:'noun', m:'a natural ability to do something', ex:'She has an aptitude for mathematics.', syn:['talent','flair'], unit:2 },
+  { w:'coursework', pos:'noun', m:'work done as part of a course', ex:'Her coursework counts towards the final grade.', syn:['assignment','project work'], unit:2 },
+  { w:'comprehend', pos:'verb', m:'to understand something fully', ex:'It took time to comprehend the theory.', syn:['understand','grasp'], unit:2 },
+  { w:'concentrate', pos:'verb', m:'to focus your attention', ex:'She concentrated hard during the test.', syn:['focus','attend'], unit:2 },
+  { w:'conscientious', pos:'adjective', m:'careful and thorough in one’s work', ex:'He is a conscientious student.', syn:['diligent','meticulous'], unit:2 },
+  { w:'curious', pos:'adjective', m:'eager to learn or know', ex:'Curious children ask many questions.', syn:['inquisitive','interested'], unit:2 },
+  { w:'debate', pos:'noun', m:'a formal discussion of an issue', ex:'The class held a debate on climate change.', syn:['discussion','argument'], unit:2 },
+  { w:'enrol', pos:'verb', m:'to officially join a course', ex:'She enrolled in an English course.', syn:['register','sign up'], unit:2 },
+  { w:'evaluate', pos:'verb', m:'to judge the value of something', ex:'Teachers evaluate student progress regularly.', syn:['assess','appraise'], unit:2 },
+  { w:'faculty', pos:'noun', m:'a department of a university', ex:'She teaches at the science faculty.', syn:['department','staff'], unit:2 },
+  { w:'grasp', pos:'verb', m:'to understand something', ex:'It took a while to grasp the concept.', syn:['understand','comprehend'], unit:2 },
+  { w:'hypothesis', pos:'noun', m:'an idea to be tested', ex:'The scientist tested her hypothesis.', syn:['theory','assumption'], unit:2 },
+  { w:'literacy', pos:'noun', m:'the ability to read and write', ex:'Literacy rates have improved.', syn:['reading ability','education'], unit:2 },
+  { w:'motivate', pos:'verb', m:'to give someone a reason to act', ex:'The teacher motivated her students.', syn:['inspire','encourage'], unit:2 },
+  { w:'plagiarism', pos:'noun', m:'copying someone else’s work as your own', ex:'Plagiarism is strictly forbidden.', syn:['copying','theft'], unit:2 },
+  { w:'proficient', pos:'adjective', m:'skilled at doing something', ex:'She is proficient in three languages.', syn:['skilled','competent'], unit:2 },
+  { w:'revise', pos:'verb', m:'to study again before an exam', ex:'I need to revise before the test.', syn:['review','study'], unit:2 },
+  { w:'scholar', pos:'noun', m:'a person with great knowledge', ex:'He is a respected scholar of history.', syn:['academic','expert'], unit:2 },
+  { w:'seminar', pos:'noun', m:'a small class for discussion', ex:'We attended a seminar on ethics.', syn:['workshop','class'], unit:2 },
+  { w:'syllabus', pos:'noun', m:'an outline of a course of study', ex:'Check the syllabus for exam topics.', syn:['curriculum','programme'], unit:2 },
+  { w:'thesis', pos:'noun', m:'a long piece of research writing', ex:'She is writing her master’s thesis.', syn:['dissertation','paper'], unit:2 },
+  { w:'vocabulary', pos:'noun', m:'the words known and used by a person', ex:'Reading builds your vocabulary.', syn:['lexicon','wordbank'], unit:2 },
 
   /* ---------- Unit 3: Nature & Environment ---------- */
   { w:'abundant', pos:'adjective', m:'existing in large quantities', ex:'Fish are abundant in this river.', syn:['plentiful','ample'], unit:3 },
@@ -820,6 +1190,25 @@ const DICTIONARY = [
   { w:'sustainable', pos:'adjective', m:'able to continue without harm', ex:'We need sustainable development.', syn:['viable','maintainable'], unit:3 },
   { w:'urban', pos:'adjective', m:'relating to a city', ex:'Urban life has its challenges.', syn:['metropolitan','city'], unit:3 },
   { w:'wildlife', pos:'noun', m:'wild animals and plants', ex:'Wildlife must be protected.', syn:['fauna','nature'], unit:3 },
+  { w:'arid', pos:'adjective', m:'having very little rainfall', ex:'The arid region receives little rain.', syn:['dry','parched'], unit:3 },
+  { w:'canopy', pos:'noun', m:'the top layer of a forest', ex:'Monkeys move through the forest canopy.', syn:['treetop','cover'], unit:3 },
+  { w:'carbon footprint', pos:'noun', m:'the amount of carbon dioxide a person produces', ex:'Cycling reduces your carbon footprint.', syn:['emissions','impact'], unit:3 },
+  { w:'contaminate', pos:'verb', m:'to make something impure', ex:'Chemicals contaminated the river.', syn:['pollute','taint'], unit:3 },
+  { w:'depletion', pos:'noun', m:'the reduction in amount of something', ex:'Ozone depletion is a global concern.', syn:['reduction','exhaustion'], unit:3 },
+  { w:'emission', pos:'noun', m:'a substance released into the air', ex:'Factories must cut carbon emissions.', syn:['discharge','output'], unit:3 },
+  { w:'extinct', pos:'adjective', m:'no longer existing', ex:'The dodo is an extinct bird.', syn:['dead','vanished'], unit:3 },
+  { w:'fossil fuel', pos:'noun', m:'fuel formed from ancient remains', ex:'We rely too heavily on fossil fuels.', syn:['coal','oil'], unit:3 },
+  { w:'irrigation', pos:'noun', m:'supplying land with water', ex:'Irrigation helps crops grow in dry areas.', syn:['watering','water supply'], unit:3 },
+  { w:'mangrove', pos:'noun', m:'a tree that grows in coastal swamps', ex:'The Sundarbans is famous for its mangroves.', syn:['swamp tree','coastal forest'], unit:3 },
+  { w:'organic', pos:'adjective', m:'grown without chemicals', ex:'She only buys organic vegetables.', syn:['natural','chemical-free'], unit:3 },
+  { w:'renewable', pos:'adjective', m:'able to be replaced naturally', ex:'Solar power is a renewable energy source.', syn:['sustainable','replenishable'], unit:3 },
+  { w:'reservoir', pos:'noun', m:'a place where water is stored', ex:'The reservoir supplies water to the city.', syn:['tank','basin'], unit:3 },
+  { w:'sediment', pos:'noun', m:'matter that settles at the bottom of water', ex:'Sediment builds up near the river mouth.', syn:['silt','deposit'], unit:3 },
+  { w:'terrain', pos:'noun', m:'the physical features of land', ex:'The hilly terrain made walking difficult.', syn:['landscape','ground'], unit:3 },
+  { w:'toxic', pos:'adjective', m:'poisonous', ex:'The factory released toxic waste.', syn:['poisonous','harmful'], unit:3 },
+  { w:'tropical', pos:'adjective', m:'relating to the hottest regions of the earth', ex:'Bangladesh has a tropical monsoon climate.', syn:['equatorial','humid'], unit:3 },
+  { w:'vegetation', pos:'noun', m:'plants in an area', ex:'Dense vegetation covers the hillside.', syn:['plant life','flora'], unit:3 },
+  { w:'wetland', pos:'noun', m:'land that is covered by water', ex:'Wetlands support many bird species.', syn:['marsh','swamp'], unit:3 },
 
   /* ---------- Unit 4: Health & Fitness ---------- */
   { w:'allergy', pos:'noun', m:'a bad reaction to something', ex:'She has a peanut allergy.', syn:['sensitivity','intolerance'], unit:4 },
@@ -849,6 +1238,25 @@ const DICTIONARY = [
   { w:'therapy', pos:'noun', m:'treatment for illness', ex:'She is undergoing therapy.', syn:['treatment','remedy'], unit:4 },
   { w:'vitamin', pos:'noun', m:'a nutrient the body needs', ex:'Oranges are rich in vitamin C.', syn:['nutrient','supplement'], unit:4 },
   { w:'wellness', pos:'noun', m:'the state of being healthy', ex:'Wellness is a lifelong journey.', syn:['health','fitness'], unit:4 },
+  { w:'ailment', pos:'noun', m:'a minor illness', ex:'He suffers from a common ailment.', syn:['illness','sickness'], unit:4 },
+  { w:'cardiovascular', pos:'adjective', m:'relating to the heart and blood vessels', ex:'Running improves cardiovascular health.', syn:['heart-related','circulatory'], unit:4 },
+  { w:'diagnose', pos:'verb', m:'to identify a disease', ex:'The doctor diagnosed the illness quickly.', syn:['identify','detect'], unit:4 },
+  { w:'endorphin', pos:'noun', m:'a hormone that reduces pain and boosts mood', ex:'Exercise releases endorphins.', syn:['hormone','mood chemical'], unit:4 },
+  { w:'epidemic', pos:'noun', m:'a widespread outbreak of disease', ex:'The epidemic spread across the region.', syn:['outbreak','plague'], unit:4 },
+  { w:'first aid', pos:'noun', m:'basic emergency medical treatment', ex:'She gave first aid to the injured man.', syn:['emergency care'], unit:4 },
+  { w:'immunity', pos:'noun', m:'protection against disease', ex:'Vaccines build immunity.', syn:['resistance','protection'], unit:4 },
+  { w:'inflammation', pos:'noun', m:'redness and swelling caused by injury', ex:'The wound showed signs of inflammation.', syn:['swelling','irritation'], unit:4 },
+  { w:'insomnia', pos:'noun', m:'the inability to sleep', ex:'Stress often causes insomnia.', syn:['sleeplessness'], unit:4 },
+  { w:'nutrient', pos:'noun', m:'a substance needed for growth', ex:'Vegetables are full of nutrients.', syn:['nourishment','vitamin'], unit:4 },
+  { w:'obese', pos:'adjective', m:'extremely overweight', ex:'Poor diet can make people obese.', syn:['overweight','fat'], unit:4 },
+  { w:'physiotherapy', pos:'noun', m:'treatment using physical exercises', ex:'He attends physiotherapy after his injury.', syn:['physical therapy'], unit:4 },
+  { w:'posture', pos:'noun', m:'the position of the body', ex:'Good posture prevents back pain.', syn:['stance','carriage'], unit:4 },
+  { w:'rehabilitation', pos:'noun', m:'the process of recovering health or ability', ex:'He is undergoing rehabilitation after surgery.', syn:['recovery','treatment'], unit:4 },
+  { w:'resilient', pos:'adjective', m:'able to recover quickly', ex:'Children are often physically resilient.', syn:['tough','hardy'], unit:4 },
+  { w:'sanitation', pos:'noun', m:'systems for keeping places clean', ex:'Good sanitation prevents disease.', syn:['hygiene','cleanliness'], unit:4 },
+  { w:'sedentary', pos:'adjective', m:'involving little physical activity', ex:'A sedentary lifestyle can cause health problems.', syn:['inactive','stationary'], unit:4 },
+  { w:'stamina', pos:'noun', m:'the ability to sustain physical effort', ex:'Marathon runners need great stamina.', syn:['endurance','energy'], unit:4 },
+  { w:'vaccinate', pos:'verb', m:'to give a vaccine to prevent disease', ex:'Children should be vaccinated on time.', syn:['immunise','inoculate'], unit:4 },
 
   /* ---------- Unit 5: Travel & Culture ---------- */
   { w:'accommodation', pos:'noun', m:'a place to stay', ex:'We booked hotel accommodation.', syn:['lodging','housing'], unit:5 },
@@ -876,6 +1284,25 @@ const DICTIONARY = [
   { w:'tourism', pos:'noun', m:'the business of holidays', ex:'Tourism brings money to the region.', syn:['travel industry','holiday trade'], unit:5 },
   { w:'tradition', pos:'noun', m:'a long-established custom', ex:'It is a family tradition.', syn:['custom','convention'], unit:5 },
   { w:'voyage', pos:'noun', m:'a long journey by sea', ex:'The voyage lasted three months.', syn:['cruise','expedition'], unit:5 },
+  { w:'baggage', pos:'noun', m:'bags and suitcases for a trip', ex:'Check your baggage before boarding.', syn:['luggage','bags'], unit:5 },
+  { w:'boarding pass', pos:'noun', m:'a document allowing entry to a flight', ex:'Please show your boarding pass.', syn:['ticket'], unit:5 },
+  { w:'commemorate', pos:'verb', m:'to honour the memory of something', ex:'The festival commemorates the harvest.', syn:['celebrate','honour'], unit:5 },
+  { w:'cosmopolitan', pos:'adjective', m:'containing people from many countries', ex:'Dhaka is becoming more cosmopolitan.', syn:['international','diverse'], unit:5 },
+  { w:'customary', pos:'adjective', m:'usual or traditional', ex:'It is customary to remove shoes indoors.', syn:['traditional','usual'], unit:5 },
+  { w:'excursion', pos:'noun', m:'a short trip for pleasure', ex:'We went on a day excursion to the hills.', syn:['outing','trip'], unit:5 },
+  { w:'exotic', pos:'adjective', m:'unusual and from a foreign country', ex:'They tried exotic fruits abroad.', syn:['foreign','unusual'], unit:5 },
+  { w:'expedition', pos:'noun', m:'a journey for a specific purpose', ex:'The team went on a mountain expedition.', syn:['journey','trek'], unit:5 },
+  { w:'immigrant', pos:'noun', m:'a person who moves to another country', ex:'The immigrant found work in the city.', syn:['migrant','settler'], unit:5 },
+  { w:'indigenous', pos:'adjective', m:'originating naturally in a place', ex:'The Chakma are an indigenous people.', syn:['native','local'], unit:5 },
+  { w:'nomadic', pos:'adjective', m:'moving from place to place', ex:'They lead a nomadic lifestyle.', syn:['wandering','itinerant'], unit:5 },
+  { w:'panorama', pos:'noun', m:'a wide view of an area', ex:'The hill offers a panorama of the valley.', syn:['view','vista'], unit:5 },
+  { w:'quaint', pos:'adjective', m:'attractively old-fashioned', ex:'They stayed in a quaint village.', syn:['charming','picturesque'], unit:5 },
+  { w:'ritual', pos:'noun', m:'a series of actions in a ceremony', ex:'The wedding ritual lasted all day.', syn:['ceremony','rite'], unit:5 },
+  { w:'sightseeing', pos:'noun', m:'visiting interesting places', ex:'We spent the day sightseeing.', syn:['touring','exploring'], unit:5 },
+  { w:'transit', pos:'noun', m:'the act of passing through a place', ex:'We had a two-hour transit in Dubai.', syn:['stopover','passage'], unit:5 },
+  { w:'trek', pos:'noun', m:'a long, difficult journey on foot', ex:'They went on a trek in the hills.', syn:['hike','march'], unit:5 },
+  { w:'visa', pos:'noun', m:'official permission to enter a country', ex:'She applied for a student visa.', syn:['permit','authorisation'], unit:5 },
+  { w:'wanderlust', pos:'noun', m:'a strong desire to travel', ex:'Her wanderlust took her across Asia.', syn:['travel bug'], unit:5 },
 
   /* ---------- Unit 6: Science & Technology ---------- */
   { w:'algorithm', pos:'noun', m:'a set of steps for solving a problem', ex:'The algorithm sorts data quickly.', syn:['procedure','method'], unit:6 },
@@ -903,6 +1330,25 @@ const DICTIONARY = [
   { w:'technology', pos:'noun', m:'the use of scientific knowledge', ex:'Technology is advancing fast.', syn:['engineering','science'], unit:6 },
   { w:'theory', pos:'noun', m:'an idea explaining something', ex:'Darwin’s theory of evolution.', syn:['hypothesis','idea'], unit:6 },
   { w:'vaccine', pos:'noun', m:'a substance that protects against disease', ex:'The vaccine saved millions.', syn:['immunisation','inoculation'], unit:6 },
+  { w:'artificial intelligence', pos:'noun', m:'computer systems that mimic human thinking', ex:'Artificial intelligence powers many apps today.', syn:['AI','machine intelligence'], unit:6 },
+  { w:'bandwidth', pos:'noun', m:'the capacity of a network to transfer data', ex:'Video calls need more bandwidth.', syn:['capacity','data rate'], unit:6 },
+  { w:'biotechnology', pos:'noun', m:'technology based on biology', ex:'Biotechnology has improved crop yields.', syn:['bioscience'], unit:6 },
+  { w:'compatible', pos:'adjective', m:'able to work together', ex:'This charger is compatible with most phones.', syn:['suitable','matching'], unit:6 },
+  { w:'database', pos:'noun', m:'an organised set of data', ex:'The database stores customer records.', syn:['data store','archive'], unit:6 },
+  { w:'encryption', pos:'noun', m:'the process of coding information', ex:'Encryption protects your passwords.', syn:['encoding','coding'], unit:6 },
+  { w:'firmware', pos:'noun', m:'software built into hardware', ex:'Update the firmware to fix the bug.', syn:['embedded software'], unit:6 },
+  { w:'gadget', pos:'noun', m:'a small useful device', ex:'She loves the latest gadgets.', syn:['device','tool'], unit:6 },
+  { w:'genome', pos:'noun', m:'the complete genetic material of an organism', ex:'Scientists mapped the human genome.', syn:['genetic code'], unit:6 },
+  { w:'malfunction', pos:'verb', m:'to fail to work properly', ex:'The engine malfunctioned mid-flight.', syn:['break down','fail'], unit:6 },
+  { w:'nanotechnology', pos:'noun', m:'technology at a very small scale', ex:'Nanotechnology may transform medicine.', syn:['nanoscience'], unit:6 },
+  { w:'obsolete', pos:'adjective', m:'no longer in use', ex:'The old software is now obsolete.', syn:['outdated','out of date'], unit:6 },
+  { w:'prototype', pos:'noun', m:'an early model of a product', ex:'Engineers built a working prototype.', syn:['model','sample'], unit:6 },
+  { w:'quantum', pos:'adjective', m:'relating to the smallest units of energy', ex:'Quantum computers could change everything.', syn:['subatomic'], unit:6 },
+  { w:'server', pos:'noun', m:'a computer that provides data to others', ex:'The server crashed during the update.', syn:['host computer'], unit:6 },
+  { w:'simulate', pos:'verb', m:'to imitate a process using a model', ex:'The program simulates weather patterns.', syn:['model','mimic'], unit:6 },
+  { w:'synthesise', pos:'verb', m:'to combine parts into a whole', ex:'Scientists synthesised a new compound.', syn:['combine','create'], unit:6 },
+  { w:'upload', pos:'verb', m:'to send data to a remote system', ex:'She uploaded the files to the cloud.', syn:['transfer','send'], unit:6 },
+  { w:'virtual reality', pos:'noun', m:'a computer-generated simulated environment', ex:'Virtual reality is used in training.', syn:['VR'], unit:6 },
 
   /* ---------- Unit 7: Sports & Games ---------- */
   { w:'athlete', pos:'noun', m:'a person who plays sports', ex:'The athlete won gold.', syn:['sportsperson','player'], unit:7 },
@@ -927,6 +1373,25 @@ const DICTIONARY = [
   { w:'training', pos:'noun', m:'preparation for sports', ex:'Training begins at dawn.', syn:['practice','drill'], unit:7 },
   { w:'trophy', pos:'noun', m:'a cup given as a prize', ex:'They lifted the trophy.', syn:['cup','prize'], unit:7 },
   { w:'victory', pos:'noun', m:'success in a contest', ex:'The victory was well deserved.', syn:['triumph','win'], unit:7 },
+  { w:'agility', pos:'noun', m:'the ability to move quickly and easily', ex:'The gymnast showed great agility.', syn:['nimbleness','quickness'], unit:7 },
+  { w:'amateur', pos:'noun', m:'a person who does something for pleasure, not pay', ex:'He started as an amateur boxer.', syn:['nonprofessional','hobbyist'], unit:7 },
+  { w:'benchwarmer', pos:'noun', m:'a player who rarely plays in a game', ex:'He was a benchwarmer for most of the season.', syn:['reserve','substitute'], unit:7 },
+  { w:'disqualify', pos:'verb', m:'to remove from a competition for breaking rules', ex:'The runner was disqualified for a false start.', syn:['bar','exclude'], unit:7 },
+  { w:'draw', pos:'noun', m:'a game that ends with equal scores', ex:'The match ended in a 1-1 draw.', syn:['tie','stalemate'], unit:7 },
+  { w:'foul', pos:'noun', m:'an action that breaks the rules', ex:'The referee called a foul.', syn:['violation','infringement'], unit:7 },
+  { w:'gymnastics', pos:'noun', m:'exercises that show strength and flexibility', ex:'She practises gymnastics every day.', syn:['acrobatics'], unit:7 },
+  { w:'marathon', pos:'noun', m:'a long-distance running race', ex:'He finished the marathon in four hours.', syn:['long race'], unit:7 },
+  { w:'mascot', pos:'noun', m:'an animal or figure representing a team', ex:'The team’s mascot entertained the crowd.', syn:['symbol','emblem'], unit:7 },
+  { w:'penalty', pos:'noun', m:'a punishment for breaking a rule', ex:'The team was awarded a penalty kick.', syn:['punishment','sanction'], unit:7 },
+  { w:'qualify', pos:'verb', m:'to earn the right to compete', ex:'They qualified for the finals.', syn:['earn a place','advance'], unit:7 },
+  { w:'relay', pos:'noun', m:'a race between teams passing a baton', ex:'The relay team broke the record.', syn:['relay race'], unit:7 },
+  { w:'rival', pos:'noun', m:'a person or team competing against another', ex:'The two clubs are fierce rivals.', syn:['opponent','competitor'], unit:7 },
+  { w:'spectator', pos:'noun', m:'a person watching an event', ex:'Thousands of spectators filled the stadium.', syn:['viewer','onlooker'], unit:7 },
+  { w:'sportsmanship', pos:'noun', m:'fair and generous behaviour in sport', ex:'He showed great sportsmanship after losing.', syn:['fair play'], unit:7 },
+  { w:'strategy', pos:'noun', m:'a plan to achieve success', ex:'The coach explained the game strategy.', syn:['plan','tactic'], unit:7 },
+  { w:'substitute', pos:'noun', m:'a player who replaces another', ex:'The substitute scored the winning goal.', syn:['replacement','reserve'], unit:7 },
+  { w:'underdog', pos:'noun', m:'a competitor expected to lose', ex:'The underdog team won the championship.', syn:['long shot'], unit:7 },
+  { w:'warm-up', pos:'noun', m:'light exercise before an activity', ex:'A good warm-up prevents injury.', syn:['stretching'], unit:7 },
 
   /* ---------- Unit 8: Food & Cuisine ---------- */
   { w:'appetite', pos:'noun', m:'the desire to eat', ex:'Exercise increases appetite.', syn:['hunger','desire'], unit:8 },
@@ -950,6 +1415,23 @@ const DICTIONARY = [
   { w:'taste', pos:'noun', m:'the flavour of food', ex:'The taste was excellent.', syn:['flavour','savour'], unit:8 },
   { w:'vegetarian', pos:'noun', m:'a person who eats no meat', ex:'She is a strict vegetarian.', syn:['meat-free','plant-based'], unit:8 },
   { w:'waiter', pos:'noun', m:'a person who serves food', ex:'The waiter took our order.', syn:['server','attendant'], unit:8 },
+  { w:'aroma', pos:'noun', m:'a pleasant smell', ex:'The aroma of fresh bread filled the kitchen.', syn:['fragrance','scent'], unit:8 },
+  { w:'bland', pos:'adjective', m:'lacking strong flavour', ex:'The soup tasted bland without salt.', syn:['tasteless','mild'], unit:8 },
+  { w:'condiment', pos:'noun', m:'a sauce or spice added to food', ex:'Ketchup is a common condiment.', syn:['sauce','seasoning'], unit:8 },
+  { w:'digest', pos:'verb', m:'to break down food in the body', ex:'It takes hours to digest a heavy meal.', syn:['break down','absorb'], unit:8 },
+  { w:'edible', pos:'adjective', m:'safe to eat', ex:'Not all mushrooms are edible.', syn:['consumable','eatable'], unit:8 },
+  { w:'ferment', pos:'verb', m:'to change chemically through bacteria or yeast', ex:'Yogurt is made by fermenting milk.', syn:['brew','culture'], unit:8 },
+  { w:'gourmet', pos:'adjective', m:'relating to high-quality food', ex:'They opened a gourmet restaurant.', syn:['fine','high-end'], unit:8 },
+  { w:'marinate', pos:'verb', m:'to soak food in a flavoured liquid', ex:'Marinate the chicken overnight.', syn:['soak','season'], unit:8 },
+  { w:'nourish', pos:'verb', m:'to provide with food for growth', ex:'A good breakfast nourishes the body.', syn:['feed','sustain'], unit:8 },
+  { w:'palatable', pos:'adjective', m:'pleasant to taste', ex:'The dish was surprisingly palatable.', syn:['tasty','agreeable'], unit:8 },
+  { w:'perishable', pos:'adjective', m:'likely to decay quickly', ex:'Milk is a perishable item.', syn:['spoilable'], unit:8 },
+  { w:'pungent', pos:'adjective', m:'having a strong, sharp smell or taste', ex:'The curry had a pungent aroma.', syn:['sharp','strong'], unit:8 },
+  { w:'ration', pos:'noun', m:'a fixed amount of food allowed', ex:'Each family received a food ration.', syn:['allowance','portion'], unit:8 },
+  { w:'sample', pos:'verb', m:'to taste a small amount of food', ex:'We sampled dishes at the food fair.', syn:['taste','try'], unit:8 },
+  { w:'staple', pos:'noun', m:'a basic food eaten regularly', ex:'Rice is a staple food in Bangladesh.', syn:['basic food','main food'], unit:8 },
+  { w:'stale', pos:'adjective', m:'no longer fresh', ex:'The bread had gone stale.', syn:['old','not fresh'], unit:8 },
+  { w:'texture', pos:'noun', m:'the feel or consistency of food', ex:'The cake has a soft texture.', syn:['consistency','feel'], unit:8 },
 
   /* ---------- Unit 9: Work & Career ---------- */
   { w:'ambition', pos:'noun', m:'a strong desire to succeed', ex:'Her ambition is to be a doctor.', syn:['aspiration','goal'], unit:9 },
@@ -970,6 +1452,25 @@ const DICTIONARY = [
   { w:'skill', pos:'noun', m:'the ability to do something well', ex:'Programming is a valuable skill.', syn:['ability','talent'], unit:9 },
   { w:'teamwork', pos:'noun', m:'working well together', ex:'Teamwork leads to success.', syn:['cooperation','collaboration'], unit:9 },
   { w:'vocation', pos:'noun', m:'a strong feeling to do a job', ex:'Teaching is her vocation.', syn:['calling','profession'], unit:9 },
+  { w:'appraisal', pos:'noun', m:'an assessment of an employee’s work', ex:'She received a positive appraisal this year.', syn:['review','evaluation'], unit:9 },
+  { w:'benefits', pos:'noun', m:'advantages given by an employer', ex:'The job offers good health benefits.', syn:['perks','allowances'], unit:9 },
+  { w:'burnout', pos:'noun', m:'exhaustion caused by overwork', ex:'He suffered burnout after months of overtime.', syn:['exhaustion','fatigue'], unit:9 },
+  { w:'compensation', pos:'noun', m:'payment for work or loss', ex:'The compensation package is generous.', syn:['payment','remuneration'], unit:9 },
+  { w:'deadline', pos:'noun', m:'the latest time to complete something', ex:'The report deadline is Friday.', syn:['cutoff','due date'], unit:9 },
+  { w:'delegate', pos:'verb', m:'to give a task to someone else', ex:'Good managers delegate tasks.', syn:['assign','entrust'], unit:9 },
+  { w:'entrepreneur', pos:'noun', m:'a person who starts a business', ex:'She is a successful entrepreneur.', syn:['business owner','founder'], unit:9 },
+  { w:'internship', pos:'noun', m:'a period of practical work training', ex:'He completed an internship at a bank.', syn:['traineeship'], unit:9 },
+  { w:'negotiate', pos:'verb', m:'to discuss to reach an agreement', ex:'They negotiated a better salary.', syn:['bargain','discuss'], unit:9 },
+  { w:'networking', pos:'noun', m:'building professional relationships', ex:'Networking helped her find a job.', syn:['connecting'], unit:9 },
+  { w:'onboarding', pos:'noun', m:'the process of introducing a new employee', ex:'The onboarding process took a week.', syn:['orientation'], unit:9 },
+  { w:'pension', pos:'noun', m:'regular payment after retirement', ex:'He receives a government pension.', syn:['retirement fund'], unit:9 },
+  { w:'productivity', pos:'noun', m:'the rate of producing work', ex:'New tools improved productivity.', syn:['efficiency','output'], unit:9 },
+  { w:'redundant', pos:'adjective', m:'no longer needed for a job', ex:'Fifty workers were made redundant.', syn:['laid off','unemployed'], unit:9 },
+  { w:'resign', pos:'verb', m:'to formally leave a job', ex:'She resigned after ten years.', syn:['quit','step down'], unit:9 },
+  { w:'stipend', pos:'noun', m:'a fixed regular payment, often small', ex:'Interns receive a monthly stipend.', syn:['allowance','payment'], unit:9 },
+  { w:'supervisor', pos:'noun', m:'a person who oversees workers', ex:'Report any issues to your supervisor.', syn:['manager','overseer'], unit:9 },
+  { w:'workforce', pos:'noun', m:'all the people who work in an organisation', ex:'The workforce grew by 20 percent.', syn:['staff','employees'], unit:9 },
+  { w:'workload', pos:'noun', m:'the amount of work to be done', ex:'Her workload increased this month.', syn:['task load'], unit:9 },
 
   /* ---------- Unit 10: Bangladesh & Liberation War ---------- */
   { w:'agreement', pos:'noun', m:'an arrangement accepted by all', ex:'The two sides signed an agreement.', syn:['deal','accord'], unit:10 },
@@ -997,6 +1498,25 @@ const DICTIONARY = [
   { w:'triumph', pos:'noun', m:'a great victory', ex:'Independence was a triumph.', syn:['victory','conquest'], unit:10 },
   { w:'unity', pos:'noun', m:'being joined as one', ex:'Unity is our strength.', syn:['oneness','solidarity'], unit:10 },
   { w:'veteran', pos:'noun', m:'a person with long experience', ex:'The veteran told his story.', syn:['expert','old hand'], unit:10 },
+  { w:'allegiance', pos:'noun', m:'loyalty to a country or cause', ex:'They swore allegiance to the new nation.', syn:['loyalty','fidelity'], unit:10 },
+  { w:'atrocity', pos:'noun', m:'an extremely cruel act', ex:'The war saw many atrocities.', syn:['cruelty','brutality'], unit:10 },
+  { w:'commemorate', pos:'verb', m:'to remember officially with respect', ex:'We commemorate Victory Day every December.', syn:['honour','remember'], unit:10 },
+  { w:'commonwealth', pos:'noun', m:'a group of self-governing states', ex:'Bangladesh joined the Commonwealth in 1972.', syn:['federation','union'], unit:10 },
+  { w:'declaration', pos:'noun', m:'a formal public statement', ex:'The declaration of independence was read aloud.', syn:['announcement','proclamation'], unit:10 },
+  { w:'genocide', pos:'noun', m:'the deliberate killing of a large group', ex:'The genocide of 1971 must never be forgotten.', syn:['mass killing'], unit:10 },
+  { w:'guerrilla', pos:'noun', m:'a member of an irregular fighting force', ex:'Guerrilla fighters resisted the occupation.', syn:['freedom fighter','insurgent'], unit:10 },
+  { w:'homage', pos:'noun', m:'special honour shown publicly', ex:'They paid homage to the fallen soldiers.', syn:['tribute','respect'], unit:10 },
+  { w:'insurgency', pos:'noun', m:'an armed rebellion against authority', ex:'The insurgency lasted nine months.', syn:['uprising','revolt'], unit:10 },
+  { w:'liberate', pos:'verb', m:'to set a place or people free', ex:'The forces liberated the town in December.', syn:['free','release'], unit:10 },
+  { w:'militia', pos:'noun', m:'a group of civilians trained as soldiers', ex:'A local militia joined the resistance.', syn:['armed group'], unit:10 },
+  { w:'mobilise', pos:'verb', m:'to organise people for action', ex:'The nation mobilised for the struggle.', syn:['organise','rally'], unit:10 },
+  { w:'proclamation', pos:'noun', m:'an official public announcement', ex:'The proclamation of independence was historic.', syn:['declaration','announcement'], unit:10 },
+  { w:'reconstruction', pos:'noun', m:'the rebuilding of something destroyed', ex:'Reconstruction began soon after the war.', syn:['rebuilding'], unit:10 },
+  { w:'resistance', pos:'noun', m:'the act of fighting against something', ex:'The resistance grew stronger each month.', syn:['opposition','struggle'], unit:10 },
+  { w:'solidarity', pos:'noun', m:'unity of purpose among people', ex:'The world showed solidarity with the refugees.', syn:['unity','support'], unit:10 },
+  { w:'surrender', pos:'verb', m:'to stop fighting and give up', ex:'The occupying army surrendered in December.', syn:['give up','capitulate'], unit:10 },
+  { w:'testimony', pos:'noun', m:'a formal statement of evidence', ex:'Survivors gave testimony about the war.', syn:['account','evidence'], unit:10 },
+  { w:'valiant', pos:'adjective', m:'showing great courage', ex:'The valiant soldiers fought bravely.', syn:['brave','courageous'], unit:10 },
 ];
 
 /* ---------- Fallback if API returns nothing ---------- */
@@ -1049,13 +1569,9 @@ function buildQuestion(word) {
 function LangutMascot({ size = 170 }) {
   return (
     <svg viewBox="0 0 170 170" width={size} height={size} fill="none" aria-hidden="true">
-      {/* Drop shadow */}
       <ellipse cx="85" cy="158" rx="46" ry="7" fill="#000" opacity="0.22" />
-      {/* Left arm */}
       <path d="M40 70c-8-4-16 0-18 8s2 16 10 18" stroke="#17102E" strokeWidth="4" fill="#F5E04D" strokeLinejoin="round" />
-      {/* Right arm */}
       <path d="M130 70c8-4 16 0 18 8s-2 16-10 18" stroke="#17102E" strokeWidth="4" fill="#F5E04D" strokeLinejoin="round" />
-      {/* Body */}
       <path
         d="M85 18c-30 0-54 24-54 54 0 17 7 31 15 40 5 6 8 12 8 19 0 4 3 7 7 7h48c4 0 7-3 7-7 0-7 3-13 8-19 8-9 15-23 15-40 0-30-24-54-54-54z"
         fill="#F5E04D"
@@ -1063,28 +1579,21 @@ function LangutMascot({ size = 170 }) {
         strokeWidth="4"
         strokeLinejoin="round"
       />
-      {/* Belly highlight */}
       <path
         d="M85 40c-20 0-36 14-36 34 0 13 6 22 12 29"
         stroke="#FBF0A0" strokeWidth="7" strokeLinecap="round" fill="none"
       />
-      {/* Left eye */}
       <circle cx="68" cy="76" r="11" fill="#fff" stroke="#17102E" strokeWidth="3.5" />
       <circle cx="70" cy="78" r="4.8" fill="#17102E" />
       <circle cx="71.6" cy="76.4" r="1.5" fill="#fff" />
-      {/* Right eye */}
       <circle cx="102" cy="76" r="11" fill="#fff" stroke="#17102E" strokeWidth="3.5" />
       <circle cx="104" cy="78" r="4.8" fill="#17102E" />
       <circle cx="105.6" cy="76.4" r="1.5" fill="#fff" />
-      {/* Smile */}
       <path d="M76 98c3 5 6 7 9 7s6-2 9-7" stroke="#17102E" strokeWidth="3.5" strokeLinecap="round" fill="none" />
-      {/* Cheeks */}
       <circle cx="56" cy="94" r="4.5" fill="#FF8FCB" opacity="0.55" />
       <circle cx="114" cy="94" r="4.5" fill="#FF8FCB" opacity="0.55" />
-      {/* Feet */}
       <ellipse cx="70" cy="132" rx="12" ry="5.5" fill="#F5E04D" stroke="#17102E" strokeWidth="3.5" />
       <ellipse cx="100" cy="132" rx="12" ry="5.5" fill="#F5E04D" stroke="#17102E" strokeWidth="3.5" />
-      {/* Sparkles */}
       <path d="M22 40l3-7 3 7-7 3 7 3-3 7-3-7-7-3z" fill="#D4F55C" />
       <path d="M148 46l2.5-6 2.5 6-6 2.5 6 2.5-2.5 6-2.5-6-6-2.5z" fill="#FF8FCB" />
     </svg>
@@ -1280,6 +1789,57 @@ export function Vocabulary() {
       else next.add(word);
       return next;
     });
+  };
+
+  /* ---------- Dictionary Quick Check exercise ---------- */
+  const [dictQ, setDictQ] = useState(null);
+  const [dictSelected, setDictSelected] = useState(null);
+  const [dictScore, setDictScore] = useState({ correct: 0, total: 0 });
+
+  const nextDictQuestion = useCallback(() => {
+    const pool = filteredDict.length >= 4 ? filteredDict : DICTIONARY;
+    const word = pool[Math.floor(Math.random() * pool.length)];
+    setDictQ(buildQuestion(word));
+    setDictSelected(null);
+  }, [filteredDict]);
+
+  useEffect(() => {
+    if (mode === 'Dictionary' && !dictQ) nextDictQuestion();
+  }, [mode, dictQ, nextDictQuestion]);
+
+  const answerDict = (opt) => {
+    if (dictSelected || !dictQ) return;
+    setDictSelected(opt);
+    const correct = opt === dictQ.answer;
+    setDictScore((s) => ({ correct: s.correct + (correct ? 1 : 0), total: s.total + 1 }));
+    if (correct) awardXp(5);
+    setTimeout(nextDictQuestion, 900);
+  };
+
+  /* ---------- Progress Review Quiz exercise ---------- */
+  const [reviewQ, setReviewQ] = useState(null);
+  const [reviewSelected, setReviewSelected] = useState(null);
+  const [reviewScore, setReviewScore] = useState({ correct: 0, total: 0 });
+
+  const nextReviewQuestion = useCallback(() => {
+    const savedList = DICTIONARY.filter((w) => savedWords.has(w.w));
+    const pool = savedList.length >= 4 ? savedList : DICTIONARY;
+    const word = pool[Math.floor(Math.random() * pool.length)];
+    setReviewQ(buildQuestion(word));
+    setReviewSelected(null);
+  }, [savedWords]);
+
+  useEffect(() => {
+    if (mode === 'Progress' && !reviewQ) nextReviewQuestion();
+  }, [mode, reviewQ, nextReviewQuestion]);
+
+  const answerReview = (opt) => {
+    if (reviewSelected || !reviewQ) return;
+    setReviewSelected(opt);
+    const correct = opt === reviewQ.answer;
+    setReviewScore((s) => ({ correct: s.correct + (correct ? 1 : 0), total: s.total + 1 }));
+    if (correct) awardXp(5);
+    setTimeout(nextReviewQuestion, 900);
   };
 
   /* ---------- Progress ---------- */
@@ -1493,6 +2053,28 @@ export function Vocabulary() {
           {/* ---------- DICTIONARY ---------- */}
           {mode === 'Dictionary' && (
             <div className="ec-voc-anim" key="dict">
+              {dictQ && (
+                <div className={`ec-quiz-card${dictSelected ? (dictSelected === dictQ.answer ? ' ec-pop' : ' ec-shake') : ''}`} style={{ marginBottom: 18 }}>
+                  <div className="ec-quiz-top">
+                    <span className="ec-quiz-badge">Quick check</span>
+                    <span className="ec-quiz-counter">{dictScore.correct} / {dictScore.total} correct</span>
+                  </div>
+                  <p className="ec-quiz-question">{dictQ.prompt}</p>
+                  <div className="ec-quiz-options">
+                    {dictQ.options.map((opt) => {
+                      const isSelected = dictSelected === opt;
+                      const isCorrect = opt === dictQ.answer;
+                      const cls = `ec-quiz-option${isSelected ? (isCorrect ? ' ec-quiz-option--correct' : ' ec-quiz-option--incorrect') : ''}`;
+                      return (
+                        <button key={opt} className={cls} onClick={() => answerDict(opt)} disabled={!!dictSelected && !isSelected && !isCorrect}>
+                          {opt}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               <div className="ec-dict-bar">
                 <div className="ec-dict-search">
                   <Icon name="search" />
@@ -1590,6 +2172,28 @@ export function Vocabulary() {
                     : `${currentReward.xp - xp} XP to unlock ${currentReward.title}`}
                 </p>
               </div>
+
+              {reviewQ && (
+                <div className={`ec-quiz-card${reviewSelected ? (reviewSelected === reviewQ.answer ? ' ec-pop' : ' ec-shake') : ''}`} style={{ marginBottom: 18 }}>
+                  <div className="ec-quiz-top">
+                    <span className="ec-quiz-badge">Review quiz{savedWords.size >= 4 ? ' · saved words' : ''}</span>
+                    <span className="ec-quiz-counter">{reviewScore.correct} / {reviewScore.total} correct</span>
+                  </div>
+                  <p className="ec-quiz-question">{reviewQ.prompt}</p>
+                  <div className="ec-quiz-options">
+                    {reviewQ.options.map((opt) => {
+                      const isSelected = reviewSelected === opt;
+                      const isCorrect = opt === reviewQ.answer;
+                      const cls = `ec-quiz-option${isSelected ? (isCorrect ? ' ec-quiz-option--correct' : ' ec-quiz-option--incorrect') : ''}`;
+                      return (
+                        <button key={opt} className={cls} onClick={() => answerReview(opt)} disabled={!!reviewSelected && !isSelected && !isCorrect}>
+                          {opt}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               <div className="ec-quiz-card">
                 <h3 style={{ marginTop: 0, fontSize: 15, fontWeight: 900, letterSpacing: '-.01em' }}>Reward milestones</h3>
