@@ -1,1142 +1,981 @@
-/* ============================================================
-   OVERVIEW — Langut-inspired
-   Deep purple + lime-yellow + chunky black outlines.
-   ============================================================ */
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { vocabApi } from '../api/vocab';
+import { gamificationApi } from '../api/gamification';
+import { paymentsApi } from '../api/payments';
+import { Icon } from '../components/Icon';
+import './Overview.css';
 
-.ec-overview {
-  --lang-bg:        #1E1252;
-  --lang-bg-2:      #2A1A6E;
-  --lang-bg-3:      #3B2596;
-  --lang-lime:      #D4F55C;
-  --lang-lime-2:    #E4FF5C;
-  --lang-lime-soft: #EDFFB0;
-  --lang-lime-deep: #B8E62E;
-  --lang-yellow:    #F5E04D;
-  --lang-purple:    #7B5CF0;
-  --lang-purple-2:  #9B7BFF;
-  --lang-pink:      #FFB3D1;
-  --lang-pink-2:    #FF8FCB;
-  --lang-ink:       #17102E;
-  --lang-ink-soft:  #6B6488;
-  --lang-line:      #17102E;
+/* ---------- Static content ---------- */
+const PROGRESS_CARDS = [
+  {
+    id: 'p1',
+    label: 'Beginner’s Language Mastery',
+    percent: 86,
+    accent: 'lime',
+    icon: 'book',
+    next: 'Lesson 12 · Family vocabulary',
+    remaining: '3 lessons to go',
+  },
+  {
+    id: 'p2',
+    label: 'English Essentials Course',
+    percent: 32,
+    accent: 'pink',
+    icon: 'target',
+    next: 'Unit 4 · Past tense verbs',
+    remaining: '18 lessons to go',
+  },
+  {
+    id: 'p3',
+    label: 'Novice to Proficient English',
+    percent: 5,
+    accent: 'purple',
+    icon: 'flag',
+    next: 'Module 1 · Foundations',
+    remaining: '42 lessons to go',
+  },
+];
+
+const CATEGORIES = [
+  { id: 'c1', label: 'Vocabulary', hint: '1,240 words', icon: 'book',   color: 'lime',   to: '/vocabulary' },
+  { id: 'c2', label: 'Grammar',    hint: '86 rules',    icon: 'target', color: 'pink',   to: '/grammar' },
+  { id: 'c3', label: 'Speaking',   hint: '24 rooms',    icon: 'mic',    color: 'purple', to: '/speaking' },
+  { id: 'c4', label: 'Exams',      hint: '12 papers',   icon: 'flag',   color: 'yellow', to: '/exams' },
+];
+
+const ARTICLES = [
+  {
+    id: 'a1',
+    title: 'Mastering Vocabulary: Proven Strategies for Efficient English Word Learning',
+    meta: 'Technique · 5 min read',
+    tag: 'Vocabulary',
+    art: 'vocab',
+    author: 'Nusrat H.',
+  },
+  {
+    id: 'a2',
+    title: 'Embarking on English: A Beginner’s Guide to Kickstart Your Language Learning',
+    meta: 'Technique · 5 min read',
+    tag: 'Getting started',
+    art: 'start',
+    author: 'Tanvir A.',
+  },
+];
+
+const UPCOMING_COURSES = [
+  {
+    id: 'c1',
+    tags: ['Beginner', 'Grammar'],
+    title: 'English Grammar',
+    blurb: 'Basic English grammar includes learning verbs, nouns, and simple sentence structure.',
+    duration: '3 months',
+    lessons: '56 lessons',
+    price: '৳ 800',
+    featured: true,
+    accent: 'yellow',
+    icon: 'target',
+    rating: 4.9,
+    students: 1240,
+  },
+  {
+    id: 'c2',
+    tags: ['Intermediate', 'Vocabulary'],
+    title: 'Idioms about friendship',
+    blurb: 'Friendship idioms add colorful expressions like “to be on the same page”.',
+    duration: '2 weeks',
+    lessons: '10 lessons',
+    price: '৳ 350',
+    featured: false,
+    accent: 'purple',
+    icon: 'book',
+    rating: 4.7,
+    students: 412,
+  },
+];
+
+/* Calendar data — a real three-week window built from today's actual date,
+   so "today" is always correct instead of a frozen, stale date. */
+const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const MONTH_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+function buildCalendarWeeks() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const mondayOffset = (today.getDay() + 6) % 7; // 0 = Monday ... 6 = Sunday
+  const currentMonday = new Date(today);
+  currentMonday.setDate(today.getDate() - mondayOffset);
+
+  return [-1, 0, 1].map((weekOffset) => {
+    const weekStart = new Date(currentMonday);
+    weekStart.setDate(currentMonday.getDate() + weekOffset * 7);
+
+    const days = DAY_LABELS.map((d, i) => {
+      const date = new Date(weekStart);
+      date.setDate(weekStart.getDate() + i);
+      const isToday = date.getTime() === today.getTime();
+      const isPast = date.getTime() < today.getTime();
+      // Plausible practice history: most past weekdays practiced, weekends lighter
+      const isWeekend = i >= 5;
+      const has = isPast && (isWeekend ? i === 5 : true) && date.getDate() % 4 !== 0;
+      return { d, n: date.getDate(), has, today: isToday, month: date.getMonth(), year: date.getFullYear() };
+    });
+
+    const anchor = days[3]; // Thursday best represents "which month this week belongs to"
+    return {
+      label: `${MONTH_NAMES[anchor.month]} ${anchor.year}`,
+      short: MONTH_SHORT[anchor.month],
+      days,
+    };
+  });
 }
 
-.ec-overview,
-.ec-overview *{box-sizing:border-box}
+const CALENDAR_WEEKS = buildCalendarWeeks();
+const TODAY_WEEK_INDEX = 1;
+const TODAY_DAY_NUMBER = CALENDAR_WEEKS[TODAY_WEEK_INDEX].days.find((d) => d.today)?.n ?? new Date().getDate();
 
-/* ---------- Base typography ---------- */
-.ec-page-title {
+/* ---------- Helpers ---------- */
+function getGreeting() {
+  const h = new Date().getHours();
+  if (h < 5) return 'Burning the midnight oil';
+  if (h < 12) return 'Good morning';
+  if (h < 17) return 'Good afternoon';
+  if (h < 21) return 'Good evening';
+  return 'Good night';
+}
+
+function useCountUp(target, duration = 900) {
+  const [value, setValue] = useState(0);
+  useEffect(() => {
+    if (target == null || target === 0) { setValue(0); return undefined; }
+    let raf;
+    const start = performance.now();
+    const tick = (now) => {
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setValue(Math.round(target * eased));
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, duration]);
+  return value;
+}
+
+/* ============================================================
+   Mascot — Langut-style yellow blob
+   ============================================================ */
+const MASCOT_STYLES = `
+.ec-mascot-btn {
+  background: none;
+  border: none;
+  padding: 0;
   margin: 0;
-  font-size: clamp(24px, 1.8vw + 16px, 32px);
-  font-weight: 900;
-  letter-spacing: -0.035em;
-  color: var(--lang-ink);
-  line-height: 1.15;
-}
-.ec-page-sub {
-  margin: 8px 0 0;
-  font-size: 14px;
-  color: var(--lang-ink-soft);
-  font-weight: 600;
-  line-height: 1.5;
-  max-width: 56ch;
-}
-.ec-section-title {
-  font-size: 20px;
-  font-weight: 900;
-  letter-spacing: -0.03em;
-  color: var(--lang-ink);
-  line-height: 1.2;
-}
-.ec-tag {
-  display: inline-flex;
-  align-items: center;
-  font-size: 10.5px;
-  font-weight: 900;
-  padding: 5px 11px;
-  border-radius: 999px;
-  background: #fff;
-  color: var(--lang-ink);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  border: 2px solid var(--lang-line);
-  box-shadow: 0 2px 0 var(--lang-line);
-}
-.ec-tag--beginner,
-.ec-tag--intermediate { background: var(--lang-purple-2); color: #fff; }
-.ec-tag--grammar      { background: var(--lang-pink-2);   color: #fff; }
-.ec-tag--vocabulary   { background: var(--lang-lime);     color: var(--lang-ink); }
-
-/* ============================================================
-   PAGE HEADING
-   ============================================================ */
-.ec-overview-head {
-  margin-bottom: 20px;
-}
-.ec-overview-eyebrow {
-  margin: 0 0 6px;
-  font-size: 11.5px;
-  font-weight: 900;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--lang-purple);
-  opacity: 0.95;
-}
-
-/* ============================================================
-   BUTTONS — chunky pills
-   ============================================================ */
-.ec-btn-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 14px 26px;
-  min-height: 54px;
-  border-radius: 999px;
-  background: var(--lang-ink);
-  color: var(--lang-lime);
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 900;
-  letter-spacing: 0.03em;
-  text-decoration: none;
-  border: 2px solid var(--lang-line);
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  box-shadow: 0 4px 0 var(--lang-line);
-}
-.ec-btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 0 var(--lang-line);
-}
-.ec-btn-primary:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--lang-line); }
-.ec-btn-primary:disabled { opacity: 0.65; cursor: default; transform: none; }
-.ec-btn-primary--sm { padding: 11px 20px; min-height: 44px; font-size: 13px; }
-
-.ec-btn-pill {
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 12px 22px;
-  min-height: 46px;
-  border-radius: 999px;
-  background: var(--lang-ink);
-  color: var(--lang-lime);
-  font-family: inherit;
-  font-size: 13.5px;
-  font-weight: 900;
-  border: 2px solid var(--lang-line);
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  box-shadow: 0 4px 0 var(--lang-line);
-  white-space: nowrap;
-  letter-spacing: 0.03em;
-}
-.ec-btn-pill:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 0 var(--lang-line);
-}
-.ec-btn-pill:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 var(--lang-line); }
-.ec-btn-pill:disabled { opacity: 0.7; cursor: default; }
-.ec-btn-pill--bought {
-  background: var(--lang-lime);
-  color: var(--lang-ink);
-}
-
-/* ============================================================
-   LAYOUT GRID
-   ============================================================ */
-.ec-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 340px;
-  gap: clamp(20px, 3vw, 32px);
-  align-items: start;
-}
-.ec-col-main { min-width: 0; }
-.ec-col-side { min-width: 0; }
-
-.ec-section-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-  margin: 32px 0 16px;
-  flex-wrap: wrap;
-}
-.ec-section-head .ec-section-title { margin: 0; }
-.ec-section-head--tight { margin-top: 28px; margin-bottom: 14px; }
-.ec-section-head--aside { margin-top: 24px; }
-.ec-section-link {
-  font-size: 13px;
-  font-weight: 900;
-  color: var(--lang-ink);
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 8px 14px;
-  margin: -8px -10px;
-  border-radius: 999px;
-  background: var(--lang-lime);
-  border: 2px solid var(--lang-line);
-  box-shadow: 0 2px 0 var(--lang-line);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  letter-spacing: 0.02em;
-}
-.ec-section-link:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 0 var(--lang-line);
-}
-
-/* ============================================================
-   HERO — deep purple, chunky stat chips, mascot
-   ============================================================ */
-.ec-hero {
-  position: relative;
-  background: linear-gradient(140deg, #2A1A6E 0%, #1E1252 55%, #3B2596 100%);
-  border-radius: 32px;
-  padding: clamp(26px, 4vw, 40px) clamp(24px, 4vw, 40px);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  color: #fff;
-  min-height: 260px;
-  box-shadow: 0 20px 52px rgba(30,18,82,.34);
-  border: 2px solid var(--lang-line);
-  overflow: hidden;
-  --px: 0px;
-  --py: 0px;
-}
-.ec-hero::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(rgba(255,255,255,.10) 1.4px, transparent 1.4px);
-  background-size: 20px 20px;
-  mask-image: radial-gradient(circle at 15% 20%, #000, transparent 65%);
-  -webkit-mask-image: radial-gradient(circle at 15% 20%, #000, transparent 65%);
-  pointer-events: none;
-}
-.ec-hero-orb {
-  position: absolute;
-  top: -90px;
-  right: 180px;
-  width: 260px;
-  height: 260px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(212,245,92,.22), transparent 68%);
-  animation: ec-hero-drift 14s ease-in-out infinite;
-  pointer-events: none;
-}
-@keyframes ec-hero-drift {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50%      { transform: translate(-18px, 16px) scale(1.08); }
-}
-.ec-hero-copy {
-  max-width: 400px;
-  position: relative;
-  z-index: 2;
-  min-width: 0;
-}
-.ec-hero-badge {
-  display: inline-flex;
-  align-items: center;
-  font-size: 10.5px;
-  font-weight: 900;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  padding: 7px 14px;
-  border-radius: 999px;
-  background: var(--lang-lime);
-  color: var(--lang-ink);
-  margin-bottom: 16px;
-  border: 2px solid var(--lang-line);
-  box-shadow: 0 3px 0 rgba(0,0,0,.4);
-}
-.ec-hero-headline {
-  font-size: clamp(24px, 2vw + 16px, 34px);
-  font-weight: 900;
-  line-height: 1.12;
-  letter-spacing: -0.035em;
-  margin: 0 0 12px;
-  color: #fff;
-}
-.ec-hero-headline em {
-  font-style: normal;
-  color: var(--lang-lime);
-}
-.ec-hero-sub {
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1.6;
-  color: rgba(255,255,255,.92);
-  margin: 0 0 24px;
-  max-width: 52ch;
-}
-.ec-hero-actions {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-.ec-hero-actions .ec-btn-primary {
-  background: var(--lang-lime);
-  color: var(--lang-ink);
-  box-shadow: 0 4px 0 var(--lang-line);
-}
-.ec-hero-actions .ec-btn-primary:hover {
-  box-shadow: 0 6px 0 var(--lang-line);
-}
-.ec-btn-arrow {
-  display: inline-block;
+  line-height: 0;
   transition: transform 0.2s ease;
 }
-.ec-btn-primary:hover .ec-btn-arrow { transform: translateX(4px); }
-.ec-hero-link {
-  color: #fff;
-  font-size: 13.5px;
-  font-weight: 900;
-  text-decoration: none;
-  padding: 8px 12px;
-  border-radius: 999px;
-  border: 2px solid rgba(255,255,255,.35);
-  background: rgba(255,255,255,.10);
-  transition: background 0.18s ease, border-color 0.18s ease;
-}
-.ec-hero-link:hover {
-  background: rgba(255,255,255,.20);
-  border-color: rgba(255,255,255,.6);
-}
-
-.ec-hero-art {
-  width: 220px;
-  height: 220px;
-  flex-shrink: 0;
-  position: relative;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transform: translate(calc(var(--px) * -1), calc(var(--py) * -1));
-  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-  filter: drop-shadow(0 14px 28px rgba(0,0,0,.28));
-  animation: ec-mascot-bob 3.5s ease-in-out infinite;
-}
-@keyframes ec-mascot-bob {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50%      { transform: translateY(-8px) rotate(-2deg); }
-}
-.ec-mascot-svg {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-/* ============================================================
-   CATEGORIES — chunky tiles
-   ============================================================ */
-.ec-categories {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-}
-.ec-category {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  padding: 16px 10px;
-  background: #fff;
-  border: 2px solid var(--lang-line);
-  border-radius: 22px;
-  cursor: pointer;
-  font-family: inherit;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-  box-shadow: 0 4px 0 var(--lang-line);
-}
-.ec-category:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 7px 0 var(--lang-line);
-}
-.ec-category:active { transform: translateY(1px); box-shadow: 0 1px 0 var(--lang-line); }
-
-.ec-category-icon {
-  width: 54px;
-  height: 54px;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  border: 2px solid var(--lang-line);
-  box-shadow: 0 3px 0 var(--lang-line);
-}
-.ec-category-icon svg { width: 24px; height: 24px; }
-.ec-category--lime   .ec-category-icon { background: var(--lang-lime);     color: var(--lang-ink); }
-.ec-category--pink   .ec-category-icon { background: var(--lang-pink-2);   color: #fff; }
-.ec-category--purple .ec-category-icon { background: var(--lang-purple-2); color: #fff; }
-.ec-category--yellow .ec-category-icon { background: var(--lang-yellow);   color: var(--lang-ink); }
-
-.ec-category-label {
-  font-size: 12.5px;
-  font-weight: 900;
-  color: var(--lang-ink);
-  letter-spacing: -0.01em;
-  text-align: center;
-  line-height: 1.2;
-}
-
-/* ============================================================
-   XP CARDS — chunky tiles
-   ============================================================ */
-.ec-xp-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-}
-.ec-xp-card {
-  position: relative;
-  background: #fff;
-  border-radius: 24px;
-  padding: 22px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  border: 2px solid var(--lang-line);
-  box-shadow: 0 6px 0 var(--lang-line);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  background-image: radial-gradient(circle at 100% 0%, rgba(212,245,92,.10), transparent 55%);
-}
-.ec-xp-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 9px 0 var(--lang-line);
-}
-.ec-xp-card:active { transform: translateY(1px); box-shadow: 0 2px 0 var(--lang-line); }
-
-.ec-xp-card--error {
-  grid-column: 1 / -1;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  flex-wrap: wrap;
-  background: var(--lang-pink-2);
-  color: #fff;
-}
-
-.ec-xp-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 50px;
-  height: 50px;
-  border-radius: 16px;
-  margin-bottom: 4px;
-  flex-shrink: 0;
-  border: 2px solid var(--lang-line);
-  box-shadow: 0 3px 0 var(--lang-line);
-}
-.ec-xp-icon svg { width: 22px; height: 22px; }
-.ec-xp-icon--lime   { background: var(--lang-lime);     color: var(--lang-ink); }
-.ec-xp-icon--yellow { background: var(--lang-yellow);   color: var(--lang-ink); }
-.ec-xp-icon--pink   { background: var(--lang-pink-2);   color: #fff; }
-.ec-xp-icon--violet { background: var(--lang-purple-2); color: #fff; }
-
-.ec-xp-value {
-  font-size: clamp(24px, 2vw + 14px, 30px);
-  font-weight: 900;
-  color: var(--lang-ink);
-  line-height: 1.05;
-  letter-spacing: -0.04em;
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  flex-wrap: wrap;
-  font-variant-numeric: tabular-nums;
-}
-.ec-xp-unit {
-  font-size: 13px;
-  font-weight: 800;
-  color: var(--lang-ink-soft);
-  letter-spacing: 0;
-}
-.ec-xp-label {
-  font-size: 12.5px;
-  color: var(--lang-ink-soft);
-  font-weight: 800;
-  letter-spacing: 0.02em;
-}
-.ec-xp-mini {
-  margin-top: 8px;
-  height: 12px;
-  border-radius: 999px;
-  background: #E8E5F2;
-  overflow: hidden;
-  border: 2px solid var(--lang-line);
-}
-.ec-xp-mini-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #D4F55C, #B8E62E);
-  border-radius: 999px;
-  transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.ec-inline-retry {
-  border: 2px solid var(--lang-line);
-  background: var(--lang-ink);
-  color: var(--lang-lime);
-  font-size: 13px;
-  font-weight: 900;
-  padding: 11px 20px;
-  min-height: 44px;
-  border-radius: 999px;
-  cursor: pointer;
-  font-family: inherit;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  box-shadow: 0 4px 0 var(--lang-line);
-  letter-spacing: 0.03em;
-}
-.ec-inline-retry:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 0 var(--lang-line);
-}
-.ec-inline-retry:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--lang-line); }
-
-/* ---------- Skeleton ---------- */
-.ec-skel {
-  display: inline-block;
-  background: linear-gradient(
-    90deg,
-    rgba(120, 110, 180, 0.10) 25%,
-    rgba(120, 110, 180, 0.22) 37%,
-    rgba(120, 110, 180, 0.10) 63%
-  );
-  background-size: 400% 100%;
-  animation: ec-shimmer 1.4s ease infinite;
-}
-@keyframes ec-shimmer {
-  0%   { background-position: 100% 50%; }
-  100% { background-position: 0 50%; }
-}
-
-/* ============================================================
-   PROGRESS CARDS — chunky colored tiles
-   ============================================================ */
-.ec-progress-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-}
-.ec-progress-card {
-  position: relative;
-  border-radius: 26px;
-  padding: 22px;
-  color: var(--lang-ink);
-  overflow: hidden;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  display: flex;
-  flex-direction: column;
-  border: 2px solid var(--lang-line);
-  box-shadow: 0 6px 0 var(--lang-line);
-}
-.ec-progress-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 0 var(--lang-line);
-}
-.ec-progress-card:active { transform: translateY(1px); box-shadow: 0 2px 0 var(--lang-line); }
-
-.ec-progress-card--lime   { background: linear-gradient(160deg, #E4FF5C 0%, #B8E62E 100%); }
-.ec-progress-card--pink   { background: linear-gradient(160deg, #FFB3D1 0%, #FF8FCB 100%); }
-.ec-progress-card--purple { background: linear-gradient(160deg, #9B7BFF 0%, #7B5CF0 100%); color: #fff; }
-
-.ec-progress-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 20px;
-  flex-shrink: 0;
-  color: var(--lang-ink);
-  border: 2px solid var(--lang-line);
-  box-shadow: 0 3px 0 var(--lang-line);
-}
-.ec-progress-icon svg { width: 26px; height: 26px; }
-
-.ec-progress-label {
-  font-size: 16px;
-  font-weight: 900;
-  line-height: 1.3;
-  margin: 0 0 20px;
-  letter-spacing: -0.02em;
-  min-height: 42px;
-}
-.ec-progress-bar-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: auto;
-}
-.ec-progress-bar {
-  flex: 1;
-  height: 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.55);
-  overflow: hidden;
-  border: 2px solid var(--lang-line);
-}
-.ec-progress-bar-fill {
-  height: 100%;
-  border-radius: 999px;
-  background: var(--lang-ink);
-  transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.ec-progress-card--purple .ec-progress-bar-fill {
-  background: var(--lang-lime);
-}
-.ec-progress-pct {
-  font-size: 14px;
-  font-weight: 900;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-  letter-spacing: -0.02em;
-}
-.ec-progress-caption {
-  display: block;
-  margin-top: 10px;
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  opacity: 0.85;
-}
-
-/* ============================================================
-   ARTICLES — chunky cards
-   ============================================================ */
-.ec-article-row {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-}
-.ec-article-card {
-  background: #fff;
-  border-radius: 26px;
-  padding: 14px;
-  border: 2px solid var(--lang-line);
-  box-shadow: 0 6px 0 var(--lang-line);
-  cursor: pointer;
-  outline: none;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.ec-article-card:hover,
-.ec-article-card:focus-visible {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 0 var(--lang-line);
-}
-.ec-article-card:active { transform: translateY(1px); box-shadow: 0 2px 0 var(--lang-line); }
-.ec-article-art {
-  position: relative;
-  height: 150px;
-  border-radius: 18px;
-  margin-bottom: 16px;
-  overflow: hidden;
-  border: 2px solid var(--lang-line);
-}
-.ec-article-art--a { background: linear-gradient(135deg, #FFB3D1 0%, #FF8FCB 100%); }
-.ec-article-art--b { background: linear-gradient(135deg, #9B7BFF 0%, #7B5CF0 100%); }
-.ec-article-tag {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  font-size: 10.5px;
-  font-weight: 900;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  padding: 5px 12px;
-  border-radius: 999px;
-  background: var(--lang-lime);
-  color: var(--lang-ink);
-  border: 2px solid var(--lang-line);
-  box-shadow: 0 2px 0 var(--lang-line);
-}
-.ec-article-body { padding: 0 8px 10px; }
-.ec-article-card h3 {
-  font-size: 15px;
-  font-weight: 900;
-  line-height: 1.4;
-  margin: 0 0 8px;
-  color: var(--lang-ink);
-  letter-spacing: -0.015em;
-}
-.ec-article-meta {
-  font-size: 12px;
-  color: var(--lang-ink-soft);
-  margin: 0;
-  font-weight: 700;
-}
-
-/* ============================================================
-   CALENDAR — chunky card
-   ============================================================ */
-.ec-calendar-card {
-  background: #fff;
-  border-radius: 26px;
-  padding: 22px 20px;
-  border: 2px solid var(--lang-line);
-  box-shadow: 0 6px 0 var(--lang-line);
-}
-.ec-calendar-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 18px;
-  gap: 12px;
-}
-.ec-calendar-head h3 {
-  font-size: 16px;
-  margin: 0;
-  font-weight: 900;
-  color: var(--lang-ink);
-  letter-spacing: -0.02em;
-}
-.ec-calendar-head button {
-  border: 2px solid var(--lang-line);
-  background: #fff;
-  color: var(--lang-ink);
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 16px;
-  font-weight: 900;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
-  box-shadow: 0 3px 0 var(--lang-line);
-}
-.ec-calendar-head button:hover:not(:disabled) {
-  background: var(--lang-lime-soft);
-  transform: translateY(-2px);
-  box-shadow: 0 5px 0 var(--lang-line);
-}
-.ec-calendar-head button:active:not(:disabled) {
-  transform: translateY(1px);
-  box-shadow: 0 1px 0 var(--lang-line);
-}
-.ec-calendar-head button:disabled { opacity: 0.35; cursor: not-allowed; }
-
-.ec-calendar-days {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 6px;
-}
-.ec-calendar-day {
-  border: 2px solid transparent;
-  background: #F4F4F8;
-  border-radius: 14px;
-  padding: 10px 2px 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  font-size: 10px;
-  color: var(--lang-ink-soft);
-  font-weight: 900;
-  cursor: pointer;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  position: relative;
-  min-height: 56px;
-  font-family: inherit;
-  transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
-}
-.ec-calendar-day:hover {
-  background: var(--lang-lime-soft);
-  border-color: var(--lang-line);
-  box-shadow: 0 3px 0 var(--lang-line);
-  transform: translateY(-2px);
-}
-.ec-calendar-day:active { transform: translateY(1px); box-shadow: 0 1px 0 var(--lang-line); }
-.ec-calendar-day strong {
-  font-size: 15px;
-  color: var(--lang-ink);
-  font-weight: 900;
-  line-height: 1;
-}
-.ec-calendar-day--active {
-  background: var(--lang-ink);
-  color: var(--lang-lime);
-  border-color: var(--lang-line);
-  box-shadow: 0 3px 0 var(--lang-line);
-}
-.ec-calendar-day--active strong { color: var(--lang-lime); }
-.ec-calendar-dot {
-  width: 6px;
-  height: 6px;
+.ec-mascot-btn:hover { transform: translateY(-3px) scale(1.04); }
+.ec-mascot-btn:active { transform: translateY(0) scale(0.96); }
+.ec-mascot-btn:focus-visible {
+  outline: 3px solid #D4F55C;
+  outline-offset: 6px;
   border-radius: 50%;
-  background: transparent;
-  display: inline-block;
-}
-.ec-calendar-dot--on { background: var(--lang-ink); }
-.ec-calendar-day--active .ec-calendar-dot--on { background: var(--lang-lime); }
-
-.ec-calendar-legend {
-  display: flex;
-  gap: 14px;
-  margin-top: 16px;
-  font-size: 11px;
-  color: var(--lang-ink-soft);
-  font-weight: 800;
-  flex-wrap: wrap;
-  letter-spacing: 0.02em;
-}
-.ec-calendar-legend-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
 }
 
-/* ============================================================
-   COURSE CARDS — chunky colored
-   ============================================================ */
-.ec-course-list { display: flex; flex-direction: column; gap: 20px; }
-.ec-course-card {
-  position: relative;
-  background: #fff;
-  border-radius: 26px;
-  padding: 22px;
-  border: 2px solid var(--lang-line);
-  box-shadow: 0 6px 0 var(--lang-line);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  overflow: hidden;
-}
-.ec-course-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 0 var(--lang-line);
-}
-.ec-course-card--yellow {
-  background: linear-gradient(160deg, #F5E04D 0%, #E8CE2A 100%);
-}
-.ec-course-card--purple {
-  background: linear-gradient(160deg, #9B7BFF 0%, #7B5CF0 100%);
-  color: #fff;
-}
-.ec-course-card--yellow .ec-course-card-blurb,
-.ec-course-card--yellow .ec-course-blurb { color: rgba(23,16,46,.75); }
-.ec-course-card--purple .ec-course-blurb { color: rgba(255,255,255,.85); }
-.ec-course-card--purple .ec-course-body h3 { color: #fff; }
-.ec-course-card--purple .ec-course-foot { color: rgba(255,255,255,.85); }
-.ec-course-card--purple .ec-course-price { color: #fff; }
-
-.ec-course-badge {
-  width: 64px;
-  height: 64px;
-  border-radius: 18px;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 18px;
-  color: var(--lang-ink);
-  border: 2px solid var(--lang-line);
-  box-shadow: 0 3px 0 var(--lang-line);
-}
-.ec-course-badge svg { width: 28px; height: 28px; }
-
-.ec-course-body { position: relative; z-index: 1; }
-.ec-course-tags {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 12px;
-  flex-wrap: wrap;
-}
-.ec-course-body h3 {
-  font-size: 20px;
-  margin: 0 0 10px;
-  font-weight: 900;
-  color: var(--lang-ink);
-  letter-spacing: -0.03em;
-  line-height: 1.2;
-}
-.ec-course-blurb {
-  font-size: 13.5px;
-  line-height: 1.55;
-  color: var(--lang-ink-soft);
-  margin: 0 0 16px;
-  font-weight: 600;
-}
-.ec-course-foot {
-  display: flex;
-  gap: 16px;
-  font-size: 12.5px;
-  color: var(--lang-ink-soft);
-  flex-wrap: wrap;
-  font-weight: 800;
-}
-.ec-course-foot > span {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-.ec-course-foot svg { width: 15px; height: 15px; opacity: 0.85; }
-
-.ec-course-cta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 20px;
-  padding-top: 18px;
-  border-top: 2px dashed rgba(23,16,46,.15);
-  flex-wrap: wrap;
-}
-.ec-course-card--purple .ec-course-cta { border-top-color: rgba(255,255,255,.25); }
-.ec-course-price {
-  font-size: 20px;
-  font-weight: 900;
-  color: var(--lang-ink);
-  letter-spacing: -0.03em;
-}
-.ec-buy-error {
-  font-size: 11.5px;
-  color: var(--lang-ink);
-  background: var(--lang-pink-2);
-  font-weight: 900;
-  width: 100%;
-  margin-top: 10px;
-  padding: 6px 12px;
-  border-radius: 10px;
-  border: 2px solid var(--lang-line);
-  text-align: center;
+.ec-mascot-glow,
+.ec-mascot-eyes,
+.ec-mascot-spark {
+  transform-box: fill-box;
+  transform-origin: center;
 }
 
-/* ============================================================
-   ANIMATIONS
-   ============================================================ */
-@keyframes ec-fade-slide-in {
-  from { opacity: 0; transform: translateY(14px) scale(0.985); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-.ec-anim-in { animation: ec-fade-slide-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.ec-mascot-glow { transition: opacity 0.35s ease; }
+.ec-mascot-svg--on .ec-mascot-glow { opacity: 0.9; animation: ec-mascot-breathe 2.6s ease-in-out infinite; }
+.ec-mascot-svg--off .ec-mascot-glow { opacity: 0; }
 
-@media (prefers-reduced-motion: reduce) {
-  .ec-anim-in,
-  .ec-hero-art,
-  .ec-hero-orb { animation: none !important; }
-  .ec-skel { animation: none; }
-  .ec-progress-card:hover,
-  .ec-article-card:hover,
-  .ec-course-card:hover,
-  .ec-xp-card:hover,
-  .ec-category:hover,
-  .ec-btn-primary:hover,
-  .ec-btn-pill:hover:not(:disabled),
-  .ec-section-link:hover,
-  .ec-calendar-head button:hover:not(:disabled),
-  .ec-calendar-day:hover { transform: none; }
-}
+.ec-mascot-svg--off { filter: grayscale(0.6) brightness(0.72); }
+.ec-mascot-svg--on { filter: none; }
 
-/* ============================================================
-   RESPONSIVE — TABLET (≤ 1080px)
-   ============================================================ */
-@media (max-width: 1080px) {
-  .ec-grid { grid-template-columns: 1fr; gap: 24px; }
-  .ec-col-side {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    align-items: start;
-  }
-  .ec-section-head--aside { grid-column: 1 / -1; margin-top: 4px; }
-  .ec-course-list { grid-column: 1 / -1; }
+.ec-mascot-svg--off .ec-mascot-filament { opacity: 0.35; }
+
+.ec-mascot-eyes { animation: ec-mascot-blink 4.5s ease-in-out infinite; }
+
+.ec-mascot-svg--on .ec-mascot-spark--a { animation: ec-mascot-twinkle 1.8s ease-in-out infinite; }
+.ec-mascot-svg--on .ec-mascot-spark--b { animation: ec-mascot-twinkle 1.8s ease-in-out infinite 0.5s; }
+.ec-mascot-svg--off .ec-mascot-spark { opacity: 0.15; }
+
+.ec-mascot-btn--pulse .ec-mascot-glow { animation: ec-mascot-pulse 0.45s ease-out; }
+
+@keyframes ec-mascot-breathe {
+  0%, 100% { opacity: 0.75; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.06); }
+}
+@keyframes ec-mascot-blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.12); }
+}
+@keyframes ec-mascot-twinkle {
+  0%, 100% { opacity: 0.35; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+@keyframes ec-mascot-pulse {
+  0% { opacity: 1; transform: scale(0.6); }
+  100% { opacity: 0; transform: scale(1.6); }
 }
 
-/* ============================================================
-   RESPONSIVE — ≤ 900px
-   ============================================================ */
-@media (max-width: 900px) {
-  .ec-grid { gap: 20px; }
-
-  .ec-categories { gap: 12px; }
-  .ec-category { padding: 14px 8px; border-radius: 20px; }
-  .ec-category-icon { width: 48px; height: 48px; border-radius: 14px; }
-  .ec-category-icon svg { width: 22px; height: 22px; }
-  .ec-category-label { font-size: 12px; }
-
-  .ec-xp-row {
-    display: flex;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: 4px 20px;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-x: contain;
-    scrollbar-width: none;
-    padding: 4px 4px 12px 0;
-    margin: 0;
-    gap: 14px;
-  }
-  .ec-xp-row::-webkit-scrollbar { display: none; }
-  .ec-xp-card { flex: 0 0 72%; scroll-snap-align: start; padding: 20px; }
-  .ec-xp-card--error {
-    flex: 0 0 100%;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-  }
-  .ec-xp-card--error .ec-btn-primary--sm { width: 100%; }
-
-  .ec-progress-row {
-    display: flex;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: 4px 20px;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-x: contain;
-    scrollbar-width: none;
-    padding: 4px 4px 14px 0;
-    margin: 0;
-    gap: 16px;
-  }
-  .ec-progress-row::-webkit-scrollbar { display: none; }
-  .ec-progress-card { flex: 0 0 76%; scroll-snap-align: start; }
-
-  .ec-hero {
-    flex-direction: column-reverse;
-    align-items: center;
-    text-align: center;
-    gap: 16px;
-    padding: 28px 22px 24px;
-    border-radius: 28px;
-  }
-  .ec-hero-copy { max-width: 100%; }
-  .ec-hero-actions { justify-content: center; }
+/* Mobile: keep the mascot out of the headline's way — tucked in the corner, not centered */
+@media (max-width: 640px) {
+  .ec-hero { position: relative; }
   .ec-hero-art {
-    width: 180px;
-    height: 180px;
-    margin-bottom: -10px;
-    transform: none;
-    animation: none;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    margin: 0;
+    transform: scale(0.68);
+    transform-origin: top right;
+    z-index: 5;
   }
+}
+`;
 
-  .ec-article-row { grid-template-columns: 1fr; }
-  .ec-article-art { height: 170px; }
+function LangutMascot({ size = 180 }) {
+  const [isOn, setIsOn] = useState(true);
+  const [pulse, setPulse] = useState(false);
 
-  .ec-col-side { grid-template-columns: 1fr; gap: 20px; }
+  const handleClick = useCallback(() => {
+    setIsOn((v) => !v);
+    setPulse(true);
+    setTimeout(() => setPulse(false), 450);
+  }, []);
+
+  return (
+    <>
+      <style>{MASCOT_STYLES}</style>
+      <button
+        type="button"
+        className={`ec-mascot-btn${pulse ? ' ec-mascot-btn--pulse' : ''}`}
+        onClick={handleClick}
+        aria-label={isOn ? 'Mascot bulb — tap to switch off' : 'Mascot bulb — tap to switch on'}
+        aria-pressed={isOn}
+        title={isOn ? 'Tap to switch off' : 'Tap to switch on'}
+      >
+        <svg
+          viewBox="0 0 170 170"
+          width={size}
+          height={size}
+          fill="none"
+          aria-hidden="true"
+          className={`ec-mascot-svg${isOn ? ' ec-mascot-svg--on' : ' ec-mascot-svg--off'}`}
+        >
+          <defs>
+            <radialGradient id="bulbGlow" cx="50%" cy="40%" r="60%">
+              <stop offset="0%" stopColor="#FFF7C2" stopOpacity="0.95" />
+              <stop offset="55%" stopColor="#F5E04D" stopOpacity="0.35" />
+              <stop offset="100%" stopColor="#F5E04D" stopOpacity="0" />
+            </radialGradient>
+          </defs>
+
+          {/* Ambient bulb glow */}
+          <circle className="ec-mascot-glow" cx="85" cy="78" r="70" fill="url(#bulbGlow)" />
+
+          <ellipse cx="85" cy="158" rx="46" ry="7" fill="#000" opacity="0.22" />
+
+          {/* Arms */}
+          <path d="M40 70c-8-4-16 0-18 8s2 16 10 18" stroke="#17102E" strokeWidth="4" fill="#F5E04D" strokeLinejoin="round" />
+          <path d="M130 70c8-4 16 0 18 8s-2 16-10 18" stroke="#17102E" strokeWidth="4" fill="#F5E04D" strokeLinejoin="round" />
+
+          {/* Bulb body */}
+          <path
+            d="M85 18c-30 0-54 24-54 54 0 17 7 31 15 40 5 6 8 12 8 19 0 4 3 7 7 7h48c4 0 7-3 7-7 0-7 3-13 8-19 8-9 15-23 15-40 0-30-24-54-54-54z"
+            fill="#F5E04D"
+            stroke="#17102E"
+            strokeWidth="4"
+            strokeLinejoin="round"
+          />
+
+          {/* Filament-style highlight */}
+          <path
+            className="ec-mascot-filament"
+            d="M85 40c-20 0-36 14-36 34 0 13 6 22 12 29"
+            stroke="#FBF0A0"
+            strokeWidth="7"
+            strokeLinecap="round"
+            fill="none"
+          />
+
+          {/* Screw-base threads, like a real bulb */}
+          <path d="M70 130h30" stroke="#17102E" strokeWidth="3" strokeLinecap="round" opacity="0.35" />
+          <path d="M71 136h28" stroke="#17102E" strokeWidth="3" strokeLinecap="round" opacity="0.35" />
+
+          {/* Eyes */}
+          <g className="ec-mascot-eyes">
+            <circle cx="68" cy="76" r="11" fill="#fff" stroke="#17102E" strokeWidth="3.5" />
+            <circle cx="70" cy="78" r="4.8" fill="#17102E" />
+            <circle cx="71.6" cy="76.4" r="1.5" fill="#fff" />
+            <circle cx="102" cy="76" r="11" fill="#fff" stroke="#17102E" strokeWidth="3.5" />
+            <circle cx="104" cy="78" r="4.8" fill="#17102E" />
+            <circle cx="105.6" cy="76.4" r="1.5" fill="#fff" />
+          </g>
+
+          <path d="M76 98c3 5 6 7 9 7s6-2 9-7" stroke="#17102E" strokeWidth="3.5" strokeLinecap="round" fill="none" />
+          <circle cx="56" cy="94" r="4.5" fill="#FF8FCB" opacity="0.55" />
+          <circle cx="114" cy="94" r="4.5" fill="#FF8FCB" opacity="0.55" />
+
+          {/* Feet */}
+          <ellipse cx="70" cy="132" rx="12" ry="5.5" fill="#F5E04D" stroke="#17102E" strokeWidth="3.5" />
+          <ellipse cx="100" cy="132" rx="12" ry="5.5" fill="#F5E04D" stroke="#17102E" strokeWidth="3.5" />
+
+          {/* Twinkling sparkles */}
+          <path className="ec-mascot-spark ec-mascot-spark--a" d="M22 40l3-7 3 7-7 3 7 3-3 7-3-7-7-3z" fill="#D4F55C" />
+          <path className="ec-mascot-spark ec-mascot-spark--b" d="M148 46l2.5-6 2.5 6-6 2.5 6 2.5-2.5 6-2.5-6-6-2.5z" fill="#FF8FCB" />
+        </svg>
+      </button>
+    </>
+  );
 }
 
 /* ============================================================
-   RESPONSIVE — PHONES (≤ 720px)
+   Article illustrations — hand-drawn SVGs related to topic
    ============================================================ */
-@media (max-width: 720px) {
-  .ec-page-title { font-size: 22px; }
-  .ec-page-sub { font-size: 13px; }
+function ArticleArtVocab() {
+  return (
+    <svg viewBox="0 0 200 140" preserveAspectRatio="xMidYMid slice" aria-hidden="true" className="ec-article-svg">
+      <defs>
+        <linearGradient id="ecVocabBg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#FFE5F2" />
+          <stop offset="100%" stopColor="#FF8FCB" />
+        </linearGradient>
+      </defs>
+      <rect width="200" height="140" fill="url(#ecVocabBg)" />
+      <circle cx="170" cy="15" r="45" fill="#fff" opacity="0.22" />
+      <circle cx="25" cy="125" r="40" fill="#fff" opacity="0.16" />
 
-  .ec-categories { grid-template-columns: repeat(4, 1fr); gap: 8px; }
-  .ec-category { padding: 12px 4px; border-radius: 16px; gap: 8px; }
-  .ec-category-icon { width: 42px; height: 42px; border-radius: 12px; }
-  .ec-category-icon svg { width: 20px; height: 20px; }
-  .ec-category-label { font-size: 10.5px; }
+      {/* Book stack */}
+      <rect x="55" y="95" width="90" height="16" rx="4" fill="#D4F55C" stroke="#17102E" strokeWidth="2.5" />
+      <rect x="60" y="80" width="80" height="16" rx="4" fill="#9B7BFF" stroke="#17102E" strokeWidth="2.5" />
+      <rect x="65" y="65" width="70" height="16" rx="4" fill="#F5E04D" stroke="#17102E" strokeWidth="2.5" />
+      <line x1="80" y1="103" x2="120" y2="103" stroke="#17102E" strokeWidth="2" strokeLinecap="round" />
+      <line x1="82" y1="88" x2="118" y2="88" stroke="#17102E" strokeWidth="2" strokeLinecap="round" />
+      <line x1="85" y1="73" x2="115" y2="73" stroke="#17102E" strokeWidth="2" strokeLinecap="round" />
 
-  .ec-xp-card { flex-basis: 80%; }
-  .ec-progress-card { flex-basis: 82%; }
+      {/* Floating word bubbles */}
+      <g className="ec-float-slow">
+        <circle cx="48" cy="45" r="15" fill="#fff" stroke="#17102E" strokeWidth="2.5" />
+        <text x="48" y="51" textAnchor="middle" fontSize="14" fontWeight="900" fill="#17102E" fontFamily="sans-serif">A</text>
+      </g>
+      <g className="ec-float-mid">
+        <circle cx="86" cy="32" r="18" fill="#D4F55C" stroke="#17102E" strokeWidth="2.5" />
+        <text x="86" y="39" textAnchor="middle" fontSize="16" fontWeight="900" fill="#17102E" fontFamily="sans-serif">B</text>
+      </g>
+      <g className="ec-float-fast">
+        <circle cx="126" cy="46" r="15" fill="#9B7BFF" stroke="#17102E" strokeWidth="2.5" />
+        <text x="126" y="52" textAnchor="middle" fontSize="14" fontWeight="900" fill="#fff" fontFamily="sans-serif">C</text>
+      </g>
 
-  .ec-hero { padding: 24px 20px; border-radius: 26px; }
-  .ec-hero-art { width: 150px; height: 150px; }
-  .ec-hero-headline { font-size: 24px; }
-  .ec-hero-sub { font-size: 13.5px; }
-
-  .ec-course-card { padding: 20px; border-radius: 22px; }
-  .ec-course-body h3 { font-size: 18px; }
-  .ec-course-cta { flex-direction: row; }
+      {/* Sparkles */}
+      <path d="M168 68l2-6 2 6-6 2 6 2-2 6-2-6-6-2z" fill="#17102E" />
+      <path d="M32 78l1.5-4 1.5 4-4 1.5 4 1.5-1.5 4-1.5-4-4-1.5z" fill="#17102E" />
+    </svg>
+  );
 }
 
-/* ============================================================
-   RESPONSIVE — SMALL PHONES (≤ 480px)
-   ============================================================ */
-@media (max-width: 480px) {
-  .ec-page-title { font-size: 20px; }
-  .ec-overview-eyebrow { font-size: 11px; }
+function ArticleArtStart() {
+  return (
+    <svg viewBox="0 0 200 140" preserveAspectRatio="xMidYMid slice" aria-hidden="true" className="ec-article-svg">
+      <defs>
+        <linearGradient id="ecStartBg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#E5DCFF" />
+          <stop offset="100%" stopColor="#7B5CF0" />
+        </linearGradient>
+      </defs>
+      <rect width="200" height="140" fill="url(#ecStartBg)" />
+      <circle cx="30" cy="25" r="50" fill="#fff" opacity="0.14" />
+      <circle cx="180" cy="120" r="45" fill="#fff" opacity="0.12" />
 
-  .ec-xp-card { flex-basis: 84%; padding: 18px; }
-  .ec-xp-value { font-size: 24px; }
-  .ec-progress-card { flex-basis: 86%; padding: 20px; }
-  .ec-progress-icon { width: 52px; height: 52px; margin-bottom: 18px; }
-  .ec-progress-label { font-size: 15px; min-height: auto; margin-bottom: 18px; }
+      {/* Trajectory path */}
+      <path
+        d="M20 120 Q60 90 100 60 T180 20"
+        stroke="#D4F55C"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeDasharray="6 6"
+        fill="none"
+        opacity="0.9"
+      />
 
-  .ec-hero { padding: 24px 18px 20px; }
-  .ec-hero-art { width: 130px; height: 130px; }
-  .ec-hero-headline { font-size: 22px; }
-  .ec-hero-actions {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-    width: 100%;
-  }
-  .ec-hero-actions .ec-btn-primary { width: 100%; }
-  .ec-hero-link { text-align: center; }
+      {/* Rocket */}
+      <g className="ec-rocket">
+        <path
+          d="M100 30c-8 10-12 22-12 34l12 8 12-8c0-12-4-24-12-34z"
+          fill="#fff"
+          stroke="#17102E"
+          strokeWidth="2.5"
+          strokeLinejoin="round"
+        />
+        <circle cx="100" cy="52" r="5" fill="#D4F55C" stroke="#17102E" strokeWidth="2" />
+        <path d="M88 72l-7 11 10-4z" fill="#D4F55C" stroke="#17102E" strokeWidth="2.5" strokeLinejoin="round" />
+        <path d="M112 72l7 11-10-4z" fill="#D4F55C" stroke="#17102E" strokeWidth="2.5" strokeLinejoin="round" />
+        {/* Flame */}
+        <path d="M100 82c-3 5-3 10 0 14 3-4 3-9 0-14z" fill="#F5A623" stroke="#17102E" strokeWidth="2" strokeLinejoin="round" />
+      </g>
 
-  .ec-calendar-card { padding: 18px 16px; }
-  .ec-calendar-head h3 { font-size: 15px; }
-  .ec-calendar-head button { width: 36px; height: 36px; font-size: 15px; }
-  .ec-calendar-day { min-height: 52px; padding: 9px 1px 7px; }
-  .ec-calendar-day strong { font-size: 14px; }
-
-  .ec-article-art { height: 150px; }
-  .ec-article-card h3 { font-size: 14.5px; }
-
-  .ec-course-card { padding: 18px; border-radius: 22px; }
-  .ec-course-badge { width: 56px; height: 56px; margin-bottom: 16px; border-radius: 16px; }
-  .ec-course-badge svg { width: 24px; height: 24px; }
-  .ec-course-body h3 { font-size: 17px; }
-  .ec-course-cta { flex-direction: column; align-items: stretch; gap: 12px; }
-  .ec-course-cta .ec-btn-pill { width: 100%; }
-  .ec-course-price { text-align: center; }
+      {/* Stars */}
+      <circle cx="45" cy="42" r="2.5" fill="#fff" />
+      <circle cx="152" cy="58" r="2" fill="#fff" />
+      <circle cx="165" cy="100" r="2.5" fill="#fff" />
+      <circle cx="60" cy="88" r="1.8" fill="#D4F55C" />
+      <path d="M40 105l2-6 2 6-6 2 6 2-2 6-2-6-6-2z" fill="#D4F55C" />
+      <path d="M170 28l1.5-4 1.5 4-4 1.5 4 1.5-1.5 4-1.5-4-4-1.5z" fill="#fff" />
+    </svg>
+  );
 }
 
-/* ============================================================
-   RESPONSIVE — TINY PHONES (≤ 380px)
-   ============================================================ */
-@media (max-width: 380px) {
-  .ec-categories { gap: 6px; }
-  .ec-category-icon { width: 38px; height: 38px; border-radius: 10px; }
-  .ec-category-icon svg { width: 18px; height: 18px; }
-  .ec-category-label { font-size: 10px; }
-
-  .ec-xp-card { flex-basis: 88%; }
-  .ec-progress-card { flex-basis: 90%; }
-
-  .ec-hero { padding: 22px 16px; }
-  .ec-hero-art { width: 110px; height: 110px; }
-  .ec-hero-headline { font-size: 20px; }
-  .ec-page-title { font-size: 19px; }
+function ArticleArt({ kind }) {
+  if (kind === 'vocab') return <ArticleArtVocab />;
+  if (kind === 'start') return <ArticleArtStart />;
+  return null;
 }
 
-/* ============================================================
-   LANDSCAPE / SHORT
-   ============================================================ */
-@media (max-width: 900px) and (orientation: landscape) and (max-height: 500px) {
-  .ec-hero { flex-direction: row; padding: 18px; text-align: left; }
-  .ec-hero-art { width: 100px; height: 100px; margin-bottom: 0; }
-  .ec-hero-copy { text-align: left; }
-  .ec-hero-actions { justify-content: flex-start; }
-  .ec-calendar-legend { display: none; }
+function Skeleton({ w = '100%', h = 14, radius = 8, style }) {
+  return <span className="ec-skel" style={{ width: w, height: h, borderRadius: radius, ...style }} />;
 }
 
-/* ============================================================
-   TOUCH DEVICES
-   ============================================================ */
-@media (hover: none) and (pointer: coarse) {
-  .ec-section-link { min-height: 40px; padding: 8px 14px; margin: -8px -10px; }
-  .ec-calendar-day { min-height: 56px; }
-  .ec-category { min-height: 88px; }
-  .ec-btn-pill { min-height: 48px; }
+function XpIcon({ name, accent }) {
+  return (
+    <span className={`ec-xp-icon ec-xp-icon--${accent}`} aria-hidden="true">
+      <Icon name={name} />
+    </span>
+  );
 }
+
+function Counter({ value, suffix = '' }) {
+  const displayed = useCountUp(value);
+  return <>{displayed}{suffix}</>;
+}
+
+export function Overview() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const [wordOfDay, setWordOfDay] = useState(null);
+  const [wordLoading, setWordLoading] = useState(true);
+
+  const [xp, setXp] = useState(null);
+  const [xpLoading, setXpLoading] = useState(true);
+  const [xpError, setXpError] = useState(false);
+
+  const [weekIndex, setWeekIndex] = useState(TODAY_WEEK_INDEX);
+  const [activeDay, setActiveDay] = useState(TODAY_DAY_NUMBER);
+
+  const [buying, setBuying] = useState(null);
+  const [bought, setBought] = useState(new Set());
+  const [buyError, setBuyError] = useState(null);
+
+  const [animateBars, setAnimateBars] = useState(false);
+
+  const heroRef = useRef(null);
+
+  const loadWord = useCallback(() => {
+    setWordLoading(true);
+    return vocabApi
+      .wordOfDay()
+      .then((d) => setWordOfDay(d))
+      .catch(() => setWordOfDay(null))
+      .finally(() => setWordLoading(false));
+  }, []);
+
+  const loadXp = useCallback(() => {
+    setXpLoading(true);
+    setXpError(false);
+    return gamificationApi
+      .summary()
+      .then((d) => setXp(d))
+      .catch(() => setXpError(true))
+      .finally(() => setXpLoading(false));
+  }, []);
+
+  useEffect(() => {
+    loadWord();
+    loadXp();
+    const t = requestAnimationFrame(() => setAnimateBars(true));
+    return () => cancelAnimationFrame(t);
+  }, [loadWord, loadXp]);
+
+  /* Desktop-only hero parallax */
+  useEffect(() => {
+    const el = heroRef.current;
+    if (!el) return undefined;
+    if (window.matchMedia('(pointer: coarse)').matches) return undefined;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+
+    const onMove = (e) => {
+      const rect = el.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width - 0.5) * 8;
+      const y = ((e.clientY - rect.top) / rect.height - 0.5) * 8;
+      el.style.setProperty('--px', `${x}px`);
+      el.style.setProperty('--py', `${y}px`);
+    };
+    const onLeave = () => {
+      el.style.setProperty('--px', '0px');
+      el.style.setProperty('--py', '0px');
+    };
+    el.addEventListener('mousemove', onMove);
+    el.addEventListener('mouseleave', onLeave);
+    return () => {
+      el.removeEventListener('mousemove', onMove);
+      el.removeEventListener('mouseleave', onLeave);
+    };
+  }, []);
+
+  const firstName = user?.name?.split(' ')[0] || 'there';
+  const greeting = getGreeting();
+  const week = CALENDAR_WEEKS[weekIndex];
+
+  const goPrevWeek = () => setWeekIndex((i) => Math.max(0, i - 1));
+  const goNextWeek = () => setWeekIndex((i) => Math.min(CALENDAR_WEEKS.length - 1, i + 1));
+
+  /* Weekly practice count */
+  const practiceDays = week.days.filter((d) => d.has).length;
+
+  const buyCourse = (course) => {
+    if (bought.has(course.id) || buying) return;
+    setBuyError(null);
+    setBuying(course.id);
+    paymentsApi
+      .checkout(course.id, 'bkash')
+      .then(() => setBought((prev) => new Set(prev).add(course.id)))
+      .catch(() => setBuyError(course.id))
+      .finally(() => setBuying(null));
+  };
+
+  const xpGoalPct = xp?.xpGoal
+    ? Math.min(100, Math.round((xp.xpToday / xp.xpGoal) * 100))
+    : 0;
+
+  const continueLesson = {
+    title: 'Family & Friends',
+    subtitle: 'Unit 1 · 20 words',
+    progress: 45,
+    to: '/vocabulary',
+  };
+
+  return (
+    <div className="ec-overview">
+      {/* ---------- Greeting ---------- */}
+      <div className="ec-overview-head ec-anim-in">
+        <div className="ec-overview-head-text">
+          <p className="ec-overview-eyebrow">{greeting}</p>
+          <h1 className="ec-page-title">Welcome back, {firstName}</h1>
+          <p className="ec-page-sub">Small steps every day add up. Let’s keep the streak alive.</p>
+        </div>
+      </div>
+
+      <div className="ec-grid">
+        <section className="ec-col-main">
+          {/* ============================================================
+             HERO
+             ============================================================ */}
+          <div className="ec-hero ec-anim-in" style={{ animationDelay: '0.05s' }} ref={heroRef}>
+            <div className="ec-hero-orb ec-hero-orb--a" aria-hidden="true" />
+            <div className="ec-hero-orb ec-hero-orb--b" aria-hidden="true" />
+
+            <div className="ec-hero-copy">
+              <div className="ec-hero-badges">
+                <span className="ec-hero-badge">Today’s focus</span>
+                <span className="ec-hero-streak">
+                  <Icon name="zap" />
+                  <strong>{xp?.streak ?? 12}</strong> day streak
+                </span>
+              </div>
+
+              {wordLoading ? (
+                <>
+                  <Skeleton w="80%" h={26} style={{ marginBottom: 10 }} />
+                  <Skeleton w="55%" h={26} style={{ marginBottom: 22 }} />
+                </>
+              ) : (
+                <h2 className="ec-hero-headline">
+                  {wordOfDay
+                    ? <>Learn <em>“{wordOfDay.word}”</em> today</>
+                    : 'Ready to learn English?'}
+                </h2>
+              )}
+
+              {!wordLoading && wordOfDay?.meaning && (
+                <p className="ec-hero-sub">{wordOfDay.meaning}</p>
+              )}
+
+              <div className="ec-hero-actions">
+                <Link to="/vocabulary" className="ec-btn-primary ec-btn-primary--lime">
+                  Start learning
+                  <span className="ec-btn-arrow" aria-hidden="true">→</span>
+                </Link>
+                <Link to="/progress" className="ec-hero-link">View progress</Link>
+              </div>
+
+              {/* Continue learning mini card */}
+              <Link to={continueLesson.to} className="ec-hero-continue">
+                <span className="ec-hero-continue-icon" aria-hidden="true">
+                  <Icon name="book" />
+                </span>
+                <span className="ec-hero-continue-body">
+                  <span className="ec-hero-continue-label">Continue where you left off</span>
+                  <strong className="ec-hero-continue-title">{continueLesson.title}</strong>
+                  <span className="ec-hero-continue-sub">{continueLesson.subtitle}</span>
+                </span>
+                <span className="ec-hero-continue-progress">
+                  <svg viewBox="0 0 36 36" width="42" height="42" aria-hidden="true">
+                    <circle cx="18" cy="18" r="15" fill="none" stroke="rgba(255,255,255,.22)" strokeWidth="4" />
+                    <circle
+                      cx="18" cy="18" r="15" fill="none"
+                      stroke="#D4F55C" strokeWidth="4" strokeLinecap="round"
+                      strokeDasharray={`${(continueLesson.progress / 100) * 94.2} 94.2`}
+                      transform="rotate(-90 18 18)"
+                    />
+                  </svg>
+                  <span className="ec-hero-continue-pct">{continueLesson.progress}%</span>
+                </span>
+              </Link>
+            </div>
+
+            <div className="ec-hero-art">
+              <LangutMascot size={200} />
+            </div>
+          </div>
+
+          {/* ============================================================
+             CATEGORIES
+             ============================================================ */}
+          <div className="ec-section-head ec-section-head--tight">
+            <h2 className="ec-section-title">Choose what to learn</h2>
+            <Link to="/curriculum" className="ec-section-link">See all →</Link>
+          </div>
+
+          <div className="ec-categories ec-anim-in" style={{ animationDelay: '0.08s' }}>
+            {CATEGORIES.map((cat, i) => (
+              <button
+                key={cat.id}
+                type="button"
+                className={`ec-category ec-category--${cat.color}`}
+                onClick={() => navigate(cat.to)}
+                style={{ animationDelay: `${0.1 + i * 0.05}s` }}
+              >
+                <span className="ec-category-icon" aria-hidden="true">
+                  <Icon name={cat.icon} />
+                </span>
+                <span className="ec-category-label">{cat.label}</span>
+                <span className="ec-category-hint">{cat.hint}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* ============================================================
+             XP ROW
+             ============================================================ */}
+          <div className="ec-section-head ec-section-head--tight">
+            <h2 className="ec-section-title">Your activity</h2>
+          </div>
+
+          <div className="ec-xp-row ec-anim-in" style={{ animationDelay: '0.1s' }}>
+            {xpLoading ? (
+              [0, 1, 2].map((i) => (
+                <div className="ec-xp-card" key={i}>
+                  <Skeleton w={44} h={44} radius={14} />
+                  <Skeleton w="60%" h={22} style={{ marginTop: 14 }} />
+                  <Skeleton w="80%" h={12} style={{ marginTop: 6 }} />
+                </div>
+              ))
+            ) : xpError ? (
+              <div className="ec-xp-card ec-xp-card--error">
+                <span className="ec-xp-label">Couldn’t load your stats.</span>
+                <button type="button" className="ec-btn-primary ec-btn-primary--sm" onClick={loadXp}>
+                  Retry
+                </button>
+              </div>
+            ) : xp ? (
+              <>
+                <div className="ec-xp-card ec-xp-card--streak">
+                  <XpIcon name="zap" accent="yellow" />
+                  <span className="ec-xp-value">
+                    <Counter value={xp.streak} />
+                    <span className="ec-xp-unit">days</span>
+                  </span>
+                  <span className="ec-xp-label">Current streak</span>
+                  <span className="ec-xp-trend ec-xp-trend--up">🔥 Personal best</span>
+                </div>
+
+                <div className="ec-xp-card ec-xp-card--goal">
+                  <XpIcon name="target" accent="lime" />
+                  <span className="ec-xp-value">
+                    <Counter value={xp.xpToday} />
+                    <span className="ec-xp-unit">/ {xp.xpGoal}</span>
+                  </span>
+                  <span className="ec-xp-label">Today’s XP</span>
+                  <div className="ec-xp-mini">
+                    <div className="ec-xp-mini-fill" style={{ width: animateBars ? `${xpGoalPct}%` : '0%' }} />
+                  </div>
+                  <span className="ec-xp-trend">{xpGoalPct}% of daily goal</span>
+                </div>
+
+                <div className="ec-xp-card ec-xp-card--rank">
+                  <XpIcon name="trophy" accent="pink" />
+                  <span className="ec-xp-value">
+                    #<Counter value={xp.rank} />
+                  </span>
+                  <span className="ec-xp-label">{xp.rankName}</span>
+                  <span className="ec-xp-trend">+3 this week</span>
+                </div>
+              </>
+            ) : null}
+          </div>
+
+          {/* ============================================================
+             PROGRESS
+             ============================================================ */}
+          <div className="ec-section-head">
+            <h2 className="ec-section-title">Your lessons</h2>
+            <Link to="/progress" className="ec-section-link">See all →</Link>
+          </div>
+
+          <div className="ec-progress-row">
+            {PROGRESS_CARDS.map((c, i) => (
+              <div
+                className={`ec-progress-card ec-progress-card--${c.accent} ec-anim-in`}
+                key={c.id}
+                style={{ animationDelay: `${0.1 + i * 0.06}s` }}
+                onClick={() => navigate('/curriculum')}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/curriculum'); }}
+              >
+                <div className="ec-progress-top">
+                  <span className="ec-progress-icon" aria-hidden="true">
+                    <Icon name={c.icon} />
+                  </span>
+                  <span className="ec-progress-pct">
+                    <Counter value={c.percent} suffix="%" />
+                  </span>
+                </div>
+                <p className="ec-progress-label">{c.label}</p>
+                <p className="ec-progress-next">{c.next}</p>
+                <div className="ec-progress-bar-row">
+                  <div className="ec-progress-bar">
+                    <div
+                      className="ec-progress-bar-fill"
+                      style={{ width: animateBars ? `${c.percent}%` : '0%' }}
+                    />
+                  </div>
+                </div>
+                <div className="ec-progress-foot">
+                  <span className="ec-progress-caption">{c.remaining}</span>
+                  <span className="ec-progress-cta" aria-hidden="true">
+                    Continue
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M9 6l6 6-6 6" />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* ============================================================
+             ARTICLES — now with real illustrations
+             ============================================================ */}
+          <div className="ec-section-head">
+            <h2 className="ec-section-title">Top articles</h2>
+            <Link to="/curriculum" className="ec-section-link">Browse all →</Link>
+          </div>
+
+          <div className="ec-article-row">
+            {ARTICLES.map((a, i) => (
+              <article
+                className="ec-article-card ec-anim-in"
+                key={a.id}
+                style={{ animationDelay: `${0.15 + i * 0.06}s` }}
+                tabIndex={0}
+              >
+                <div className={`ec-article-art ec-article-art--${a.art}`} aria-hidden="true">
+                  <ArticleArt kind={a.art} />
+                  <span className="ec-article-tag">{a.tag}</span>
+                  <span className="ec-article-bookmark">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M6 4h12v16l-6-4-6 4z" />
+                    </svg>
+                  </span>
+                </div>
+                <div className="ec-article-body">
+                  <h3>{a.title}</h3>
+                  <div className="ec-article-foot">
+                    <span className="ec-article-avatar" aria-hidden="true">
+                      {a.author.charAt(0)}
+                    </span>
+                    <span className="ec-article-meta">{a.author} · {a.meta}</span>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        {/* ============================================================
+           SIDEBAR
+           ============================================================ */}
+        <aside className="ec-col-side">
+          {/* ---------- Calendar (redesigned) ---------- */}
+          <div className="ec-calendar-card ec-anim-in" style={{ animationDelay: '0.1s' }}>
+            <div className="ec-calendar-head">
+              <div className="ec-calendar-head-copy">
+                <span className="ec-calendar-eyebrow">Practice calendar</span>
+                <h3>{week.label}</h3>
+              </div>
+              <div className="ec-calendar-nav">
+                <button
+                  type="button"
+                  aria-label="Previous month"
+                  onClick={goPrevWeek}
+                  disabled={weekIndex === 0}
+                >
+                  ‹
+                </button>
+                <button
+                  type="button"
+                  aria-label="Next month"
+                  onClick={goNextWeek}
+                  disabled={weekIndex === CALENDAR_WEEKS.length - 1}
+                >
+                  ›
+                </button>
+              </div>
+            </div>
+
+            <div className="ec-calendar-stats">
+              <div className="ec-calendar-stat">
+                <span className="ec-calendar-stat-value">{practiceDays}</span>
+                <span className="ec-calendar-stat-label">days active</span>
+              </div>
+              <div className="ec-calendar-stat">
+                <span className="ec-calendar-stat-value">{practiceDays * 45}</span>
+                <span className="ec-calendar-stat-label">XP this week</span>
+              </div>
+              <div className="ec-calendar-stat ec-calendar-stat--streak">
+                <span className="ec-calendar-stat-value">
+                  🔥 {xp?.streak ?? 7}
+                </span>
+                <span className="ec-calendar-stat-label">streak</span>
+              </div>
+            </div>
+
+            <div className="ec-calendar-weekdays" aria-hidden="true">
+              <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+            </div>
+
+            <div className="ec-calendar-days">
+              {week.days.map((w) => {
+                const isActive = activeDay === w.n;
+                const isToday = w.today;
+                return (
+                  <button
+                    type="button"
+                    key={w.n}
+                    className={
+                      `ec-calendar-day${isActive ? ' ec-calendar-day--active' : ''}` +
+                      `${isToday ? ' ec-calendar-day--today' : ''}` +
+                      `${w.has ? ' ec-calendar-day--practiced' : ''}`
+                    }
+                    onClick={() => setActiveDay(w.n)}
+                  >
+                    <strong>{w.n}</strong>
+                    <span className={`ec-calendar-dot${w.has ? ' ec-calendar-dot--on' : ''}`} />
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="ec-calendar-legend">
+              <span className="ec-calendar-legend-item">
+                <i className="ec-calendar-dot ec-calendar-dot--on" /> Practiced
+              </span>
+              <span className="ec-calendar-legend-item">
+                <i className="ec-calendar-dot ec-calendar-dot--today" /> Today
+              </span>
+              <span className="ec-calendar-legend-item">
+                <i className="ec-calendar-dot" /> Not yet
+              </span>
+            </div>
+          </div>
+
+          {/* ---------- Courses ---------- */}
+          <div className="ec-section-head ec-section-head--aside">
+            <h2 className="ec-section-title">Courses</h2>
+            <Link to="/pricing" className="ec-section-link">All →</Link>
+          </div>
+
+          <div className="ec-course-list">
+            {UPCOMING_COURSES.map((c, i) => {
+              const isBought = bought.has(c.id);
+              const isBuying = buying === c.id;
+              const failed = buyError === c.id;
+              return (
+                <div
+                  className={`ec-course-card ec-course-card--${c.accent} ec-anim-in`}
+                  key={c.id}
+                  style={{ animationDelay: `${0.15 + i * 0.08}s` }}
+                >
+                  {c.featured && <span className="ec-course-ribbon">Popular</span>}
+
+                  <div className="ec-course-head-row">
+                    <div className="ec-course-badge" aria-hidden="true">
+                      <Icon name={c.icon} />
+                    </div>
+                    <div className="ec-course-tags">
+                      {c.tags.map((t) => (
+                        <span className={`ec-tag ec-tag--${t.toLowerCase()}`} key={t}>{t}</span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="ec-course-body">
+                    <h3>{c.title}</h3>
+                    <p className="ec-course-blurb">{c.blurb}</p>
+
+                    <div className="ec-course-rating">
+                      <span className="ec-course-stars" aria-hidden="true">★★★★★</span>
+                      <strong>{c.rating}</strong>
+                      <span className="ec-course-students">· {c.students.toLocaleString()} students</span>
+                    </div>
+
+                    <div className="ec-course-foot">
+                      <span><Icon name="calendar" /> {c.duration}</span>
+                      <span><Icon name="book" /> {c.lessons}</span>
+                    </div>
+                  </div>
+
+                  <div className="ec-course-cta">
+                    <span className="ec-course-price">{c.price}</span>
+                    <button
+                      type="button"
+                      className={`ec-btn-pill${isBought ? ' ec-btn-pill--bought' : ''}`}
+                      onClick={() => buyCourse(c)}
+                      disabled={isBuying || isBought}
+                    >
+                      {isBought ? 'Owned ✓' : isBuying ? 'Processing…' : failed ? 'Retry' : 'Enroll now'}
+                    </button>
+                  </div>
+                  {failed && <span className="ec-buy-error">Payment failed — try again</span>}
+                </div>
+              );
+            })}
+          </div>
+        </aside>
+      </div>
+    </div>
+  );
+}
+
+export default Overview;
