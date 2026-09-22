@@ -5,22 +5,20 @@ import { Icon } from '../components/Icon';
 import './Layout.css';
 
 /* ============================================================
-   Layout v9 — RAIL CSS is rendered inline via <style>.
-   Rendered inside <body> at first paint, so it beats every
-   <head> stylesheet (including index.css) on source order.
+   Layout v10 — Mobile drawer matches the Langut theme.
    ============================================================ */
 
 const NAV = [
-  { to: '/',            icon: 'grid',     label: 'Overview',   end: true },
-  { to: '/vocabulary',  icon: 'book',     label: 'Vocabulary' },
-  { to: '/grammar',     icon: 'target',   label: 'Grammar' },
-  { to: '/curriculum',  icon: 'calendar', label: 'Curriculum' },
-  { to: '/exams',       icon: 'flag',     label: 'Exams' },
-  { to: '/speaking',    icon: 'mic',      label: 'Speaking' },
-  { to: '/progress',    icon: 'trophy',   label: 'Progress' },
-  { to: '/community',   icon: 'chat',     label: 'Community' },
-  { to: '/live-rooms',  icon: 'zap',      label: 'Live Rooms' },
-  { to: '/pricing',     icon: 'wallet',   label: 'Pricing' },
+  { to: '/',            icon: 'grid',     label: 'Overview',   end: true, tint: 'purple'  },
+  { to: '/vocabulary',  icon: 'book',     label: 'Vocabulary',            tint: 'lime'    },
+  { to: '/grammar',     icon: 'target',   label: 'Grammar',               tint: 'pink'    },
+  { to: '/curriculum',  icon: 'calendar', label: 'Curriculum',            tint: 'yellow'  },
+  { to: '/exams',       icon: 'flag',     label: 'Exams',                 tint: 'purple2' },
+  { to: '/speaking',    icon: 'mic',      label: 'Speaking',              tint: 'pink2'   },
+  { to: '/progress',    icon: 'trophy',   label: 'Progress',              tint: 'lime'    },
+  { to: '/community',   icon: 'chat',     label: 'Community',             tint: 'purple'  },
+  { to: '/live-rooms',  icon: 'zap',      label: 'Live Rooms',            tint: 'yellow'  },
+  { to: '/pricing',     icon: 'wallet',   label: 'Pricing',               tint: 'pink'    },
 ];
 
 const MOBILE_NAV = [
@@ -31,10 +29,6 @@ const MOBILE_NAV = [
   { to: '/profile',    icon: 'users',  label: 'Profile' },
 ];
 
-/* ============================================================
-   RAIL CSS — every selector uses #root prefix (1,1,0 specificity)
-   + !important, so nothing can override.
-   ============================================================ */
 const RAIL_CSS = `
 #root .ec-rail {
   width: 84px !important;
@@ -262,9 +256,6 @@ const RAIL_CSS = `
 }
 `;
 
-/* ============================================================
-   Inline SVGs
-   ============================================================ */
 const MenuIcon = () => (
   <svg viewBox="0 0 24 24" width="20" height="20" fill="none"
        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -274,7 +265,7 @@ const MenuIcon = () => (
 
 const CloseIcon = () => (
   <svg viewBox="0 0 24 24" width="18" height="18" fill="none"
-       stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+       stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
     <path d="M6 6l12 12M18 6 6 18" />
   </svg>
 );
@@ -335,11 +326,9 @@ export function Layout({ children }) {
 
   return (
     <>
-      {/* Rail CSS — rendered into <body> at first paint, wins source order */}
       <style dangerouslySetInnerHTML={{ __html: RAIL_CSS }} />
 
       <div className="ec-shell">
-        {/* ============ Desktop rail ============ */}
         <aside
           className={`ec-rail${railExpanded ? ' ec-rail--expanded' : ''}`}
           aria-label="Primary"
@@ -395,7 +384,6 @@ export function Layout({ children }) {
           </button>
         </aside>
 
-        {/* ============ Main column ============ */}
         <main className="ec-main">
           <header className="ec-topbar">
             <button
@@ -465,7 +453,6 @@ export function Layout({ children }) {
           <div className="ec-main-content">{children}</div>
         </main>
 
-        {/* ============ Mobile bottom dock ============ */}
         <nav className="ec-bottom-nav" aria-label="Primary mobile">
           {MOBILE_NAV.map((item) => (
             <NavLink
@@ -484,14 +471,12 @@ export function Layout({ children }) {
           ))}
         </nav>
 
-        {/* ============ Drawer backdrop ============ */}
         <div
           className={`ec-drawer-backdrop${menuOpen ? ' ec-drawer-backdrop--open' : ''}`}
           onClick={() => setMenuOpen(false)}
           aria-hidden="true"
         />
 
-        {/* ============ Mobile drawer ============ */}
         <aside
           id="ec-drawer"
           className={`ec-drawer${menuOpen ? ' ec-drawer--open' : ''}`}
@@ -547,7 +532,11 @@ export function Layout({ children }) {
                 style={{ animationDelay: menuOpen ? `${0.05 + i * 0.025}s` : '0s' }}
                 onClick={() => setMenuOpen(false)}
               >
-                <span className="ec-drawer-link-icon" aria-hidden="true">
+                <span
+                  className="ec-drawer-link-icon"
+                  data-tint={item.tint || 'lime'}
+                  aria-hidden="true"
+                >
                   <Icon name={item.icon} />
                 </span>
                 <span className="ec-drawer-link-label">{item.label}</span>
