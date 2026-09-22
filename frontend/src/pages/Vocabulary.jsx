@@ -281,7 +281,7 @@ const VOCAB_CSS = `
 }
 
 /* ---------- Grade buttons — chunky pills ---------- */
-.ec-grade-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.ec-grade-row{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
 .ec-grade-btn{
   border:2px solid var(--lang-line);
   padding:15px 10px;
@@ -295,10 +295,9 @@ const VOCAB_CSS = `
 }
 .ec-grade-btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--lang-line)}
 .ec-grade-btn:active{transform:translateY(2px);box-shadow:0 1px 0 var(--lang-line)}
-.ec-grade-btn--again{background:var(--lang-pink-2);color:#fff}
-.ec-grade-btn--hard {background:var(--lang-yellow)}
-.ec-grade-btn--good {background:var(--lang-lime)}
-.ec-grade-btn--easy {background:var(--lang-purple);color:#fff}
+.ec-grade-btn--prev{background:#fff}
+.ec-grade-btn--next{background:var(--lang-lime)}
+.ec-grade-btn--prev svg,.ec-grade-btn--next svg{width:16px;height:16px;vertical-align:-3px;margin:0 2px}
 
 /* ============================================================
    QUIZ / BLITZ
@@ -1210,19 +1209,15 @@ export function Vocabulary() {
 
   /* ---------- Flashcards ---------- */
   const card = deck[index];
-  const grade = (g) => {
+  const goNext = () => {
     if (!card) return;
-    if (card.id) vocabApi.review(card.id, g).catch(() => {});
-    const key = card.word;
-    setMastery((m) => {
-      const cur = m[key] ?? 0;
-      const next = g === 'again' ? 0 : g === 'hard' ? Math.min(3, cur) : g === 'good' ? Math.min(3, cur + 1) : 3;
-      return { ...m, [key]: next };
-    });
-    const xpAmount = g === 'again' ? 1 : g === 'hard' ? 3 : g === 'good' ? 5 : 8;
-    awardXp(xpAmount);
     setFlipped(false);
     setIndex((i) => (i + 1 < deck.length ? i + 1 : 0));
+  };
+  const goPrev = () => {
+    if (!card) return;
+    setFlipped(false);
+    setIndex((i) => (i - 1 >= 0 ? i - 1 : deck.length - 1));
   };
 
   /* ---------- Quiz ---------- */
@@ -1388,10 +1383,12 @@ export function Vocabulary() {
                 </div>
 
                 <div className="ec-grade-row">
-                  <button className="ec-grade-btn ec-grade-btn--again" onClick={() => grade('again')}>Again</button>
-                  <button className="ec-grade-btn ec-grade-btn--hard"  onClick={() => grade('hard')}>Hard</button>
-                  <button className="ec-grade-btn ec-grade-btn--good"  onClick={() => grade('good')}>Good</button>
-                  <button className="ec-grade-btn ec-grade-btn--easy"  onClick={() => grade('easy')}>Easy</button>
+                  <button className="ec-grade-btn ec-grade-btn--prev" onClick={goPrev}>
+                    <span aria-hidden="true">←</span> Previous
+                  </button>
+                  <button className="ec-grade-btn ec-grade-btn--next" onClick={goNext}>
+                    Next <span aria-hidden="true">→</span>
+                  </button>
                 </div>
               </div>
             ) : (
