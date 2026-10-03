@@ -21,6 +21,9 @@ import paymentsRoutes    from './modules/payments/routes.js';
 import adminRoutes       from './modules/admin/routes.js';
 import examPapersUserRouter from './modules/exam-papers/user.routes.js';
 import examPapersAdminRouter from './modules/exam-papers/admin.routes.js';
+import gimiRoutes from './modules/gimi/routes.js';
+import searchRoutes from './modules/search/routes.js';
+import notificationsRoutes from './modules/notifications/routes.js';
 
 export function createApp() {
   const app = express();
@@ -47,6 +50,9 @@ export function createApp() {
   app.use('/api/live-rooms',   liveRoomsRoutes);
   app.use('/api/payments',     paymentsRoutes);
   app.use('/api/admin',        adminRoutes);
+  app.use('/api/gimi', gimiRoutes);
+  app.use('/api/search', searchRoutes);
+  app.use('/api/notifications', notificationsRoutes);
 
   app.use('/api/exams/papers', examPapersUserRouter);
   app.use('/api/admin/exam-papers', examPapersAdminRouter);

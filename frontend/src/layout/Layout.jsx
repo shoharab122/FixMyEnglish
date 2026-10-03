@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { NavLink, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Icon } from '../components/Icon';
+import { GiMi } from '../components/GiMi/GiMi';
 import './Layout.css';
 
 /* ============================================================
@@ -568,6 +569,11 @@ export function Layout({ children }) {
           </footer>
         </aside>
       </div>
+
+      {/* ============================================================
+          GiMi — floating AI assistant (mounted once for the whole app)
+         ============================================================ */}
+      <GiMi />
     </>
   );
 }
