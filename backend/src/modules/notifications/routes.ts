@@ -24,7 +24,7 @@ router.get('/', authOptional, async (req: any, res, next) => {
         const badges = await prisma.userAchievement.findMany({
           where: { userId: req.user.id },
           take: 5,
-          orderBy: { earnedAt: 'desc' },
+          orderBy: { unlockedAt: 'desc' },
           include: { achievement: true },
         });
         for (const b of badges) {
@@ -33,7 +33,7 @@ router.get('/', authOptional, async (req: any, res, next) => {
             kind: 'badge',
             title: '🏆 Badge earned!',
             body: b.achievement?.title ?? 'New badge',
-            ts: b.earnedAt?.toISOString?.() ?? new Date().toISOString(),
+            ts: b.unlockedAt?.toISOString?.() ?? new Date().toISOString(),
             read: false,
             to: '/progress',
           });
