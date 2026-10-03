@@ -49,3 +49,4 @@ coach_pgdata/
 *.tmp
 *.swp
 *~
+*.bak

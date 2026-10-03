@@ -538,8 +538,6 @@ const FILLER_WORDS = [
   'literally', 'so', 'well', 'anyway', 'kind of', 'sort of',
 ];
 
-<<<<<<< Updated upstream
-=======
 // Cohesive devices — genuine (if crude) evidence of organised, linked speech.
 // Rewards exactly the behaviour the "Recording tips" sidebar asks users for.
 const LINKING_WORDS = [
@@ -558,7 +556,6 @@ const COMPLEX_MARKERS = [
   'whereas', 'which', 'who', 'that', 'in order to', 'so that',
 ];
 
->>>>>>> Stashed changes
 const CRITERIA = [
   { id: 'c1', label: 'Fluency & coherence', weight: '25%' },
   { id: 'c2', label: 'Lexical resource', weight: '25%' },
@@ -625,11 +622,7 @@ function countWords(text) {
 /* ============================================================
    SECTION 4 — SCORING ENGINE
    ============================================================ */
-<<<<<<< Updated upstream
-function detectFaults(transcript, durationSec) {
-=======
 function detectFaults(transcript, durationSec, avgConfidence = null) {
->>>>>>> Stashed changes
   const text = (transcript || '').toLowerCase().trim();
   const words = text.split(/\s+/).filter(Boolean);
   const result = {
@@ -637,14 +630,10 @@ function detectFaults(transcript, durationSec, avgConfidence = null) {
     repetition: { count: 0, examples: [], severity: 'ok' },
     pace: { wpm: 0, severity: 'ok' },
     length: { words: words.length, severity: 'ok' },
-<<<<<<< Updated upstream
-    vocabulary: { unique: 0, ratio: 0, severity: 'ok' },
-=======
     vocabulary: { unique: 0, ratio: 0, ttr: 0, severity: 'ok' },
     coherence: { count: 0, found: [], severity: 'ok' },
     complexity: { count: 0, severity: 'ok' },
     confidence: avgConfidence, // real ASR confidence (0..1) when the browser reports it
->>>>>>> Stashed changes
   };
 
   const fillerMap = {};
@@ -660,26 +649,16 @@ function detectFaults(transcript, durationSec, avgConfidence = null) {
   const fillerRatio = words.length ? result.fillers.count / words.length : 0;
   result.fillers.severity = fillerRatio > 0.12 ? 'bad' : fillerRatio > 0.06 ? 'warn' : 'ok';
 
-<<<<<<< Updated upstream
-  for (let i = 0; i < words.length - 2; i++) {
-    if (words[i].length > 2 && words[i] === words[i + 1] && words[i] === words[i + 2]) {
-=======
   // Repetition: catch immediate stutters (word repeated 2+ times in a row —
   // catching the 2nd repeat, not just the 3rd, so it isn't missed on short
   // answers) AND redundant repeated two-word phrases spaced apart in the
   // answer, which the old 3-in-a-row check never saw.
   for (let i = 0; i < words.length - 1; i++) {
     if (words[i].length > 2 && words[i] === words[i + 1]) {
->>>>>>> Stashed changes
       result.repetition.count += 1;
       result.repetition.examples.push(words[i]);
     }
   }
-<<<<<<< Updated upstream
-  result.repetition.severity = result.repetition.count >= 2
-    ? 'bad'
-    : result.repetition.count === 1
-=======
   const bigramSeen = new Map();
   for (let i = 0; i < words.length - 1; i++) {
     const a = words[i], b = words[i + 1];
@@ -695,7 +674,6 @@ function detectFaults(transcript, durationSec, avgConfidence = null) {
   result.repetition.severity = result.repetition.count >= 3
     ? 'bad'
     : result.repetition.count >= 1
->>>>>>> Stashed changes
       ? 'warn'
       : 'ok';
 
@@ -709,14 +687,6 @@ function detectFaults(transcript, durationSec, avgConfidence = null) {
   if (words.length < 20) result.length.severity = 'bad';
   else if (words.length < 45) result.length.severity = 'warn';
 
-<<<<<<< Updated upstream
-  const unique = new Set(words).size;
-  result.vocabulary.unique = unique;
-  result.vocabulary.ratio = words.length ? unique / words.length : 0;
-  if (words.length < 5) result.vocabulary.severity = 'bad';
-  else if (result.vocabulary.ratio < 0.4) result.vocabulary.severity = 'bad';
-  else if (result.vocabulary.ratio < 0.55) result.vocabulary.severity = 'warn';
-=======
   // Corrected type-token ratio (unique / sqrt(2*N)) instead of raw
   // unique/N. Raw TTR mathematically falls as an answer gets longer even
   // when vocabulary stays equally varied, so it was quietly punishing
@@ -754,7 +724,6 @@ function detectFaults(transcript, durationSec, avgConfidence = null) {
   }
   result.complexity.count = complexityCount;
   if (words.length >= 30 && complexityCount === 0) result.complexity.severity = 'warn';
->>>>>>> Stashed changes
 
   return result;
 }
@@ -765,16 +734,6 @@ function scoreFromAnalysis(faults) {
 
   const wpm = faults.pace.wpm;
   const fillerRatio = faults.fillers.count / Math.max(1, words);
-<<<<<<< Updated upstream
-  const vocabRatio = faults.vocabulary.ratio;
-  const [idealLo, idealHi] = SCORING.idealWpm;
-  const [acceptLo, acceptHi] = SCORING.acceptWpm;
-  const rep = faults.repetition.count;
-
-  let fluency = SCORING.base;
-  if (wpm >= idealLo && wpm <= idealHi) fluency += 2.5;
-  else if (wpm >= acceptLo && wpm <= acceptHi) fluency += 1.5;
-=======
   const vocabTtr = faults.vocabulary.ttr;      // length-corrected, fair at any length
   const [idealLo, idealHi] = SCORING.idealWpm;
   const [acceptLo, acceptHi] = SCORING.acceptWpm;
@@ -786,7 +745,6 @@ function scoreFromAnalysis(faults) {
   let fluency = SCORING.base;
   if (wpm >= idealLo && wpm <= idealHi) fluency += 2.0;
   else if (wpm >= acceptLo && wpm <= acceptHi) fluency += 1.2;
->>>>>>> Stashed changes
   else if (wpm > 0) fluency -= 0.5;
   if (words >= 30) fluency += 0.5;
   if (words >= 60) fluency += 0.5;
@@ -795,22 +753,6 @@ function scoreFromAnalysis(faults) {
   if (fillerRatio > 0.04) fluency -= 0.5;
   if (fillerRatio > 0.08) fluency -= 1.0;
   if (fillerRatio > 0.15) fluency -= 1.5;
-<<<<<<< Updated upstream
-
-  let vocabulary = SCORING.base;
-  if (vocabRatio > 0.50) vocabulary += 1.0;
-  if (vocabRatio > 0.60) vocabulary += 1.0;
-  if (vocabRatio > 0.70) vocabulary += 1.0;
-  if (words >= 60) vocabulary += 1.0;
-  if (words >= 100) vocabulary += 1.0;
-  if (vocabRatio < 0.35 && words >= 20) vocabulary -= 1.0;
-
-  let grammar = SCORING.base;
-  if (words >= 15) grammar += 0.5;
-  if (words >= 40) grammar += 1.0;
-  if (words >= 70) grammar += 1.0;
-  if (words >= 100) grammar += 0.5;
-=======
   if (rep >= 1) fluency -= 0.3;
   if (rep >= 3) fluency -= 0.5;
   // Cohesion is literally half of "Fluency & coherence" — reward it directly.
@@ -834,17 +776,10 @@ function scoreFromAnalysis(faults) {
   // where the old version only ever looked at raw word count.
   if (complexity >= 1) grammar += 0.5;
   if (complexity >= 3) grammar += 0.5;
->>>>>>> Stashed changes
   if (rep >= 1) grammar -= 0.5;
   if (rep >= 3) grammar -= 1.0;
 
   let pronunciation = SCORING.base;
-<<<<<<< Updated upstream
-  if (wpm >= idealLo && wpm <= idealHi) pronunciation += 2.0;
-  else if (wpm >= acceptLo && wpm <= acceptHi) pronunciation += 1.0;
-  if (fillerRatio < 0.04) pronunciation += 1.0;
-  if (fillerRatio > 0.12) pronunciation -= 1.0;
-=======
   if (confidence !== null) {
     // Real signal available (Chrome/Edge/Android report it): weight it
     // heavily — it's the closest thing to actual pronunciation/clarity
@@ -861,7 +796,6 @@ function scoreFromAnalysis(faults) {
     if (fillerRatio < 0.04) pronunciation += 1.0;
     if (fillerRatio > 0.12) pronunciation -= 1.0;
   }
->>>>>>> Stashed changes
 
   const clamp = (n) => Math.max(3, Math.min(9, Math.round(n * 10) / 10));
 
@@ -876,10 +810,6 @@ function scoreFromAnalysis(faults) {
 function scoreExplanation(faults) {
   const words = faults.length.words;
   const wpm = faults.pace.wpm;
-<<<<<<< Updated upstream
-  const vocabRatio = faults.vocabulary.ratio;
-=======
->>>>>>> Stashed changes
   const [idealLo, idealHi] = SCORING.idealWpm;
 
   const lines = [];
@@ -900,10 +830,6 @@ function scoreExplanation(faults) {
     lines.push(`Speak longer — aim for ${SCORING.longAnswerWords}+ words to lift fluency.`);
   }
 
-<<<<<<< Updated upstream
-  if (vocabRatio < 0.5 && words >= 20) {
-    lines.push('Vary your word choice — repetition hurts your vocabulary score.');
-=======
   if (faults.vocabulary.ttr < 4.2 && words >= 20) {
     lines.push('Vary your word choice — repeating the same words hurts your vocabulary score.');
   }
@@ -922,7 +848,6 @@ function scoreExplanation(faults) {
 
   if (typeof faults.confidence === 'number' && faults.confidence < 0.6) {
     lines.push('Speak a little closer to the mic and more clearly — the recognizer had trouble with some words.');
->>>>>>> Stashed changes
   }
 
   return lines.join(' ');
@@ -983,11 +908,8 @@ function useSpeechCapture() {
   const heardRef = useRef(false);
   const levelRef = useRef(0);           // synthetic voice-activity level (0..~0.3)
   const wakeLockRef = useRef(null);
-<<<<<<< Updated upstream
-=======
   const confSumRef = useRef(0);         // sum of ASR confidence across final results
   const confCountRef = useRef(0);       // number of final results counted
->>>>>>> Stashed changes
 
   /* ---- Push refs → React state ---- */
   const publish = useCallback(() => {
@@ -1117,11 +1039,6 @@ function useSpeechCapture() {
       let partial = '';
       for (let i = 0; i < event.results.length; i++) {
         const res = event.results[i];
-<<<<<<< Updated upstream
-        const text = (res[0] && res[0].transcript) || '';
-        if (res.isFinal) finals += ` ${text}`;
-        else partial += ` ${text}`;
-=======
         const alt = res[0] || {};
         const text = alt.transcript || '';
         if (res.isFinal) {
@@ -1136,7 +1053,6 @@ function useSpeechCapture() {
         } else {
           partial += ` ${text}`;
         }
->>>>>>> Stashed changes
       }
       sessionFinalRef.current = joinText(finals, '');
       interimRef.current = joinText(partial, '');
@@ -1257,11 +1173,8 @@ function useSpeechCapture() {
     heardRef.current = false;
     errorCountRef.current = 0;
     restartFailsRef.current = 0;
-<<<<<<< Updated upstream
-=======
     confSumRef.current = 0;
     confCountRef.current = 0;
->>>>>>> Stashed changes
     setTranscript('');
     setInterim('');
     setError(null);
@@ -1353,9 +1266,6 @@ function useSpeechCapture() {
     setActive(false);
     setHint(null);
 
-<<<<<<< Updated upstream
-    return { transcript: finalText, durationSec };
-=======
     // Average real ASR confidence across finalised chunks (0..1), when the
     // engine reports it. null means no usable signal — callers should fall
     // back to the heuristic estimate rather than treat 0 as "bad".
@@ -1364,7 +1274,6 @@ function useSpeechCapture() {
       : null;
 
     return { transcript: finalText, durationSec, avgConfidence };
->>>>>>> Stashed changes
   }, [stopTimers, releaseWakeLock, commitSession, publish]);
 
   /* ---- Abort without returning results ---- */
@@ -1381,11 +1290,8 @@ function useSpeechCapture() {
     sessionFinalRef.current = '';
     interimRef.current = '';
     lastLenRef.current = 0;
-<<<<<<< Updated upstream
-=======
     confSumRef.current = 0;
     confCountRef.current = 0;
->>>>>>> Stashed changes
     setTranscript('');
     setInterim('');
     setSeconds(0);
@@ -3010,17 +2916,10 @@ export function Speaking() {
   }, [turns, conversationBusy, capture.active, capture.transcript, capture.interim]);
 
   /* --- Score a transcript --- */
-<<<<<<< Updated upstream
-  const processTranscript = useCallback(async (transcript, durationSec) => {
-    setScoring(true);
-    try {
-      const detected = detectFaults(transcript, durationSec);
-=======
   const processTranscript = useCallback(async (transcript, durationSec, avgConfidence = null) => {
     setScoring(true);
     try {
       const detected = detectFaults(transcript, durationSec, avgConfidence);
->>>>>>> Stashed changes
       const bands = scoreFromAnalysis(detected);
 
       if (!bands) {
@@ -3061,11 +2960,7 @@ export function Speaking() {
 
     if (capture.active) {
       /* ---------- STOP ---------- */
-<<<<<<< Updated upstream
-      const { transcript: finalText, durationSec } = await capture.stop();
-=======
       const { transcript: finalText, durationSec, avgConfidence } = await capture.stop();
->>>>>>> Stashed changes
 
       if (!finalText) {
         setSubmitError(
@@ -3089,11 +2984,7 @@ export function Speaking() {
         return;
       }
 
-<<<<<<< Updated upstream
-      await processTranscript(finalText, durationSec);
-=======
       await processTranscript(finalText, durationSec, avgConfidence);
->>>>>>> Stashed changes
     } else {
       /* ---------- START ---------- */
       setResult(null);
