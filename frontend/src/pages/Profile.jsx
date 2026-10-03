@@ -6,7 +6,7 @@ import { Icon } from '../components/Icon';
 
 const PROFILE_CSS = `
 /* ============================================================
-   PROFILE — Langut-inspired, animated
+   PROFILE — Langut-inspired, organised
    ============================================================ */
 .ec-prof{
   --lang-bg:        #1E1252;
@@ -33,7 +33,7 @@ const PROFILE_CSS = `
 /* ============================================================
    HEAD
    ============================================================ */
-.ec-prof-head{margin-bottom:22px}
+.ec-prof-head{margin-bottom:20px}
 .ec-prof-eyebrow{
   margin:0 0 6px;font-size:11.5px;font-weight:900;
   letter-spacing:.16em;text-transform:uppercase;
@@ -41,31 +41,32 @@ const PROFILE_CSS = `
 }
 
 /* ============================================================
-   HERO — deep purple, mascot, sparkles
+   HERO — avatar + identity + inline stat strip
    ============================================================ */
 .ec-prof-hero{
   position:relative;overflow:hidden;
   border-radius:32px;
-  padding:clamp(26px,4vw,38px) clamp(24px,4vw,40px);
+  padding:clamp(24px,3.4vw,34px) clamp(22px,3.4vw,36px);
   color:#fff;
-  background:linear-gradient(140deg,#2A1A6E 0%,#1E1252 55%,#3B2596 100%);
-  box-shadow:0 20px 52px rgba(30,18,82,.34);
+  background:
+    radial-gradient(120% 90% at 88% 12%, rgba(155,123,255,.34), transparent 55%),
+    radial-gradient(90% 70% at 6% 92%, rgba(241,76,160,.20), transparent 55%),
+    linear-gradient(140deg,#2A1A6E 0%,#1E1252 55%,#3B2596 100%);
+  box-shadow:0 22px 58px rgba(30,18,82,.36), inset 0 1px 0 rgba(255,255,255,.06);
   border:2px solid var(--lang-line);
   margin-bottom:22px;
-  min-height:240px;
-  display:flex;align-items:center;justify-content:space-between;gap:20px;
   animation:ec-prof-slide-in .55s cubic-bezier(.22,1,.36,1) both;
 }
 .ec-prof-hero::before{
   content:'';position:absolute;inset:0;
   background-image:radial-gradient(rgba(255,255,255,.10) 1.4px,transparent 1.4px);
-  background-size:20px 20px;
+  background-size:22px 22px;
   mask-image:radial-gradient(circle at 15% 20%,#000,transparent 65%);
   -webkit-mask-image:radial-gradient(circle at 15% 20%,#000,transparent 65%);
   pointer-events:none;
 }
 .ec-prof-hero-orb{
-  position:absolute;top:-90px;right:220px;
+  position:absolute;top:-90px;right:180px;
   width:260px;height:260px;border-radius:50%;
   background:radial-gradient(circle,rgba(212,245,92,.22),transparent 68%);
   animation:ec-prof-drift 14s ease-in-out infinite;
@@ -75,10 +76,11 @@ const PROFILE_CSS = `
   0%,100%{transform:translate(0,0) scale(1)}
   50%{transform:translate(-18px,16px) scale(1.08)}
 }
-.ec-prof-hero-inner{
+
+.ec-prof-hero-top{
   position:relative;z-index:1;
-  display:flex;align-items:center;gap:24px;flex-wrap:wrap;
-  flex:1;min-width:0;
+  display:flex;align-items:center;gap:22px;flex-wrap:wrap;
+  margin-bottom:22px;
 }
 
 /* Avatar with rotating dashed ring */
@@ -100,10 +102,10 @@ const PROFILE_CSS = `
 }
 @keyframes ec-prof-spin{to{transform:rotate(360deg)}}
 
-.ec-prof-hero-body{flex:1;min-width:0}
+.ec-prof-identity{flex:1;min-width:0}
 .ec-prof-name-row{
-  display:flex;align-items:baseline;gap:12px;
-  flex-wrap:wrap;margin-bottom:8px;
+  display:flex;align-items:center;gap:12px;
+  flex-wrap:wrap;margin-bottom:6px;
 }
 .ec-prof-name{
   font-size:clamp(22px,2vw + 14px,30px);font-weight:900;
@@ -116,50 +118,29 @@ const PROFILE_CSS = `
   background:var(--lang-lime);color:var(--lang-ink);
   border:2px solid var(--lang-line);
   box-shadow:0 2px 0 rgba(0,0,0,.4);
+  white-space:nowrap;
 }
 .ec-prof-tier[data-tier="premium"]{
-  background:var(--lang-yellow);color:var(--lang-ink);
+  background:var(--lang-yellow);
 }
 .ec-prof-hero-sub{
-  font-size:13.5px;line-height:1.6;color:rgba(255,255,255,.9);
+  font-size:13.5px;line-height:1.55;color:rgba(255,255,255,.85);
   margin:0;font-weight:600;max-width:56ch;
 }
-.ec-prof-hero-chips{
-  display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;
-}
-.ec-prof-chip{
-  display:inline-flex;align-items:center;gap:6px;
-  font-size:11.5px;font-weight:900;
-  padding:6px 13px;border-radius:999px;
-  background:var(--lang-lime);color:var(--lang-ink);
-  border:2px solid var(--lang-line);
-  box-shadow:0 3px 0 var(--lang-line);
-  letter-spacing:.02em;
-  animation:ec-prof-chip-pop .5s cubic-bezier(.34,1.56,.64,1) both;
-  transition:transform .22s cubic-bezier(.34,1.56,.64,1);
-}
-.ec-prof-chip:nth-child(1){animation-delay:.15s}
-.ec-prof-chip:nth-child(2){animation-delay:.25s;background:var(--lang-pink)}
-.ec-prof-chip:nth-child(3){animation-delay:.35s;background:var(--lang-purple-2);color:#fff}
-.ec-prof-chip:hover{transform:translateY(-3px) scale(1.04)}
-@keyframes ec-prof-chip-pop{
-  from{opacity:0;transform:translateY(6px) scale(.9)}
-  to{opacity:1;transform:translateY(0) scale(1)}
-}
-.ec-prof-chip strong{font-weight:900}
-.ec-prof-chip svg{width:14px;height:14px}
 
-/* Mascot + sparkles */
+/* Hero mascot */
 .ec-prof-hero-mascot{
-  position:relative;z-index:1;
-  flex-shrink:0;
+  position:absolute;
+  right:22px;top:50%;transform:translateY(-50%);
+  z-index:1;
   display:flex;align-items:center;justify-content:center;
   filter:drop-shadow(0 14px 28px rgba(0,0,0,.28));
   animation:ec-prof-bob 4s ease-in-out infinite;
+  pointer-events:none;
 }
 @keyframes ec-prof-bob{
-  0%,100%{transform:translateY(0) rotate(-2deg)}
-  50%{transform:translateY(-10px) rotate(2deg)}
+  0%,100%{transform:translateY(-50%) rotate(-2deg)}
+  50%{transform:translateY(calc(-50% - 10px)) rotate(2deg)}
 }
 .ec-prof-sparkle{
   position:absolute;
@@ -172,12 +153,63 @@ const PROFILE_CSS = `
   background:currentColor;
   clip-path:polygon(50% 0,55% 45%,100% 50%,55% 55%,50% 100%,45% 55%,0 50%,45% 45%);
 }
-.ec-prof-sparkle--a{top:8%;right:24%;color:var(--lang-lime);animation-delay:0s}
-.ec-prof-sparkle--b{top:22%;right:8%;color:var(--lang-pink);animation-delay:.6s;width:10px;height:10px}
-.ec-prof-sparkle--c{bottom:14%;right:22%;color:var(--lang-yellow);animation-delay:1.2s;width:12px;height:12px}
+.ec-prof-sparkle--a{top:-8%;right:6%;color:var(--lang-lime);animation-delay:0s}
+.ec-prof-sparkle--b{top:18%;right:-4%;color:var(--lang-pink);animation-delay:.6s;width:10px;height:10px}
+.ec-prof-sparkle--c{bottom:2%;right:2%;color:var(--lang-yellow);animation-delay:1.2s;width:12px;height:12px}
 @keyframes ec-prof-sparkle{
   0%,100%{opacity:1;transform:scale(1) rotate(0deg)}
   50%{opacity:.35;transform:scale(.75) rotate(30deg)}
+}
+
+/* Inline stat strip inside hero */
+.ec-prof-hero-stats{
+  position:relative;z-index:1;
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;max-width:640px;
+}
+.ec-prof-hero-stat{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 16px;border-radius:16px;
+  background:var(--lang-lime);color:var(--lang-ink);
+  border:2px solid var(--lang-line);
+  box-shadow:0 4px 0 var(--lang-line);
+  transition:transform .25s cubic-bezier(.34,1.56,.64,1);
+  animation:ec-prof-chip-pop .5s cubic-bezier(.34,1.56,.64,1) both;
+}
+.ec-prof-hero-stat:nth-child(1){animation-delay:.15s}
+.ec-prof-hero-stat:nth-child(2){animation-delay:.25s;background:var(--lang-pink)}
+.ec-prof-hero-stat:nth-child(3){animation-delay:.35s;background:var(--lang-purple-2);color:#fff}
+.ec-prof-hero-stat:hover{transform:translateY(-3px)}
+@keyframes ec-prof-chip-pop{
+  from{opacity:0;transform:translateY(8px) scale(.92)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+.ec-prof-hero-stat-icon{
+  width:34px;height:34px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.55);
+  color:var(--lang-ink);
+  border:2px solid var(--lang-line);
+  box-shadow:0 2px 0 var(--lang-line);
+  flex-shrink:0;
+}
+.ec-prof-hero-stat:nth-child(3) .ec-prof-hero-stat-icon{
+  background:rgba(255,255,255,.22);
+  color:#fff;
+}
+.ec-prof-hero-stat-icon svg{width:16px;height:16px}
+.ec-prof-hero-stat-body{min-width:0}
+.ec-prof-hero-stat-value{
+  font-size:18px;font-weight:900;line-height:1;
+  letter-spacing:-.03em;
+  font-variant-numeric:tabular-nums;
+  margin-bottom:3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.ec-prof-hero-stat-label{
+  font-size:9.5px;font-weight:900;
+  letter-spacing:.1em;text-transform:uppercase;
+  opacity:.75;
 }
 
 /* ============================================================
@@ -185,7 +217,7 @@ const PROFILE_CSS = `
    ============================================================ */
 .ec-prof-grid{
   display:grid;grid-template-columns:minmax(0,1fr) 340px;
-  gap:22px;align-items:start;margin-bottom:22px;
+  gap:22px;align-items:start;
 }
 
 /* ============================================================
@@ -199,6 +231,7 @@ const PROFILE_CSS = `
   box-shadow:0 6px 0 var(--lang-line);
   background-image:radial-gradient(circle at 100% 0%,rgba(212,245,92,.10),transparent 55%);
 }
+.ec-prof-card + .ec-prof-card{margin-top:20px}
 .ec-prof-card h3{
   margin:0 0 16px;font-size:15px;font-weight:900;
   color:var(--lang-ink);
@@ -214,19 +247,20 @@ const PROFILE_CSS = `
   letter-spacing:.06em;text-transform:uppercase;
   border:2px solid var(--lang-line);
   box-shadow:0 2px 0 var(--lang-line);
+  white-space:nowrap;
 }
 
 /* ============================================================
-   XP HEADER + BAR
+   XP PROGRESS CARD
    ============================================================ */
 .ec-prof-xp-header{
   display:flex;align-items:baseline;justify-content:space-between;
-  gap:12px;margin-bottom:14px;
+  gap:12px;margin-bottom:14px;flex-wrap:wrap;
 }
 .ec-prof-xp-num{
-  font-size:28px;font-weight:900;
+  font-size:32px;font-weight:900;
   color:var(--lang-ink);line-height:1;
-  letter-spacing:-.04em;
+  letter-spacing:-.045em;
   font-variant-numeric:tabular-nums;
 }
 .ec-prof-xp-num small{
@@ -275,47 +309,6 @@ const PROFILE_CSS = `
 }
 
 /* ============================================================
-   MINI STATS — chunky colored tiles
-   ============================================================ */
-.ec-prof-stats{
-  display:grid;grid-template-columns:repeat(3,1fr);
-  gap:12px;margin-top:20px;
-}
-.ec-prof-stat{
-  padding:16px 12px;border-radius:18px;
-  background:var(--lang-lime-soft);
-  border:2px solid var(--lang-line);
-  box-shadow:0 3px 0 var(--lang-line);
-  text-align:center;
-  transition:transform .26s cubic-bezier(.34,1.56,.64,1),
-             box-shadow .2s ease,
-             background .2s ease;
-  animation:ec-prof-slide-in .5s cubic-bezier(.22,1,.36,1) both;
-}
-.ec-prof-stat:nth-child(1){animation-delay:.1s}
-.ec-prof-stat:nth-child(2){animation-delay:.2s}
-.ec-prof-stat:nth-child(3){animation-delay:.3s}
-.ec-prof-stat:hover{
-  transform:translateY(-4px) scale(1.03);
-  box-shadow:0 7px 0 var(--lang-line);
-}
-.ec-prof-stat strong{
-  display:block;font-size:22px;font-weight:900;
-  color:var(--lang-ink);line-height:1.1;
-  letter-spacing:-.03em;
-  font-variant-numeric:tabular-nums;
-}
-.ec-prof-stat span{
-  font-size:10.5px;font-weight:900;
-  text-transform:uppercase;letter-spacing:.08em;
-  color:var(--lang-ink-soft);margin-top:6px;display:block;
-}
-.ec-prof-stat:nth-child(2){background:var(--lang-pink)}
-.ec-prof-stat:nth-child(3){background:var(--lang-purple-2)}
-.ec-prof-stat:nth-child(3) strong{color:#fff}
-.ec-prof-stat:nth-child(3) span{color:rgba(255,255,255,.85)}
-
-/* ============================================================
    TODAY'S PLAN
    ============================================================ */
 .ec-prof-plan-item{
@@ -340,6 +333,8 @@ const PROFILE_CSS = `
   box-shadow:0 3px 0 var(--lang-line);
   transition:transform .3s cubic-bezier(.34,1.56,.64,1);
 }
+.ec-prof-plan-item:nth-child(2) .ec-prof-plan-icon{background:var(--lang-pink)}
+.ec-prof-plan-item:nth-child(3) .ec-prof-plan-icon{background:var(--lang-purple-2);color:#fff}
 .ec-prof-plan-item:hover .ec-prof-plan-icon{
   transform:scale(1.08) rotate(-5deg);
 }
@@ -355,11 +350,11 @@ const PROFILE_CSS = `
 }
 
 /* ============================================================
-   ACHIEVEMENT BADGES
+   ACHIEVEMENTS
    ============================================================ */
 .ec-prof-badges{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));
-  gap:14px;
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:12px;
 }
 .ec-prof-badge{
   position:relative;
@@ -388,15 +383,18 @@ const PROFILE_CSS = `
   box-shadow:0 8px 0 var(--lang-line);
 }
 .ec-prof-badge-icon{
-  width:44px;height:44px;border-radius:12px;
+  width:46px;height:46px;border-radius:12px;
   background:var(--lang-lime);
   color:var(--lang-ink);
   display:flex;align-items:center;justify-content:center;
-  font-size:20px;flex-shrink:0;font-weight:900;
+  font-size:22px;flex-shrink:0;font-weight:900;
   border:2px solid var(--lang-line);
   box-shadow:0 2px 0 var(--lang-line);
   transition:transform .3s cubic-bezier(.34,1.56,.64,1);
 }
+.ec-prof-badge:nth-child(2n) .ec-prof-badge-icon{background:var(--lang-pink)}
+.ec-prof-badge:nth-child(3n) .ec-prof-badge-icon{background:var(--lang-purple-2);color:#fff}
+.ec-prof-badge:nth-child(4n) .ec-prof-badge-icon{background:var(--lang-yellow)}
 .ec-prof-badge:hover .ec-prof-badge-icon{
   transform:scale(1.1) rotate(-8deg);
 }
@@ -424,7 +422,7 @@ const PROFILE_CSS = `
 }
 
 /* ============================================================
-   UPGRADE / MEMBERSHIP
+   SIDEBAR — upgrade / membership / links
    ============================================================ */
 .ec-prof-upgrade{
   position:relative;overflow:hidden;
@@ -489,6 +487,7 @@ const PROFILE_CSS = `
 .ec-prof-membership h3{
   margin:0 0 12px;font-size:15px;font-weight:900;
   color:var(--lang-ink);letter-spacing:-.02em;
+  display:flex;align-items:center;gap:8px;
 }
 .ec-prof-membership p{
   margin:0;font-size:13px;
@@ -496,9 +495,7 @@ const PROFILE_CSS = `
   font-weight:700;opacity:.85;
 }
 
-/* ============================================================
-   QUICK LINKS
-   ============================================================ */
+/* Quick links */
 .ec-prof-quicklinks{
   display:flex;flex-direction:column;gap:10px;
 }
@@ -506,6 +503,7 @@ const PROFILE_CSS = `
   display:flex;
   justify-content:space-between;
   align-items:center;
+  gap:12px;
   padding:13px 16px;
   border-radius:14px;
   background:#fff;
@@ -525,22 +523,42 @@ const PROFILE_CSS = `
 .ec-prof-quicklink:nth-child(2){animation-delay:.16s}
 .ec-prof-quicklink:nth-child(3){animation-delay:.22s}
 .ec-prof-quicklink:nth-child(4){animation-delay:.28s}
+.ec-prof-quicklink-left{
+  display:flex;align-items:center;gap:12px;min-width:0;
+}
+.ec-prof-quicklink-icon{
+  width:32px;height:32px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--lang-lime);
+  color:var(--lang-ink);
+  border:2px solid var(--lang-line);
+  box-shadow:0 2px 0 var(--lang-line);
+  flex-shrink:0;
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+}
+.ec-prof-quicklink:nth-child(2) .ec-prof-quicklink-icon{background:var(--lang-pink)}
+.ec-prof-quicklink:nth-child(3) .ec-prof-quicklink-icon{background:var(--lang-purple-2);color:#fff}
+.ec-prof-quicklink:nth-child(4) .ec-prof-quicklink-icon{background:var(--lang-yellow)}
+.ec-prof-quicklink-icon svg{width:16px;height:16px}
+.ec-prof-quicklink span[aria-hidden]{
+  font-size:16px;
+  color:var(--lang-ink-soft);
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+}
 .ec-prof-quicklink:hover{
   background:var(--lang-lime-soft);
   transform:translateY(-3px) translateX(3px);
   box-shadow:0 6px 0 var(--lang-line);
 }
-.ec-prof-quicklink:active{
-  transform:translateY(1px);
-  box-shadow:0 1px 0 var(--lang-line);
-}
-.ec-prof-quicklink span[aria-hidden]{
-  font-size:16px;
-  color:var(--lang-ink);
-  transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+.ec-prof-quicklink:hover .ec-prof-quicklink-icon{
+  transform:rotate(-8deg) scale(1.08);
 }
 .ec-prof-quicklink:hover span[aria-hidden]{
   transform:translateX(4px);
+}
+.ec-prof-quicklink:active{
+  transform:translateY(1px);
+  box-shadow:0 1px 0 var(--lang-line);
 }
 
 /* ============================================================
@@ -567,7 +585,7 @@ const PROFILE_CSS = `
   border-radius:18px;
   padding:14px 18px;
   display:flex;align-items:center;justify-content:space-between;
-  gap:12px;margin-bottom:20px;
+  gap:12px;
   box-shadow:0 4px 0 var(--lang-line);
 }
 .ec-prof-error span{
@@ -601,46 +619,60 @@ const PROFILE_CSS = `
 /* ============================================================
    RESPONSIVE
    ============================================================ */
+@media(max-width:1080px){
+  .ec-prof-grid{grid-template-columns:1fr}
+}
 @media(max-width:900px){
-  .ec-prof-grid{grid-template-columns:1fr;gap:20px}
-  .ec-prof-hero{flex-direction:column;align-items:flex-start;min-height:0}
   .ec-prof-hero-mascot{
-    position:absolute;right:14px;bottom:14px;
-    transform:scale(.72);transform-origin:bottom right;
-    animation:none;
+    right:12px;
+    transform:translateY(-50%) scale(.75);
+    transform-origin:right center;
+  }
+  @keyframes ec-prof-bob{
+    0%,100%{transform:translateY(-50%) scale(.75) rotate(-2deg)}
+    50%{transform:translateY(calc(-50% - 8px)) scale(.75) rotate(2deg)}
   }
 }
 @media(max-width:720px){
   .ec-prof-hero{padding:22px 20px;border-radius:26px}
-  .ec-prof-hero-inner{gap:18px}
+  .ec-prof-hero-top{gap:16px;margin-bottom:18px}
   .ec-prof-avatar{width:78px;height:78px;font-size:28px}
   .ec-prof-name{font-size:22px}
   .ec-prof-hero-sub{font-size:12.5px}
   .ec-prof-hero-mascot{display:none}
-  .ec-prof-stats{grid-template-columns:repeat(3,1fr);gap:8px}
-  .ec-prof-stat{padding:12px 8px;border-radius:14px}
-  .ec-prof-stat strong{font-size:18px}
-  .ec-prof-stat span{font-size:9.5px}
+  .ec-prof-hero-stats{grid-template-columns:1fr;gap:8px}
+  .ec-prof-hero-stat{padding:10px 12px;border-radius:14px}
+  .ec-prof-hero-stat-icon{width:30px;height:30px;border-radius:9px}
+  .ec-prof-hero-stat-icon svg{width:14px;height:14px}
+  .ec-prof-hero-stat-value{font-size:16px}
+  .ec-prof-hero-stat-label{font-size:9px}
+
   .ec-prof-card{padding:18px;border-radius:22px;box-shadow:0 5px 0 var(--lang-line)}
-  .ec-prof-badges{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+  .ec-prof-xp-num{font-size:26px}
+  .ec-prof-badges{grid-template-columns:1fr;gap:10px}
   .ec-prof-badge{padding:12px;gap:10px}
-  .ec-prof-badge-icon{width:38px;height:38px;font-size:18px}
+  .ec-prof-badge-icon{width:40px;height:40px;font-size:20px}
   .ec-prof-badge-body p{font-size:12px}
   .ec-prof-upgrade{padding:20px;border-radius:20px}
   .ec-prof-upgrade h3{font-size:15px}
   .ec-prof-membership{padding:18px;border-radius:20px}
 }
+@media(max-width:420px){
+  .ec-prof-hero-stats{grid-template-columns:1fr 1fr}
+  .ec-prof-hero-stat:nth-child(3){grid-column:1 / -1}
+}
 @media(prefers-reduced-motion:reduce){
   .ec-prof-hero,.ec-prof-hero-orb,.ec-prof-hero-mascot,
-  .ec-prof-avatar::after,.ec-prof-sparkle,.ec-prof-chip,
-  .ec-prof-stat,.ec-prof-plan-item,.ec-prof-badge,
+  .ec-prof-avatar::after,.ec-prof-sparkle,.ec-prof-hero-stat,
+  .ec-prof-plan-item,.ec-prof-badge,
   .ec-prof-quicklink,.ec-prof-upgrade,.ec-prof-membership{animation:none!important}
   .ec-prof-xp-fill{transition:none}
   .ec-prof-xp-fill::after,.ec-prof-upgrade::after{animation:none!important;display:none}
-  .ec-prof-chip:hover,.ec-prof-stat:hover,.ec-prof-badge:hover,
+  .ec-prof-hero-stat:hover,.ec-prof-badge:hover,
   .ec-prof-quicklink:hover,.ec-prof-retry:hover,
   .ec-prof-upgrade a:hover,.ec-prof-plan-item:hover .ec-prof-plan-icon,
-  .ec-prof-badge:hover .ec-prof-badge-icon{transform:none}
+  .ec-prof-badge:hover .ec-prof-badge-icon,
+  .ec-prof-quicklink:hover .ec-prof-quicklink-icon{transform:none}
 }
 `;
 
@@ -701,6 +733,13 @@ const DEFAULT_BADGES = [
   { id: 'b6', name: '30-Day Streak', icon: '⚡', unlocked: false, description: 'Practise 30 days in a row' },
 ];
 
+const QUICK_LINKS = [
+  { to: '/progress',  label: 'Full progress report', icon: 'trophy' },
+  { to: '/speaking',  label: 'Speaking practice',    icon: 'mic' },
+  { to: '/exams',     label: 'Exam preparation',     icon: 'flag' },
+  { to: '/live-rooms',label: 'Live rooms',           icon: 'zap' },
+];
+
 export function Profile() {
   const { user, isPremium } = useAuth();
   const [xp, setXp] = useState(null);
@@ -742,6 +781,7 @@ export function Profile() {
   const xpGoal = xp?.xpGoal ?? 100;
   const xpPct = Math.max(0, Math.min(100, Math.round((xpToday / Math.max(xpGoal, 1)) * 100)));
   const shownBadges = badges || DEFAULT_BADGES;
+  const unlockedCount = shownBadges.filter((b) => b.unlocked !== false && b.earned !== false).length;
 
   return (
     <div className="ec-prof">
@@ -753,12 +793,15 @@ export function Profile() {
         <p className="ec-page-sub">Avatar, stats, achievements and today’s plan.</p>
       </div>
 
-      {/* Hero */}
+      {/* ============================================================
+          HERO — identity + inline stat strip
+         ============================================================ */}
       <div className="ec-prof-hero">
         <div className="ec-prof-hero-orb" aria-hidden="true" />
-        <div className="ec-prof-hero-inner">
+
+        <div className="ec-prof-hero-top">
           <div className="ec-prof-avatar" aria-hidden="true">{initials(user?.name)}</div>
-          <div className="ec-prof-hero-body">
+          <div className="ec-prof-identity">
             <div className="ec-prof-name-row">
               <h2 className="ec-prof-name">{user?.name || 'Guest learner'}</h2>
               <span className="ec-prof-tier" data-tier={user?.tier ?? 'guest'}>
@@ -770,23 +813,36 @@ export function Profile() {
                 ? 'Premium member — thanks for supporting English Coach.'
                 : 'Free plan — upgrade any time to unlock AI speaking, all mocks and priority seating.'}
             </p>
+          </div>
+        </div>
 
-            <div className="ec-prof-hero-chips">
-              {!xpLoading && !xpError && (
-                <>
-                  <span className="ec-prof-chip">
-                    <Icon name="zap" /> <strong>{xp?.streak ?? 0}</strong>-day streak
-                  </span>
-                  <span className="ec-prof-chip">
-                    <Icon name="trophy" /> Rank <strong>{xp?.rank ?? '—'}</strong>
-                  </span>
-                  {xp?.rankName && (
-                    <span className="ec-prof-chip">
-                      <Icon name="target" /> {xp.rankName}
-                    </span>
-                  )}
-                </>
-              )}
+        {/* Inline stat strip — always visible, updates with data */}
+        <div className="ec-prof-hero-stats">
+          <div className="ec-prof-hero-stat">
+            <span className="ec-prof-hero-stat-icon"><Icon name="zap" /></span>
+            <div className="ec-prof-hero-stat-body">
+              <div className="ec-prof-hero-stat-value">
+                {xpLoading ? '—' : (xp?.streak ?? 0)} days
+              </div>
+              <div className="ec-prof-hero-stat-label">Streak</div>
+            </div>
+          </div>
+          <div className="ec-prof-hero-stat">
+            <span className="ec-prof-hero-stat-icon"><Icon name="trophy" /></span>
+            <div className="ec-prof-hero-stat-body">
+              <div className="ec-prof-hero-stat-value">
+                {xpLoading ? '—' : (xp?.rank ?? '—')}
+              </div>
+              <div className="ec-prof-hero-stat-label">Rank</div>
+            </div>
+          </div>
+          <div className="ec-prof-hero-stat">
+            <span className="ec-prof-hero-stat-icon"><Icon name="target" /></span>
+            <div className="ec-prof-hero-stat-body">
+              <div className="ec-prof-hero-stat-value">
+                {xpLoading ? '—' : (xp?.rankName ?? 'Learner')}
+              </div>
+              <div className="ec-prof-hero-stat-label">Title</div>
             </div>
           </div>
         </div>
@@ -795,12 +851,16 @@ export function Profile() {
           <span className="ec-prof-sparkle ec-prof-sparkle--a" aria-hidden="true" />
           <span className="ec-prof-sparkle ec-prof-sparkle--b" aria-hidden="true" />
           <span className="ec-prof-sparkle ec-prof-sparkle--c" aria-hidden="true" />
-          <LangutMascot size={170} />
+          <LangutMascot size={160} />
         </div>
       </div>
 
+      {/* ============================================================
+          MAIN GRID
+         ============================================================ */}
       <div className="ec-prof-grid">
         <section>
+          {/* Today's progress ------------------------------------------------ */}
           {xpError ? (
             <div className="ec-prof-error">
               <span>Couldn’t load today’s progress.</span>
@@ -827,27 +887,13 @@ export function Profile() {
                       ? 'Daily goal reached — well done! 🎉'
                       : `Keep going — ${xpGoal - xpToday} XP to hit today's goal.`}
                   </p>
-
-                  <div className="ec-prof-stats">
-                    <div className="ec-prof-stat">
-                      <strong>{xp?.streak ?? '—'}</strong>
-                      <span>Streak</span>
-                    </div>
-                    <div className="ec-prof-stat">
-                      <strong>{xp?.rank ?? '—'}</strong>
-                      <span>Rank</span>
-                    </div>
-                    <div className="ec-prof-stat">
-                      <strong>{xp?.rankName ?? '—'}</strong>
-                      <span>Title</span>
-                    </div>
-                  </div>
                 </>
               )}
             </div>
           )}
 
-          <div className="ec-prof-card" style={{ marginTop: 20, animation: 'ec-prof-slide-in .5s cubic-bezier(.22,1,.36,1) both', animationDelay: '.15s' }}>
+          {/* Today's plan ----------------------------------------------------- */}
+          <div className="ec-prof-card" style={{ animation: 'ec-prof-slide-in .5s cubic-bezier(.22,1,.36,1) both', animationDelay: '.15s' }}>
             <h3>Today’s plan <span>{WEEKLY_PLAN.length} tasks</span></h3>
             {WEEKLY_PLAN.map((p) => (
               <div className="ec-prof-plan-item" key={p.id}>
@@ -860,14 +906,15 @@ export function Profile() {
             ))}
           </div>
 
-          <div className="ec-prof-card" style={{ marginTop: 20, animation: 'ec-prof-slide-in .5s cubic-bezier(.22,1,.36,1) both', animationDelay: '.2s' }}>
-            <h3>Achievements <span>{shownBadges.filter(b => b.unlocked !== false).length}/{shownBadges.length}</span></h3>
+          {/* Achievements ----------------------------------------------------- */}
+          <div className="ec-prof-card" style={{ animation: 'ec-prof-slide-in .5s cubic-bezier(.22,1,.36,1) both', animationDelay: '.2s' }}>
+            <h3>Achievements <span>{unlockedCount}/{shownBadges.length}</span></h3>
 
             {badgesLoading ? (
               <div className="ec-prof-badges">
-                {[0, 1, 2, 3, 4].map((i) => (
+                {[0, 1, 2, 3, 4, 5].map((i) => (
                   <div className="ec-prof-badge" key={i}>
-                    <span className="ec-prof-skel" style={{ width: 44, height: 44, borderRadius: 12 }} />
+                    <span className="ec-prof-skel" style={{ width: 46, height: 46, borderRadius: 12 }} />
                     <span className="ec-prof-skel" style={{ width: '60%', height: 12 }} />
                   </div>
                 ))}
@@ -896,6 +943,9 @@ export function Profile() {
           </div>
         </section>
 
+        {/* ============================================================
+            SIDEBAR
+           ============================================================ */}
         <aside>
           {!isPremium && (
             <div className="ec-prof-upgrade">
@@ -907,24 +957,24 @@ export function Profile() {
 
           {isPremium && (
             <div className="ec-prof-membership">
-              <h3>Membership</h3>
+              <h3>⭐ Premium active</h3>
               <p>
                 You’re a Premium member. AI speaking scoring, all mock exams, and priority seating are active on your account.
               </p>
             </div>
           )}
 
-          <div className="ec-prof-card" style={{ marginTop: 20 }}>
+          <div className="ec-prof-card">
             <h3>Quick links</h3>
             <div className="ec-prof-quicklinks">
-              {[
-                { to: '/progress', label: 'Full progress report' },
-                { to: '/speaking', label: 'Speaking practice' },
-                { to: '/exams', label: 'Exam preparation' },
-                { to: '/live-rooms', label: 'Live rooms' },
-              ].map((l) => (
+              {QUICK_LINKS.map((l) => (
                 <Link key={l.to} to={l.to} className="ec-prof-quicklink">
-                  {l.label}
+                  <span className="ec-prof-quicklink-left">
+                    <span className="ec-prof-quicklink-icon" aria-hidden="true">
+                      <Icon name={l.icon} />
+                    </span>
+                    <span>{l.label}</span>
+                  </span>
                   <span aria-hidden="true">→</span>
                 </Link>
               ))}
