@@ -1,0 +1,554 @@
+/* ============================================================
+   GiMi — floating AI assistant for FixMyEnglish
+   Mobile-first · Langut palette · safe-area aware
+   Bubble sits ABOVE the mobile bottom nav (no overlap)
+   ============================================================ */
+
+/* ---------- Floating bubble ---------- */
+.gimi-bubble {
+  position: fixed;
+  right: 20px;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  z-index: 2147482999;                /* BELOW bottom-nav (2147483000) so nav wins */
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 3px solid #17102E;
+  background: linear-gradient(135deg, #9B7BFF 0%, #7B5CF0 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 0 #17102E, 0 14px 32px rgba(123,92,240,.45);
+  transition: transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .22s ease, background .22s ease;
+  font-family: inherit;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  overflow: visible;
+}
+.gimi-bubble:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 9px 0 #17102E, 0 18px 40px rgba(123,92,240,.55);
+}
+.gimi-bubble:active { transform: translateY(2px) scale(.96); box-shadow: 0 2px 0 #17102E; }
+.gimi-bubble:focus-visible { outline: 3px solid #D4F55C; outline-offset: 4px; }
+.gimi-bubble--open {
+  background: linear-gradient(135deg, #F5E04D 0%, #B8E62E 100%);
+  color: #17102E;
+  box-shadow: 0 6px 0 #17102E, 0 14px 32px rgba(184,230,46,.5);
+}
+.gimi-bubble svg { width: 28px; height: 28px; display: block; }
+
+.gimi-bubble-pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(212,245,92,.85);
+  animation: gimi-ring 2.4s ease-out infinite;
+  pointer-events: none;
+}
+@keyframes gimi-ring {
+  0%   { transform: scale(1);   opacity: .9; }
+  100% { transform: scale(1.75); opacity: 0; }
+}
+
+/* ---------- Backdrop (mobile) ---------- */
+.gimi-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483200;
+  background: rgba(15, 18, 34, .5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: gimi-fade .24s ease both;
+}
+@keyframes gimi-fade { from { opacity: 0; } to { opacity: 1; } }
+
+/* ---------- Panel (desktop) ---------- */
+.gimi-panel {
+  position: fixed;
+  right: 22px;
+  bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+  z-index: 2147483300;
+  width: 400px;
+  max-width: calc(100vw - 44px);
+  height: 600px;
+  max-height: calc(100vh - 130px);
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 3px solid #17102E;
+  border-radius: 24px;
+  box-shadow: 0 10px 0 #17102E, 0 24px 60px rgba(15,18,34,.28);
+  overflow: hidden;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #17102E;
+  transform-origin: bottom right;
+  transform: translateY(16px) scale(.94);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform .3s cubic-bezier(.34,1.56,.64,1), opacity .24s ease;
+}
+.gimi-panel--open {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ---------- Header ---------- */
+.gimi-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, #2A1A6E 0%, #1E1252 100%);
+  color: #fff;
+  border-bottom: 3px solid #17102E;
+  flex-shrink: 0;
+}
+.gimi-head-avatar {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #F5E04D 0%, #B8E62E 100%);
+  color: #17102E;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 18px;
+  border: 2px solid #17102E;
+  box-shadow: 0 3px 0 rgba(0,0,0,.4);
+  flex-shrink: 0;
+}
+.gimi-head-avatar-inner { line-height: 1; }
+.gimi-head-dot {
+  position: absolute;
+  right: -3px;
+  bottom: -3px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #D4F55C;
+  border: 2px solid #17102E;
+  box-shadow: 0 0 8px rgba(212,245,92,.9);
+}
+.gimi-head-text { flex: 1; min-width: 0; }
+.gimi-head-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: -.01em;
+}
+.gimi-head-badge {
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  background: #D4F55C;
+  color: #17102E;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1.5px solid #17102E;
+}
+.gimi-head-sub {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: rgba(255,255,255,.7);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.gimi-head-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.gimi-icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 2px solid rgba(255,255,255,.15);
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background .2s ease, transform .15s ease;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.gimi-icon-btn:hover { background: rgba(255,255,255,.22); transform: translateY(-1px); }
+.gimi-icon-btn:active { transform: scale(.94); }
+
+/* ---------- Scroll area ---------- */
+.gimi-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 18px 14px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: #F8F9FC;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(120,110,180,.35) transparent;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+.gimi-scroll::-webkit-scrollbar { width: 6px; }
+.gimi-scroll::-webkit-scrollbar-thumb { background: rgba(120,110,180,.3); border-radius: 999px; }
+
+/* ---------- Message ---------- */
+.gimi-msg {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  animation: gimi-msg-in .35s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes gimi-msg-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.gimi-msg--user { flex-direction: row-reverse; }
+.gimi-msg-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #9B7BFF 0%, #7B5CF0 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 900;
+  border: 2px solid #17102E;
+  box-shadow: 0 2px 0 #17102E;
+  align-self: flex-start;
+}
+.gimi-msg-bubble {
+  position: relative;
+  max-width: 84%;
+  padding: 11px 14px;
+  border-radius: 16px;
+  background: #fff;
+  border: 2px solid #17102E;
+  box-shadow: 0 3px 0 #17102E;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #17102E;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+.gimi-msg--user .gimi-msg-bubble {
+  background: linear-gradient(135deg, #E4FF5C 0%, #B8E62E 100%);
+  color: #17102E;
+  border-top-right-radius: 6px;
+}
+.gimi-msg:not(.gimi-msg--user) .gimi-msg-bubble { border-top-left-radius: 6px; }
+.gimi-msg--error .gimi-msg-bubble { background: #FFB3D1; color: #17102E; }
+
+.gimi-msg-text p { margin: 0 0 6px; }
+.gimi-msg-text p:last-child { margin-bottom: 0; }
+.gimi-msg-text strong { font-weight: 900; }
+.gimi-msg-text em { font-style: italic; }
+.gimi-msg-text ul, .gimi-msg-text ol { margin: 4px 0 6px; padding-left: 20px; }
+.gimi-msg-text li { margin-bottom: 2px; }
+.gimi-msg-text code {
+  background: rgba(123,92,240,.12);
+  color: #6B48E8;
+  padding: 1px 6px;
+  border-radius: 6px;
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 12.5px;
+}
+.gimi-msg-text a { color: #7B5CF0; text-decoration: underline; word-break: break-word; }
+.gimi-msg-text h4 { margin: 8px 0 4px; font-size: 13.5px; font-weight: 900; }
+.gimi-msg-text hr { border: none; border-top: 2px dashed rgba(23,16,46,.15); margin: 8px 0; }
+.gimi-msg-text br { display: block; content: ''; margin: 3px 0; }
+
+.gimi-msg-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1.5px dashed rgba(23,16,46,.15);
+}
+.gimi-msg-action {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(123,92,240,.1);
+  color: #7B5CF0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background .18s ease, transform .15s ease;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 900;
+  -webkit-tap-highlight-color: transparent;
+}
+.gimi-msg-action:hover { background: rgba(123,92,240,.22); transform: translateY(-1px); }
+.gimi-msg-action:active { transform: scale(.94); }
+
+.gimi-caret {
+  display: inline-block;
+  width: 7px;
+  height: 14px;
+  margin-left: 3px;
+  background: #7B5CF0;
+  border-radius: 2px;
+  vertical-align: -2px;
+  animation: gimi-blink .9s steps(2,start) infinite;
+}
+@keyframes gimi-blink { 50% { opacity: 0; } }
+
+/* ---------- Suggested prompt chips ---------- */
+.gimi-suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 4px 8px;
+  animation: gimi-msg-in .5s cubic-bezier(.22,1,.36,1) both;
+  animation-delay: .2s;
+}
+.gimi-suggestion {
+  text-align: left;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 2px solid #17102E;
+  background: #fff;
+  color: #17102E;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 3px 0 #17102E;
+  transition: transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s ease, background .18s ease;
+  letter-spacing: -.01em;
+  min-height: 44px;
+  -webkit-tap-highlight-color: transparent;
+}
+.gimi-suggestion:hover:not(:disabled) { background: #EDFFB0; transform: translateY(-2px) translateX(2px); box-shadow: 0 5px 0 #17102E; }
+.gimi-suggestion:active:not(:disabled) { transform: translateY(1px); box-shadow: 0 1px 0 #17102E; }
+.gimi-suggestion:disabled { opacity: .55; cursor: not-allowed; }
+
+/* ---------- Quick actions ---------- */
+.gimi-quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 4px 8px;
+  animation: gimi-msg-in .4s cubic-bezier(.22,1,.36,1) both;
+}
+.gimi-quick-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 9px 14px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #E4FF5C 0%, #B8E62E 100%);
+  color: #17102E;
+  font-size: 12.5px;
+  font-weight: 900;
+  text-decoration: none;
+  border: 2px solid #17102E;
+  box-shadow: 0 3px 0 #17102E;
+  transition: transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.gimi-quick-action:hover { transform: translateY(-2px); box-shadow: 0 5px 0 #17102E; }
+.gimi-quick-action:active { transform: translateY(1px); box-shadow: 0 1px 0 #17102E; }
+
+/* ---------- Composer ---------- */
+.gimi-composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 10px 12px;
+  background: #fff;
+  border-top: 3px solid #17102E;
+  flex-shrink: 0;
+}
+.gimi-input {
+  flex: 1;
+  min-height: 44px;
+  max-height: 120px;
+  resize: none;
+  padding: 12px 14px;
+  border: 2px solid #17102E;
+  border-radius: 14px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: #17102E;
+  background: #F8F9FC;
+  outline: none;
+  line-height: 1.4;
+  transition: box-shadow .18s ease, background .2s ease;
+  box-shadow: 0 2px 0 #17102E;
+  -webkit-appearance: none;
+}
+.gimi-input:focus {
+  background: #fff;
+  box-shadow: 0 2px 0 #17102E, 0 0 0 4px rgba(212,245,92,.55);
+}
+.gimi-input::placeholder { color: #8A90A2; font-weight: 500; }
+.gimi-input:disabled { opacity: .6; }
+
+.gimi-voice,
+.gimi-send {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 2px solid #17102E;
+  background: linear-gradient(135deg, #E4FF5C 0%, #B8E62E 100%);
+  color: #17102E;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s ease, opacity .18s ease;
+  box-shadow: 0 3px 0 #17102E;
+  flex-shrink: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.gimi-voice {
+  background: #F8F9FC;
+}
+.gimi-voice:hover:not(:disabled),
+.gimi-send:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 0 #17102E; }
+.gimi-voice:active:not(:disabled),
+.gimi-send:active:not(:disabled) { transform: translateY(1px); box-shadow: 0 1px 0 #17102E; }
+.gimi-send:disabled,
+.gimi-voice:disabled { opacity: .5; cursor: not-allowed; }
+
+.gimi-voice--on {
+  background: linear-gradient(135deg, #FFB3D1 0%, #FF69B4 100%);
+  color: #fff;
+  animation: gimi-pulse-voice 1.2s ease-in-out infinite;
+}
+@keyframes gimi-pulse-voice {
+  0%, 100% { box-shadow: 0 3px 0 #17102E, 0 0 0 0 rgba(255, 105, 180, .6); }
+  50%      { box-shadow: 0 3px 0 #17102E, 0 0 0 10px rgba(255, 105, 180, 0); }
+}
+
+.gimi-send--stop {
+  background: linear-gradient(135deg, #FFB3D1 0%, #FF69B4 100%);
+  color: #fff;
+}
+
+/* ============================================================
+   MOBILE — full-screen sheet
+   ============================================================ */
+.gimi-panel--mobile {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  max-width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  max-height: 100vh;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+  transform-origin: bottom center;
+  transform: translateY(100%);
+  opacity: 1;
+  transition: transform .34s cubic-bezier(.22, 1, .36, 1);
+  z-index: 2147483300;                /* above bottom-nav */
+}
+.gimi-panel--mobile.gimi-panel--open {
+  transform: translateY(0);
+}
+.gimi-panel--mobile .gimi-head {
+  padding:
+    calc(14px + env(safe-area-inset-top, 0px))
+    16px
+    14px;
+}
+.gimi-panel--mobile .gimi-composer {
+  padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+}
+.gimi-panel--mobile .gimi-scroll {
+  padding: 16px 12px 12px;
+}
+.gimi-panel--mobile .gimi-msg-bubble { max-width: 88%; }
+.gimi-panel--mobile .gimi-input { font-size: 16px; } /* prevents iOS auto-zoom */
+
+/* ============================================================
+   Small screens (≤768px) — bubble ABOVE the app's bottom nav
+   The app's bottom nav is fixed at bottom: 12px + safe-area,
+   with ~64px height → its top edge is ~76-80px from bottom.
+   We place the bubble at 92px + safe-area to guarantee a gap.
+   ============================================================ */
+@media (max-width: 768px) {
+  .gimi-bubble {
+    right: 16px;
+    bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+    width: 58px;
+    height: 58px;
+    border-width: 3px;
+    z-index: 2147482999;              /* keep below the bottom-nav */
+  }
+  .gimi-bubble svg { width: 26px; height: 26px; }
+}
+
+/* ---------- Very small phones (≤380px) — slightly tighter ---------- */
+@media (max-width: 380px) {
+  .gimi-bubble {
+    right: 14px;
+    bottom: calc(94px + env(safe-area-inset-bottom, 0px));
+    width: 56px;
+    height: 56px;
+  }
+  .gimi-bubble svg { width: 25px; height: 25px; }
+}
+
+/* ---------- Short mobile screens (≤640px tall) ---------- */
+@media (max-width: 768px) and (max-height: 640px) {
+  .gimi-bubble {
+    bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+    width: 54px;
+    height: 54px;
+  }
+  .gimi-bubble svg { width: 24px; height: 24px; }
+}
+
+/* ---------- Landscape phones ---------- */
+@media (max-width: 900px) and (orientation: landscape) and (max-height: 500px) {
+  .gimi-bubble {
+    right: 12px;
+    bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+    width: 52px;
+    height: 52px;
+  }
+  .gimi-bubble svg { width: 23px; height: 23px; }
+}
+
+/* ---------- Reduce motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .gimi-bubble,
+  .gimi-bubble-pulse,
+  .gimi-panel,
+  .gimi-panel--mobile,
+  .gimi-msg,
+  .gimi-suggestions,
+  .gimi-quick-actions,
+  .gimi-caret,
+  .gimi-voice--on,
+  .gimi-backdrop {
+    animation: none !important;
+    transition: none !important;
+  }
+}
