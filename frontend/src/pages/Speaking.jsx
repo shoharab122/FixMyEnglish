@@ -531,6 +531,15 @@ const SCORING = {
   idealWpm: [110, 160],
   acceptWpm: [90, 180],
   base: 4,
+  // --- accuracy / marking upgrade ---
+  minBand: 2,            // lowest band ever awarded
+  maxBand: 9,            // highest band
+  bandCurve: 1.3,        // >1 = mid-quality speech scores honestly, near-perfect still reaches 9
+  drillWpm: [50, 260],   // read-aloud drills: tongue twisters are naturally slow or fast
+  confFloor: 0.5,        // ASR confidence mapped 0.5 → 0 … 0.95 → 1
+  confCeil: 0.95,
+  noConfCap: 8.5,        // pronunciation can't be verified without ASR confidence (e.g. iOS Safari)
+  shortAnswerWords: 35,  // expected length for IELTS Part 1 short answers
 };
 
 const FILLER_WORDS = [
@@ -541,19 +550,23 @@ const FILLER_WORDS = [
 // Cohesive devices — genuine (if crude) evidence of organised, linked speech.
 // Rewards exactly the behaviour the "Recording tips" sidebar asks users for.
 const LINKING_WORDS = [
-  'first', 'firstly', 'second', 'secondly', 'finally', 'in conclusion',
+  'first', 'firstly', 'second', 'secondly', 'third', 'finally', 'in conclusion',
   'however', 'therefore', 'because', 'so that', 'as a result', 'moreover',
   'furthermore', 'in addition', 'also', 'for example', 'for instance',
   'on the other hand', 'in contrast', 'although', 'even though', 'while',
   'since', 'unless', 'in my opinion', 'to sum up', 'overall', 'meanwhile',
-  'then', 'after that', 'next', 'in fact',
+  'then', 'after that', 'next', 'in fact', 'besides', 'whereas', 'despite',
+  'as well as', 'not only', 'that is why', 'for this reason', 'at the same time',
+  'to begin with', 'lastly', 'afterwards', 'eventually',
 ];
 
-// A few subordinating/complex-structure markers — a crude but real proxy for
-// grammatical range (IELTS rewards complex sentences, not just length).
+// Subordinating / relative markers — a crude but real proxy for grammatical
+// range. "that" is handled separately (relative / noun clause) because it is
+// far too often just a demonstrative.
 const COMPLEX_MARKERS = [
-  'because', 'although', 'though', 'while', 'if', 'when', 'since', 'unless',
-  'whereas', 'which', 'who', 'that', 'in order to', 'so that',
+  'because', 'although', 'though', 'even though', 'while', 'if', 'when', 'since',
+  'unless', 'whereas', 'which', 'who', 'whom', 'whose', 'whenever', 'wherever',
+  'in order to', 'so that', 'as long as', 'as soon as', 'rather than', 'instead of',
 ];
 
 const CRITERIA = [
@@ -562,6 +575,76 @@ const CRITERIA = [
   { id: 'c3', label: 'Grammatical range', weight: '25%' },
   { id: 'c4', label: 'Pronunciation', weight: '25%' },
 ];
+
+// --- word lists used by the scoring engine (kept together, easy to tune) ---
+const STOPWORDS = new Set((
+  'a an the and or but if then so of to in on at by for with from as is are was were be been being am ' +
+  'do does did have has had i me my we our you your he him his she her it its they them their this that ' +
+  'these those there here what which who whom whose when where why how not no yes can could will would ' +
+  'shall should may might must just very really also too than about into over after before up down out ' +
+  'off more most some any all each every other such own same yeah okay ok um uh er erm ah hmm oh well ' +
+  'like got get gets go goes going went one two thing things lot lots many much people'
+).split(/\s+/));
+
+// Over-used "safe" words — a lot of these signals a limited lexical resource.
+const WEAK_WORDS = new Set([
+  'very', 'really', 'good', 'nice', 'bad', 'big', 'thing', 'things', 'stuff', 'lot', 'lots', 'got',
+]);
+
+const HESITATIONS = new Set(['um', 'umm', 'uh', 'uhh', 'er', 'erm', 'ah', 'ahh', 'hmm', 'hm', 'mm', 'eh']);
+const SOFT_FILLERS = new Set(['basically', 'actually', 'literally', 'honestly', 'anyway', 'obviously']);
+const LEGIT_DOUBLES = new Set(['had', 'that', 'no', 'so', 'bye']);
+
+// Grammar structures — the more distinct ones a speaker uses, the wider the range.
+const NOT_ADJ_ED = '(?!tired|bored|excited|interested|surprised|worried|pleased|scared|married|crowded|relaxed|embarrassed|disappointed|confused|annoyed|amazed|shocked|exhausted|satisfied)';
+const GRAMMAR_STRUCTURES = [
+  { id: 'past', label: 'past tense',
+    re: /\b(was|were|did|went|saw|took|made|came|said|felt|knew|thought|began|ate|met|ran|bought|told|found|gave|left|lost|won|had)\b|\b\w{2,}[^e\s]ed\b/ },
+  { id: 'perfect', label: 'perfect tense',
+    re: /\b(have|has|had|\w+'ve)\s+(?:\w+\s+)?(been|done|gone|seen|made|taken|given|known|become|gotten|\w{2,}[^e\s]ed)\b/ },
+  { id: 'future', label: 'future forms',
+    re: /\b(will|won't|going to|gonna|shall)\b|\b\w+'ll\b/ },
+  { id: 'conditional', label: 'conditionals',
+    re: /\bif\b.{0,80}\b(would|could|might|will|can|should|were)\b|\b(would|could|might)\b.{0,60}\bif\b|\bunless\b/ },
+  { id: 'passive', label: 'passive voice',
+    re: new RegExp(`\\b(is|are|was|were|been|being|be)\\s+(?:\\w+ly\\s+)?${NOT_ADJ_ED}(\\w{2,}[^e\\s]ed|made|built|done|given|taken|known|seen|written|held|chosen|born|called|found|used|spoken|sold|paid|kept)\\b`) },
+  { id: 'modal', label: 'modal verbs',
+    re: /\b(could|should|must|might|may|ought to|have to|has to|had to|used to|would rather)\b/ },
+  { id: 'relative', label: 'relative clauses',
+    re: /\b(who|whom|whose|which|where)\b|\b(the|a|an|something|everything|someone|people|person|place|thing|things|one)\s+\w+\s+that\b/ },
+  { id: 'comparative', label: 'comparatives',
+    re: /\b(more|less)\s+\w+\s+than\b|\b\w{3,}er\s+than\b|\bas\s+\w+\s+as\b|\bthe\s+(most|least|\w{3,}est)\b/ },
+  { id: 'subordination', label: 'complex sentences',
+    re: /\b(because|although|though|whereas|so that|in order to|so as to|despite|in spite of|even though)\b/ },
+  { id: 'noun-clause', label: 'noun clauses',
+    re: /\b(think|believe|know|feel|say|said|hope|realize|realise|mean|sure|glad|sorry|afraid|show|shows|found|find|understand)\s+that\b/ },
+];
+
+// Common learner errors that survive speech-to-text (ASR normally "fixes" them,
+// so anything still visible here is a real error — a lower bound, never a guess).
+const BASE_VERBS = new Set([
+  'go', 'do', 'have', 'like', 'want', 'need', 'make', 'take', 'come', 'know', 'think', 'say', 'play',
+  'work', 'live', 'study', 'eat', 'love', 'feel', 'get', 'see', 'look', 'speak', 'read', 'write',
+  'sleep', 'run', 'walk', 'drive', 'buy', 'give', 'tell', 'enjoy', 'help', 'try', 'use',
+]);
+const AUX_BEFORE = new Set([
+  'do', 'does', 'did', 'can', 'could', 'will', 'would', 'should', 'must', 'may', 'might', 'shall', 'to',
+  'let', 'make', 'makes', 'made', 'help', 'helps', 'see', 'saw', 'hear', 'heard', 'watch', 'than', 'dont', "don't",
+]);
+const PAST_FORMS = new Set([
+  'went', 'saw', 'ate', 'took', 'came', 'had', 'did', 'was', 'were', 'made', 'got', 'gave', 'said',
+  'knew', 'thought', 'told', 'found', 'bought', 'ran', 'wrote', 'felt', 'left', 'met',
+]);
+const WRONG_PLURALS = new Set([
+  'informations', 'advices', 'furnitures', 'equipments', 'knowledges', 'homeworks', 'peoples', 'childrens', 'mens', 'womens',
+]);
+const WRONG_COMPARATIVES = new Set([
+  'better', 'worse', 'easier', 'bigger', 'faster', 'happier', 'cheaper', 'smaller', 'larger', 'taller',
+  'older', 'younger', 'harder', 'stronger', 'higher', 'lower', 'nicer', 'safer',
+]);
+const WRONG_SUPERLATIVES = new Set(['best', 'worst', 'easiest', 'biggest', 'fastest', 'happiest', 'cheapest', 'smallest', 'largest']);
+const UNCOUNTABLE = new Set(['water', 'money', 'time', 'information', 'advice', 'traffic', 'food', 'music', 'homework', 'furniture', 'luggage']);
+const COUNTABLE_PLURAL = new Set(['people', 'friends', 'books', 'students', 'things', 'cars', 'places', 'children', 'problems', 'ideas']);
 
 /* ============================================================
    SECTION 3 — UTILITIES
@@ -622,188 +705,481 @@ function countWords(text) {
 /* ============================================================
    SECTION 4 — SCORING ENGINE
    ============================================================ */
-function detectFaults(transcript, durationSec, avgConfidence = null) {
-  const text = (transcript || '').toLowerCase().trim();
-  const words = text.split(/\s+/).filter(Boolean);
+function detectFaults(transcript, durationSec, avgConfidence = null, ctx = {}) {
+  const words = tokenize(transcript);
+  const text = words.join(' ');
+  const isDrill = ctx.mode === 'drill' && !!ctx.referenceText;
+  const refWords = isDrill ? normalizeForMatch(ctx.referenceText) : [];
+  const targetWords = isDrill ? refWords.length : (ctx.targetWords || SCORING.longAnswerWords);
+
   const result = {
+    mode: isDrill ? 'drill' : 'free',
+    targetWords,
+    minWords: getMinWords(ctx),
     fillers: { count: 0, words: {}, severity: 'ok' },
     repetition: { count: 0, examples: [], severity: 'ok' },
     pace: { wpm: 0, severity: 'ok' },
     length: { words: words.length, severity: 'ok' },
-    vocabulary: { unique: 0, ratio: 0, ttr: 0, severity: 'ok' },
-    coherence: { count: 0, found: [], severity: 'ok' },
-    complexity: { count: 0, severity: 'ok' },
-    confidence: avgConfidence, // real ASR confidence (0..1) when the browser reports it
+    vocabulary: { unique: 0, ratio: 0, ttr: 0, guiraud: 0, advancedRatio: 0, weak: 0, severity: 'ok' },
+    coherence: { count: 0, found: [], variety: 0, severity: 'ok' },
+    complexity: { count: 0, variety: 0, severity: 'ok' },
+    grammar: { structures: [], needed: 0, errors: 0, examples: [] },
+    accuracy: null,
+    // real ASR confidence (0..1) when the browser reports it
+    confidence: typeof avgConfidence === 'number' && avgConfidence > 0 ? avgConfidence : null,
   };
 
-  const fillerMap = {};
-  for (const f of FILLER_WORDS) {
-    const regex = new RegExp(`\\b${f.replace(/\s+/g, '\\s+')}\\b`, 'g');
-    const matches = text.match(regex);
-    if (matches) {
-      fillerMap[f] = matches.length;
-      result.fillers.count += matches.length;
-    }
-  }
-  result.fillers.words = fillerMap;
-  const fillerRatio = words.length ? result.fillers.count / words.length : 0;
-  result.fillers.severity = fillerRatio > 0.12 ? 'bad' : fillerRatio > 0.06 ? 'warn' : 'ok';
+  /* ---- Fillers (context-aware: "I like music" is NOT a filler) ---- */
+  const fl = findFillers(words, new Set(refWords));
+  result.fillers.count = fl.count;
+  result.fillers.words = fl.words;
+  const fillerRatio = words.length ? fl.count / words.length : 0;
+  result.fillers.severity = fillerRatio > 0.1 ? 'bad' : fillerRatio > 0.05 ? 'warn' : 'ok';
 
-  // Repetition: catch immediate stutters (word repeated 2+ times in a row —
-  // catching the 2nd repeat, not just the 3rd, so it isn't missed on short
-  // answers) AND redundant repeated two-word phrases spaced apart in the
-  // answer, which the old 3-in-a-row check never saw.
-  for (let i = 0; i < words.length - 1; i++) {
-    if (words[i].length > 2 && words[i] === words[i + 1]) {
-      result.repetition.count += 1;
-      result.repetition.examples.push(words[i]);
+  /* ---- Repetition (free speech only — drills repeat words by design) ---- */
+  if (!isDrill) {
+    for (let i = 0; i < words.length - 1; i++) {
+      if (words[i] === words[i + 1] && !LEGIT_DOUBLES.has(words[i])) {
+        result.repetition.count += 1;
+        result.repetition.examples.push(words[i]);
+      }
     }
-  }
-  const bigramSeen = new Map();
-  for (let i = 0; i < words.length - 1; i++) {
-    const a = words[i], b = words[i + 1];
-    if (a.length <= 2 || b.length <= 2) continue; // skip "a of", "to the", etc.
-    const bigram = `${a} ${b}`;
-    const seenAt = bigramSeen.get(bigram);
-    if (seenAt !== undefined && i - seenAt > 2) {
-      result.repetition.count += 1;
-      result.repetition.examples.push(bigram);
+    // Content phrases said 3+ times read as a loop, not as emphasis.
+    const bigrams = new Map();
+    for (let i = 0; i < words.length - 1; i++) {
+      const a = words[i], b = words[i + 1];
+      if (STOPWORDS.has(a) || STOPWORDS.has(b) || a.length <= 2 || b.length <= 2) continue;
+      const key = `${a} ${b}`;
+      bigrams.set(key, (bigrams.get(key) || 0) + 1);
     }
-    bigramSeen.set(bigram, i);
+    for (const [key, n] of bigrams) {
+      if (n >= 3) {
+        result.repetition.count += n - 2;
+        result.repetition.examples.push(key);
+      }
+    }
+    result.repetition.severity = result.repetition.count >= 3
+      ? 'bad'
+      : result.repetition.count >= 1 ? 'warn' : 'ok';
   }
-  result.repetition.severity = result.repetition.count >= 3
-    ? 'bad'
-    : result.repetition.count >= 1
-      ? 'warn'
-      : 'ok';
 
+  /* ---- Pace ---- */
   result.pace.wpm = durationSec > 0 && words.length > 0
     ? Math.round((words.length / durationSec) * 60)
     : 0;
+  const [paceLo, paceHi] = isDrill ? SCORING.drillWpm : [100, 170];
+  const [badLo, badHi] = isDrill ? [35, 300] : [80, 200];
   if (words.length === 0) result.pace.severity = 'bad';
-  else if (result.pace.wpm < 80 || result.pace.wpm > 200) result.pace.severity = 'bad';
-  else if (result.pace.wpm < 100 || result.pace.wpm > 170) result.pace.severity = 'warn';
+  else if (result.pace.wpm < badLo || result.pace.wpm > badHi) result.pace.severity = 'bad';
+  else if (result.pace.wpm < paceLo || result.pace.wpm > paceHi) result.pace.severity = 'warn';
 
-  if (words.length < 20) result.length.severity = 'bad';
-  else if (words.length < 45) result.length.severity = 'warn';
+  /* ---- Length (relative to what this prompt expects) ---- */
+  if (isDrill) {
+    if (words.length < targetWords * 0.5) result.length.severity = 'bad';
+    else if (words.length < targetWords * 0.85) result.length.severity = 'warn';
+  } else {
+    if (words.length < targetWords * 0.33) result.length.severity = 'bad';
+    else if (words.length < targetWords * 0.75) result.length.severity = 'warn';
+  }
 
-  // Corrected type-token ratio (unique / sqrt(2*N)) instead of raw
-  // unique/N. Raw TTR mathematically falls as an answer gets longer even
-  // when vocabulary stays equally varied, so it was quietly punishing
-  // people for speaking more — exactly backwards for a speaking test.
+  /* ---- Vocabulary ---- */
   const unique = new Set(words).size;
   result.vocabulary.unique = unique;
   result.vocabulary.ratio = words.length ? unique / words.length : 0;
+  // Length-corrected TTR (kept for the existing report card + severity).
   result.vocabulary.ttr = words.length ? unique / Math.sqrt(2 * words.length) : 0;
   if (words.length < 5) result.vocabulary.severity = 'bad';
-  else if (result.vocabulary.ttr < 3.2) result.vocabulary.severity = 'bad';
-  else if (result.vocabulary.ttr < 4.2) result.vocabulary.severity = 'warn';
+  else if (!isDrill && result.vocabulary.ttr < 3.2) result.vocabulary.severity = 'bad';
+  else if (!isDrill && result.vocabulary.ttr < 4.2) result.vocabulary.severity = 'warn';
 
-  // Coherence: cohesive devices signal organised, linked speech.
-  const foundLinks = [];
-  let coherenceCount = 0;
-  for (const l of LINKING_WORDS) {
-    const regex = new RegExp(`\\b${l.replace(/\s+/g, '\\s+')}\\b`, 'g');
-    const matches = text.match(regex);
-    if (matches) {
-      coherenceCount += matches.length;
-      foundLinks.push(l);
+  // Content-word measures: function words ("the", "and") are always repeated and
+  // say nothing about vocabulary, so diversity/sophistication use content words only.
+  const content = words.filter((w) => w.length > 2 && /^[a-z']+$/.test(w) && !STOPWORDS.has(w));
+  const contentUnique = new Set(content);
+  result.vocabulary.guiraud = content.length ? contentUnique.size / Math.sqrt(content.length) : 0;
+  result.vocabulary.advancedRatio = contentUnique.size
+    ? [...contentUnique].filter(isAdvancedWord).length / contentUnique.size
+    : 0;
+  result.vocabulary.weak = words.filter((w) => WEAK_WORDS.has(w)).length;
+
+  /* ---- Coherence + complexity + grammar (free speech only) ---- */
+  if (!isDrill) {
+    const foundLinks = [];
+    let coherenceCount = 0;
+    for (const l of LINKING_WORDS) {
+      const n = countPhrase(text, l);
+      if (n) { coherenceCount += n; foundLinks.push(l); }
     }
-  }
-  result.coherence.count = coherenceCount;
-  result.coherence.found = foundLinks;
-  if (words.length >= 30 && coherenceCount === 0) result.coherence.severity = 'warn';
+    result.coherence.count = coherenceCount;
+    result.coherence.found = foundLinks;
+    result.coherence.variety = foundLinks.length;
+    if (words.length >= 30 && coherenceCount === 0) result.coherence.severity = 'warn';
 
-  // Complexity: subordinating/relative structures — a crude but real signal
-  // that the speaker is attempting more than simple sentences.
-  let complexityCount = 0;
-  for (const m of COMPLEX_MARKERS) {
-    const regex = new RegExp(`\\b${m.replace(/\s+/g, '\\s+')}\\b`, 'g');
-    const matches = text.match(regex);
-    if (matches) complexityCount += matches.length;
+    let complexityCount = 0;
+    let complexityVariety = 0;
+    for (const m of COMPLEX_MARKERS) {
+      const n = countPhrase(text, m);
+      if (n) { complexityCount += n; complexityVariety += 1; }
+    }
+    const thatClauses =
+      (text.match(/\b(think|believe|know|feel|say|said|hope|realize|realise|mean|sure|glad|sorry|afraid|show|shows|found|find|understand)\s+that\b/g) || []).length +
+      (text.match(/\b(the|a|an|something|everything|someone|people|person|place|thing|things|one)\s+\w+\s+that\b/g) || []).length;
+    if (thatClauses) { complexityCount += thatClauses; complexityVariety += 1; }
+    result.complexity.count = complexityCount;
+    result.complexity.variety = complexityVariety;
+    if (words.length >= 30 && complexityCount === 0) result.complexity.severity = 'warn';
+
+    result.grammar.structures = GRAMMAR_STRUCTURES.filter((s) => s.re.test(text)).map((s) => s.id);
+    result.grammar.needed = Math.max(2, Math.min(5, Math.round(words.length / 14)));
+    const g = findGrammarErrors(words);
+    result.grammar.errors = g.count;
+    result.grammar.examples = g.examples;
   }
-  result.complexity.count = complexityCount;
-  if (words.length >= 30 && complexityCount === 0) result.complexity.severity = 'warn';
+
+  /* ---- Word-for-word accuracy against the drill text ---- */
+  if (isDrill) {
+    result.accuracy = scoreAccuracy(refWords, words);
+  }
 
   return result;
 }
 
+/* ---------- helpers for the scoring engine ---------- */
+function tokenize(text) {
+  return (text || '')
+    .toLowerCase()
+    .replace(/[’‘`]/g, "'")
+    .replace(/[^a-z0-9'\s-]/g, ' ')
+    .split(/\s+/)
+    .map((w) => w.replace(/^[-']+|[-']+$/g, ''))
+    .filter(Boolean);
+}
+
+function countPhrase(text, phrase) {
+  const re = new RegExp(`\\b${phrase.replace(/\s+/g, '\\s+')}\\b`, 'g');
+  return (text.match(re) || []).length;
+}
+
+function isAdvancedWord(w) {
+  if (w.length >= 8) return true;
+  return w.length >= 7 && /(tion|sion|ment|ness|ity|ive|ous|ible|able|ize|ise|ful|less|ence|ance)$/.test(w);
+}
+
+function clamp01(n) {
+  return Math.max(0, Math.min(1, Number.isFinite(n) ? n : 0));
+}
+
+function findFillers(words, skip = new Set()) {
+  const found = {};
+  let count = 0;
+  const add = (k) => { found[k] = (found[k] || 0) + 1; count += 1; };
+  const softSeen = {};
+  const NOUN_DET = new Set(['a', 'this', 'that', 'the', 'what', 'which', 'another', 'any', 'every', 'each', 'same', 'different', 'one', 'these', 'those', 'some', 'all', 'many', 'of', 'kind', 'sort']);
+  const KNOW_OBJ = new Set(['him', 'her', 'them', 'it', 'me', 'us', 'this', 'that', 'about', 'how', 'what', 'why', 'where', 'when', 'who', 'which', 'the']);
+  const NO_KNOW_BEFORE = new Set(['do', 'did', 'if', 'as', 'what', 'how', 'that', 'and', 'will', 'would', 'can', 'could', 'let', 'should', 'to', 'dont', "don't"]);
+  for (let i = 0; i < words.length; i++) {
+    const w = words[i];
+    const p = words[i - 1] || '';
+    const n = words[i + 1] || '';
+    const n2 = words[i + 2] || '';
+    if (skip.has(w)) continue;
+    if (HESITATIONS.has(w)) { add(w); continue; }
+    if (SOFT_FILLERS.has(w)) {
+      // one use is ordinary speech; repeating it is a verbal tic
+      softSeen[w] = (softSeen[w] || 0) + 1;
+      if (softSeen[w] >= 2) add(w);
+      continue;
+    }
+    if (w === 'you' && n === 'know' && !NO_KNOW_BEFORE.has(p) && !KNOW_OBJ.has(n2)) { add('you know'); i += 1; continue; }
+    if (w === 'i' && n === 'mean' && !['what', 'do', 'did', 'dont', "don't", 'if', 'as', 'that', 'how'].includes(p) && !['it', 'that', 'what'].includes(n2)) { add('i mean'); i += 1; continue; }
+    if ((w === 'kind' || w === 'sort') && n === 'of' && !NOUN_DET.has(p)) { add(`${w} of`); i += 1; continue; }
+    if (w === 'like') {
+      const fillerLike = i === 0 || ['was', 'were', 'and', 'but', 'so', 'just', 'then', 'like'].includes(p) || HESITATIONS.has(p);
+      if (fillerLike) add('like');
+      continue;
+    }
+    if (w === 'so' && (i === 0 || ['yeah', 'okay', 'like', 'basically', 'anyway'].includes(n) || HESITATIONS.has(n))) { add('so'); continue; }
+    if (w === 'well' && (i === 0 || ['you', 'like', 'so', 'basically'].includes(n) || HESITATIONS.has(n))) { add('well'); continue; }
+  }
+  return { count, words: found };
+}
+
+function findGrammarErrors(words) {
+  const examples = [];
+  const SUBJ_BAD = {
+    i: ['is', 'are', 'has', 'does'], you: ['is', 'was', 'has'], we: ['is', 'was', 'has'],
+    they: ['is', 'was', 'has'], he: ['are'], she: ['are'], it: ['are'],
+    people: ['is'], everyone: ['are'], everybody: ['are'],
+  };
+  const vowelSound = (w) => {
+    if (/^(one|once|ones)$/.test(w)) return false;
+    if (/^[aeio]/.test(w)) return true;
+    if (/^u/.test(w)) return !/^(uni|use|usu|uti|ute|ubi|ura|uro|uk|eu)/.test(w);
+    if (/^h/.test(w)) return /^(hour|honest|honor|honour|heir)/.test(w);
+    return false;
+  };
+  for (let i = 0; i < words.length; i++) {
+    const w = words[i];
+    const n = words[i + 1] || '';
+    const p = words[i - 1] || '';
+    // he/she/it + base verb  ("he go", "she don't")
+    if ((w === 'he' || w === 'she' || w === 'it') && !AUX_BEFORE.has(p) && (BASE_VERBS.has(n) || n === "don't" || n === 'dont')) {
+      examples.push(`${w} ${n}`);
+    }
+    // subject / "be" or "have" mismatch ("I is", "they was", "people is")
+    if (SUBJ_BAD[w] && SUBJ_BAD[w].includes(n)) examples.push(`${w} ${n}`);
+    // a / an
+    if (p === 'a' && /^[a-z]{3,}$/.test(w) && !HESITATIONS.has(w) && vowelSound(w)) examples.push(`a ${w}`);
+    if (p === 'an' && /^[a-z]{3,}$/.test(w) && !HESITATIONS.has(w) && !vowelSound(w)) examples.push(`an ${w}`);
+    // didn't + past form ("didn't went")
+    if ((p === "didn't" || p === 'didnt' || (p === 'not' && words[i - 2] === 'did')) && PAST_FORMS.has(w)) examples.push(`didn't ${w}`);
+    // modal + to ("can to go")
+    if (['can', 'could', 'should', 'must', 'might'].includes(p) && w === 'to') examples.push(`${p} to`);
+    // double comparatives
+    if (w === 'more' && WRONG_COMPARATIVES.has(n)) examples.push(`more ${n}`);
+    if (w === 'most' && WRONG_SUPERLATIVES.has(n)) examples.push(`most ${n}`);
+    // frequent learner errors
+    if (w === 'am' && n === 'agree') examples.push('am agree');
+    if (/^discuss(ed|es|ing)?$/.test(w) && n === 'about') examples.push(`${w} about`);
+    if (WRONG_PLURALS.has(w)) examples.push(w);
+    if (w === 'much' && COUNTABLE_PLURAL.has(n)) examples.push(`much ${n}`);
+    if (w === 'many' && UNCOUNTABLE.has(n)) examples.push(`many ${n}`);
+  }
+  return { count: examples.length, examples };
+}
+
+/* ---------- reading accuracy (pronunciation drills) ---------- */
+const NUM_ONES = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten',
+  'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+const NUM_TENS = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+function numberToWords(n) {
+  if (n < 20) return NUM_ONES[n];
+  const t = NUM_TENS[Math.floor(n / 10)];
+  return n % 10 ? `${t} ${NUM_ONES[n % 10]}` : t;
+}
+
+const CONTRACTIONS = {
+  "i'm": 'i am', "you're": 'you are', "we're": 'we are', "they're": 'they are',
+  "he's": 'he is', "she's": 'she is', "it's": 'it is', "that's": 'that is',
+  "don't": 'do not', "doesn't": 'does not', "didn't": 'did not', "can't": 'cannot',
+  "won't": 'will not', "isn't": 'is not', "aren't": 'are not', "wasn't": 'was not',
+};
+
+function normalizeForMatch(text) {
+  let t = (text || '').toLowerCase().replace(/[’‘`]/g, "'").replace(/^\s*(say|repeat|read)\s*:\s*/, '');
+  t = t.replace(/\b\d{1,2}\b/g, (m) => ` ${numberToWords(Number(m))} `);
+  t = t.replace(/[a-z]+'[a-z]+/g, (m) => CONTRACTIONS[m] || m);
+  return t
+    .replace(/[^a-z'\s]/g, ' ')
+    .split(/\s+/)
+    .map((w) => w.replace(/^'+|'+$/g, ''))
+    .filter(Boolean);
+}
+
+function editDistance(a, b) {
+  const dp = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+  for (let j = 1; j <= b.length; j++) dp[0][j] = j;
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      dp[i][j] = Math.min(
+        dp[i - 1][j] + 1,
+        dp[i][j - 1] + 1,
+        dp[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1),
+      );
+    }
+  }
+  return dp[a.length][b.length];
+}
+
+function wordSimilarity(a, b) {
+  if (a === b) return 1;
+  // A near-miss means the recogniser heard a *different* word — in a
+  // pronunciation drill that is partial credit at best.
+  if (a.length >= 4 && b.length >= 4 && editDistance(a, b) === 1) return 0.5;
+  return 0;
+}
+
+function scoreAccuracy(refWords, hypWords) {
+  const n = refWords.length;
+  const m = hypWords.length;
+  if (!n || !m) return { score: 0, matched: 0, total: n, missed: refWords.slice(0, 6) };
+  // Practising the same line twice or more is normal — mark the best attempt.
+  const attempts = Math.round(m / n);
+  if (attempts >= 2) {
+    const size = Math.ceil(m / attempts);
+    let best = null;
+    for (let k = 0; k < attempts; k++) {
+      const chunk = hypWords.slice(k * size, (k + 1) * size);
+      const r = alignAccuracy(refWords, chunk);
+      if (!best || r.score > best.score) best = r;
+    }
+    return best;
+  }
+  return alignAccuracy(refWords, hypWords);
+}
+
+function alignAccuracy(refWords, hypWords) {
+  const n = refWords.length;
+  const m = hypWords.length;
+  if (!n || !m) return { score: 0, matched: 0, total: n, missed: refWords.slice(0, 6) };
+  const sim = refWords.map((r) => hypWords.map((h) => wordSimilarity(r, h)));
+  const dp = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
+  for (let i = 1; i <= n; i++) {
+    for (let j = 1; j <= m; j++) {
+      dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1] + sim[i - 1][j - 1]);
+    }
+  }
+  const credit = new Array(n).fill(0);
+  let i = n;
+  let j = m;
+  while (i > 0 && j > 0) {
+    if (sim[i - 1][j - 1] > 0 && Math.abs(dp[i][j] - (dp[i - 1][j - 1] + sim[i - 1][j - 1])) < 1e-9) {
+      credit[i - 1] = sim[i - 1][j - 1];
+      i -= 1;
+      j -= 1;
+    } else if (Math.abs(dp[i][j] - dp[i - 1][j]) < 1e-9) {
+      i -= 1;
+    } else {
+      j -= 1;
+    }
+  }
+  const matched = dp[n][m];
+  const recall = matched / n;
+  const precision = matched / m; // extra / repeated words lower this
+  const score = recall + precision > 0 ? (2 * recall * precision) / (recall + precision) : 0;
+  const missed = [...new Set(refWords.filter((_, k) => credit[k] < 1))].slice(0, 6);
+  return { score: clamp01(score), matched, total: n, missed };
+}
+
+function getMinWords(ctx = {}) {
+  if (ctx.mode === 'drill' && ctx.referenceText) {
+    return Math.max(2, Math.min(SCORING.minWords, normalizeForMatch(ctx.referenceText).length));
+  }
+  return SCORING.minWords;
+}
+
+// Pulls what the scorer needs to know about the prompt being practised.
+function getScoringContext(catId, promptIndex) {
+  const c = ALL_CATEGORIES.find((x) => x.id === catId);
+  const prompt = c ? c.prompts[promptIndex] || '' : '';
+  if (catId === 'pron' && prompt) {
+    return { mode: 'drill', referenceText: prompt, targetWords: 0 };
+  }
+  return {
+    mode: 'free',
+    referenceText: '',
+    targetWords: catId === 'ielts1' ? SCORING.shortAnswerWords : SCORING.longAnswerWords,
+  };
+}
+
+/* ---------- marking ---------- */
+function paceQuality(wpm, [idealLo, idealHi], [acceptLo, acceptHi]) {
+  if (!wpm) return 0;
+  if (wpm >= idealLo && wpm <= idealHi) return 1;
+  if (wpm >= acceptLo && wpm < idealLo) return 0.8 + (0.2 * (wpm - acceptLo)) / (idealLo - acceptLo);
+  if (wpm > idealHi && wpm <= acceptHi) return 0.8 + (0.2 * (acceptHi - wpm)) / (acceptHi - idealHi);
+  const dist = wpm < acceptLo ? acceptLo - wpm : wpm - acceptHi;
+  return Math.max(0.2, 0.8 - dist * 0.015);
+}
+
+// 0..1 quality → band. The curve keeps average speech honest while a genuinely
+// excellent answer (quality ≈ 1) still lands on 8.5–9.
+function qualityToBand(q) {
+  const span = SCORING.maxBand - SCORING.minBand;
+  return SCORING.minBand + span * Math.pow(clamp01(q), SCORING.bandCurve);
+}
+
+// IELTS reports whole and half bands only.
+function finishBand(b, cap = SCORING.maxBand) {
+  return Math.round(Math.max(SCORING.minBand, Math.min(cap, b)) * 2) / 2;
+}
+
 function scoreFromAnalysis(faults) {
   const words = faults.length.words;
-  if (words < SCORING.minWords) return null;
+  if (words < (faults.minWords ?? SCORING.minWords)) return null;
 
   const wpm = faults.pace.wpm;
   const fillerRatio = faults.fillers.count / Math.max(1, words);
-  const vocabTtr = faults.vocabulary.ttr;      // length-corrected, fair at any length
-  const [idealLo, idealHi] = SCORING.idealWpm;
-  const [acceptLo, acceptHi] = SCORING.acceptWpm;
-  const rep = faults.repetition.count;
-  const coherence = faults.coherence.count;
-  const complexity = faults.complexity.count;
-  const confidence = faults.confidence; // 0..1 real ASR signal, or null
+  const fillerQ = clamp01(1 - fillerRatio / 0.1); // 0 fillers → 1, 10%+ → 0
+  const conf = typeof faults.confidence === 'number' ? faults.confidence : null;
+  const confQ = conf === null
+    ? null
+    : clamp01((conf - SCORING.confFloor) / (SCORING.confCeil - SCORING.confFloor));
 
-  let fluency = SCORING.base;
-  if (wpm >= idealLo && wpm <= idealHi) fluency += 2.0;
-  else if (wpm >= acceptLo && wpm <= acceptHi) fluency += 1.2;
-  else if (wpm > 0) fluency -= 0.5;
-  if (words >= 30) fluency += 0.5;
-  if (words >= 60) fluency += 0.5;
-  if (words >= 90) fluency += 0.5;
-  if (words >= 120) fluency += 0.5;
-  if (fillerRatio > 0.04) fluency -= 0.5;
-  if (fillerRatio > 0.08) fluency -= 1.0;
-  if (fillerRatio > 0.15) fluency -= 1.5;
-  if (rep >= 1) fluency -= 0.3;
-  if (rep >= 3) fluency -= 0.5;
-  // Cohesion is literally half of "Fluency & coherence" — reward it directly.
-  if (coherence >= 1) fluency += 0.5;
-  if (coherence >= 3) fluency += 0.5;
-
-  let vocabulary = SCORING.base;
-  if (vocabTtr > 3.6) vocabulary += 1.0;
-  if (vocabTtr > 4.4) vocabulary += 1.0;
-  if (vocabTtr > 5.2) vocabulary += 1.0;
-  if (words >= 60) vocabulary += 0.5;
-  if (words >= 100) vocabulary += 0.5;
-  if (vocabTtr < 3.0 && words >= 20) vocabulary -= 1.0;
-
-  let grammar = SCORING.base;
-  if (words >= 15) grammar += 0.5;
-  if (words >= 40) grammar += 0.5;
-  if (words >= 70) grammar += 0.5;
-  if (words >= 100) grammar += 0.5;
-  // Complex/subordinate structures are real evidence of grammatical range,
-  // where the old version only ever looked at raw word count.
-  if (complexity >= 1) grammar += 0.5;
-  if (complexity >= 3) grammar += 0.5;
-  if (rep >= 1) grammar -= 0.5;
-  if (rep >= 3) grammar -= 1.0;
-
-  let pronunciation = SCORING.base;
-  if (confidence !== null) {
-    // Real signal available (Chrome/Edge/Android report it): weight it
-    // heavily — it's the closest thing to actual pronunciation/clarity
-    // evidence this client-side engine can get, since the ASR itself
-    // struggled to recognise unclear speech.
-    pronunciation += (confidence - 0.5) * 6; // confidence 0.5 → +0, 1.0 → +3
-    if (fillerRatio < 0.04) pronunciation += 0.5;
-    if (fillerRatio > 0.12) pronunciation -= 0.5;
-  } else {
-    // No confidence reported (e.g. iOS Safari) — fall back to the pace/filler
-    // proxy used before, clearly weaker evidence than real ASR confidence.
-    if (wpm >= idealLo && wpm <= idealHi) pronunciation += 2.0;
-    else if (wpm >= acceptLo && wpm <= acceptHi) pronunciation += 1.0;
-    if (fillerRatio < 0.04) pronunciation += 1.0;
-    if (fillerRatio > 0.12) pronunciation -= 1.0;
+  /* ---------- Read-aloud drills: marked on word-for-word accuracy ---------- */
+  if (faults.mode === 'drill' && faults.accuracy) {
+    const acc = faults.accuracy.score;
+    const [lo, hi] = SCORING.drillWpm;
+    const dist = wpm < lo ? lo - wpm : wpm > hi ? wpm - hi : 0;
+    const paceQ = wpm ? Math.max(0.2, 1 - dist * 0.012) : 0;
+    const fluencyQ = 0.4 * acc + 0.3 * paceQ + 0.3 * fillerQ;
+    const pronQ = confQ === null ? acc : 0.65 * acc + 0.35 * confQ;
+    const wordBand = finishBand(qualityToBand(acc));
+    return {
+      fluency: finishBand(qualityToBand(fluencyQ)),
+      // In a drill the words are given, so vocabulary/grammar reflect how
+      // accurately the text was reproduced.
+      vocabulary: wordBand,
+      grammar: wordBand,
+      pronunciation: finishBand(qualityToBand(pronQ), confQ === null ? SCORING.noConfCap : SCORING.maxBand),
+    };
   }
 
-  const clamp = (n) => Math.max(3, Math.min(9, Math.round(n * 10) / 10));
+  /* ---------- Free speech ---------- */
+  const target = faults.targetWords || SCORING.longAnswerWords;
+  const lengthRatio = words / target;
+  // A sample that is far too short can't prove range, whatever it contains.
+  const lengthCap =
+    lengthRatio < 0.15 ? 4.5
+      : lengthRatio < 0.3 ? 5.5
+        : lengthRatio < 0.5 ? 6.5
+          : lengthRatio < 0.75 ? 7.5
+            : SCORING.maxBand;
+
+  const paceQ = paceQuality(wpm, SCORING.idealWpm, SCORING.acceptWpm);
+  const lengthQ = clamp01(lengthRatio);
+  const neededLinks = Math.max(1, Math.min(4, Math.round(words / 20)));
+  const coherenceQ = clamp01(faults.coherence.variety / neededLinks);
+  const repPenalty = Math.min(0.25, faults.repetition.count * 0.06);
+  const complexityQ = clamp01(
+    0.5 * clamp01(faults.complexity.count / Math.max(1, words / 20)) +
+    0.5 * clamp01(faults.complexity.variety / 3),
+  );
+
+  // Fluency & coherence: pace, sustained length, hesitation, cohesive devices,
+  // and "flow" (extended, connected sentences rather than short simple ones)
+  const fluencyQ = clamp01(0.2 * paceQ + 0.2 * lengthQ + 0.2 * fillerQ + 0.2 * coherenceQ + 0.2 * complexityQ - repPenalty);
+
+  // Lexical resource: diversity of content words + less-common words − "safe word" overuse
+  const v = faults.vocabulary;
+  const contentEnough = v.guiraud > 0;
+  const diversityQ = contentEnough ? clamp01((v.guiraud - 2.0) / (5.0 - 2.0)) : 0.4;
+  const sophisticationQ = clamp01(v.advancedRatio / 0.2);
+  const weakPenalty = clamp01(v.weak / Math.max(1, words) / 0.08) * 0.1;
+  const vocabQ = clamp01(0.3 + 0.7 * (0.55 * diversityQ + 0.45 * sophisticationQ) - weakPenalty);
+
+  // Grammatical range & accuracy
+  const g = faults.grammar;
+  const rangeQ = clamp01(g.structures.length / Math.max(1, g.needed));
+  const accuracyQ = clamp01(1 - 0.4 * (g.errors / Math.max(1, words / 25)));
+  const grammarQ = clamp01(0.35 * rangeQ + 0.25 * complexityQ + 0.4 * accuracyQ);
+
+  // Pronunciation: real ASR confidence is the best evidence a browser gives us.
+  let pronQ;
+  let pronCap = SCORING.maxBand;
+  if (confQ !== null) {
+    pronQ = 0.8 * confQ + 0.2 * paceQ;
+  } else {
+    // iOS Safari etc. report no confidence — estimate from delivery, capped.
+    pronQ = 0.4 + 0.35 * paceQ + 0.25 * fillerQ;
+    pronCap = SCORING.noConfCap;
+  }
 
   return {
-    fluency: clamp(fluency),
-    vocabulary: clamp(vocabulary),
-    grammar: clamp(grammar),
-    pronunciation: clamp(pronunciation),
+    fluency: finishBand(qualityToBand(fluencyQ), lengthCap),
+    vocabulary: finishBand(qualityToBand(vocabQ), lengthCap),
+    grammar: finishBand(qualityToBand(grammarQ), lengthCap),
+    pronunciation: finishBand(qualityToBand(pronQ), pronCap),
   };
 }
 
@@ -811,14 +1187,29 @@ function scoreExplanation(faults) {
   const words = faults.length.words;
   const wpm = faults.pace.wpm;
   const [idealLo, idealHi] = SCORING.idealWpm;
+  const isDrill = faults.mode === 'drill' && faults.accuracy;
+
+  const bands = scoreFromAnalysis(faults);
+  const avg = bands ? (bands.fluency + bands.vocabulary + bands.grammar + bands.pronunciation) / 4 : 0;
 
   const lines = [];
   lines.push(`You said ${words} words in about ${wpm ? Math.round((words / wpm) * 60) : 0}s.`);
 
-  if (wpm >= idealLo && wpm <= idealHi) {
-    lines.push(`Your pace (${wpm} wpm) is in the ideal ${idealLo}–${idealHi} range.`);
-  } else if (wpm > 0) {
-    lines.push(`Your pace was ${wpm} wpm — aim for ${idealLo}–${idealHi}.`);
+  if (avg >= 8) lines.push('Excellent — clear, accurate and well delivered. This is top-band speaking.');
+  else if (avg >= 7) lines.push('Strong result — only small polish points below.');
+
+  if (isDrill) {
+    const pct = Math.round(faults.accuracy.score * 100);
+    lines.push(`Reading accuracy: ${pct}%.`);
+    if (faults.accuracy.missed.length > 0 && pct < 100) {
+      lines.push(`Practise these words: ${faults.accuracy.missed.slice(0, 4).join(', ')}.`);
+    }
+  } else {
+    if (wpm >= idealLo && wpm <= idealHi) {
+      lines.push(`Your pace (${wpm} wpm) is in the ideal ${idealLo}–${idealHi} range.`);
+    } else if (wpm > 0) {
+      lines.push(`Your pace was ${wpm} wpm — aim for ${idealLo}–${idealHi}.`);
+    }
   }
 
   if (faults.fillers.count > 0) {
@@ -826,28 +1217,52 @@ function scoreExplanation(faults) {
     lines.push(`Reduce filler words (${faults.fillers.count} found: ${top.join(', ')}).`);
   }
 
-  if (words < SCORING.longAnswerWords) {
-    lines.push(`Speak longer — aim for ${SCORING.longAnswerWords}+ words to lift fluency.`);
+  if (!isDrill) {
+    if (words < faults.targetWords) {
+      lines.push(`Speak longer — aim for ${faults.targetWords}+ words to lift fluency.`);
+    }
+
+    if (faults.vocabulary.guiraud > 0 && faults.vocabulary.guiraud < 3.4 && words >= 20) {
+      lines.push('Vary your word choice — repeating the same words hurts your vocabulary score.');
+    }
+    if (words >= 25 && faults.vocabulary.weak / words > 0.06) {
+      lines.push('Swap simple words like "very", "good", "nice" and "thing" for more precise ones.');
+    }
+    if (words >= 30 && faults.vocabulary.advancedRatio < 0.08) {
+      lines.push('Add a few less common, precise words (e.g. "essential" instead of "important").');
+    }
+
+    if (faults.coherence.severity === 'warn') {
+      lines.push('Add linking words ("however", "for example", "as a result") to connect your ideas.');
+    }
+
+    if (faults.complexity.severity === 'warn') {
+      lines.push('Try a few complex sentences (using "because", "although", "which") for grammatical range.');
+    }
+
+    if (faults.grammar.errors > 0) {
+      const ex = [...new Set(faults.grammar.examples)].slice(0, 3).map((e) => `"${e}"`).join(', ');
+      lines.push(`Check your grammar: ${ex}.`);
+    }
+
+    if (words >= 30 && faults.grammar.structures.length < faults.grammar.needed) {
+      const missing = ['conditionals', 'perfect tense', 'passive voice', 'relative clauses', 'comparatives']
+        .filter((label) => !GRAMMAR_STRUCTURES.some((s) => s.label === label && faults.grammar.structures.includes(s.id)))
+        .slice(0, 2);
+      if (missing.length) lines.push(`Show more grammar range — try ${missing.join(' or ')}.`);
+    }
+
+    if (faults.repetition.count >= 1) {
+      lines.push('Watch for repeated words or phrases — it reads as hesitation.');
+    }
   }
 
-  if (faults.vocabulary.ttr < 4.2 && words >= 20) {
-    lines.push('Vary your word choice — repeating the same words hurts your vocabulary score.');
-  }
-
-  if (faults.coherence.severity === 'warn') {
-    lines.push('Add linking words ("however", "for example", "as a result") to connect your ideas.');
-  }
-
-  if (faults.complexity.severity === 'warn') {
-    lines.push('Try a few complex sentences (using "because", "although", "which") for grammatical range.');
-  }
-
-  if (faults.repetition.count >= 1) {
-    lines.push('Watch for repeated words or phrases — it reads as hesitation.');
-  }
-
-  if (typeof faults.confidence === 'number' && faults.confidence < 0.6) {
-    lines.push('Speak a little closer to the mic and more clearly — the recognizer had trouble with some words.');
+  if (typeof faults.confidence === 'number') {
+    if (faults.confidence < 0.6) {
+      lines.push('Speak a little closer to the mic and more clearly — the recognizer had trouble with some words.');
+    }
+  } else {
+    lines.push('This browser gives no sound-level data, so pronunciation is estimated from your delivery. Use Chrome or Edge for a precise pronunciation score.');
   }
 
   return lines.join(' ');
@@ -2898,7 +3313,7 @@ export function Speaking() {
   const cat = ALL_CATEGORIES.find((c) => c.id === catId) || ALL_CATEGORIES[0];
   const promptText = cat.prompts[promptIndex] || '';
   const averageScore = result
-    ? Math.round(((result.fluency + result.pronunciation + result.vocabulary + result.grammar) / 4) * 10) / 10
+    ? Math.round(((result.fluency + result.pronunciation + result.vocabulary + result.grammar) / 4) * 2) / 2
     : null;
   const practiceError = capture.error || submitError;
   const showTranscriptPanel = capture.active || capture.transcript || capture.interim || result;
@@ -2919,7 +3334,7 @@ export function Speaking() {
   const processTranscript = useCallback(async (transcript, durationSec, avgConfidence = null) => {
     setScoring(true);
     try {
-      const detected = detectFaults(transcript, durationSec, avgConfidence);
+      const detected = detectFaults(transcript, durationSec, avgConfidence, getScoringContext(catId, promptIndex));
       const bands = scoreFromAnalysis(detected);
 
       if (!bands) {
@@ -2977,7 +3392,7 @@ export function Speaking() {
       }
 
       const wordCount = countWords(finalText);
-      if (wordCount < SCORING.minWords) {
+      if (wordCount < getMinWords(getScoringContext(catId, promptIndex))) {
         setSubmitError(
           `Only ${wordCount} word${wordCount === 1 ? '' : 's'} detected — aim for a longer answer.`
         );
@@ -3001,7 +3416,7 @@ export function Speaking() {
         }, 350);
       }
     }
-  }, [capture, processTranscript, env.isMobile]);
+  }, [capture, processTranscript, env.isMobile, catId, promptIndex]);
 
   /* --- Next prompt --- */
   const goToNextPrompt = useCallback(() => {
