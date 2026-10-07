@@ -1,4 +1,4 @@
-\import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { curriculumApi } from '../api/curriculum';
 import { Icon } from '../components/Icon';
 
