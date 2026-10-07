@@ -1,11 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+vimport { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { curriculumApi } from '../api/curriculum';
 import { Icon } from '../components/Icon';
 
 /* ============================================================
    CURRICULUM — Langut-inspired, mobile-first
    2000+ exercises · 35+ categories · Lessons + Practice
-   Includes dedicated IELTS categories.
    ============================================================ */
 
 const CURRICULUM_CSS = `
@@ -178,43 +177,12 @@ const CURRICULUM_CSS = `
 .ec-cur-cat:active{transform:translateY(1px);box-shadow:0 1px 0 var(--lang-line)}
 .ec-cur-cat--active{background:var(--lang-ink);color:var(--lang-lime);box-shadow:0 3px 0 var(--lang-ink)}
 .ec-cur-cat--active:hover{background:var(--lang-ink);color:var(--lang-lime)}
-.ec-cur-cat--ielts{background:linear-gradient(160deg,#FFB3D1,#FF8FCB);color:#fff;border-color:var(--lang-line)}
-.ec-cur-cat--ielts:hover{background:linear-gradient(160deg,#FFA0C6,#FF7BBF)}
-.ec-cur-cat--ielts.ec-cur-cat--active{background:linear-gradient(160deg,#9B7BFF,#7B5CF0);color:#fff;box-shadow:0 3px 0 var(--lang-ink)}
 .ec-cur-cat svg{width:15px;height:15px;flex-shrink:0}
 .ec-cur-cat-count{
   font-size:10px;font-weight:900;
   padding:2px 7px;border-radius:999px;
   background:var(--lang-lime);color:var(--lang-ink);
   border:2px solid var(--lang-line);
-}
-
-/* IELTS BANNER */
-.ec-cur-ielts-banner{
-  display:flex;align-items:center;gap:10px;
-  padding:12px 16px;margin-bottom:14px;
-  background:linear-gradient(160deg,#FFB3D1,#FF8FCB);
-  border:2px solid var(--lang-line);
-  border-radius:18px;
-  box-shadow:0 4px 0 var(--lang-line);
-  animation:ec-cur-fade .45s ease both;
-}
-.ec-cur-ielts-banner-icon{
-  width:36px;height:36px;border-radius:12px;
-  background:#fff;color:var(--lang-ink);
-  border:2px solid var(--lang-line);
-  display:flex;align-items:center;justify-content:center;
-  font-size:16px;flex-shrink:0;
-  box-shadow:0 2px 0 var(--lang-line);
-}
-.ec-cur-ielts-banner-body{flex:1;min-width:0}
-.ec-cur-ielts-banner-title{
-  margin:0 0 2px;font-size:13px;font-weight:900;color:#fff;
-  letter-spacing:.01em;
-}
-.ec-cur-ielts-banner-sub{
-  margin:0;font-size:11.5px;font-weight:700;color:rgba(255,255,255,.9);
-  line-height:1.4;
 }
 
 /* GRID */
@@ -304,7 +272,6 @@ const CURRICULUM_CSS = `
   box-shadow:0 2px 0 var(--lang-line);
   max-width:100%;
 }
-.ec-quiz-badge--ielts{background:linear-gradient(160deg,#FFB3D1,#FF8FCB);color:#fff}
 .ec-quiz-counter{
   font-size:11.5px;font-weight:900;
   color:var(--lang-ink-soft);
@@ -374,8 +341,6 @@ const CURRICULUM_CSS = `
 .ec-cur-topic-btn:hover{background:var(--lang-lime-soft);transform:translateY(-1px);box-shadow:0 4px 0 var(--lang-line)}
 .ec-cur-topic-btn--active{background:var(--lang-ink);color:var(--lang-lime)}
 .ec-cur-topic-btn--active:hover{background:var(--lang-ink);color:var(--lang-lime)}
-.ec-cur-topic-btn--ielts{background:linear-gradient(160deg,#FFE0EE,#FFD0E5)}
-.ec-cur-topic-btn--ielts.ec-cur-topic-btn--active{background:linear-gradient(160deg,#9B7BFF,#7B5CF0);color:#fff}
 .ec-cur-topic-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ec-cur-topic-count{
   font-size:10.5px;font-weight:900;
@@ -442,6 +407,40 @@ const CURRICULUM_CSS = `
 @keyframes ec-shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
 .ec-shake{animation:ec-shake .4s ease}
 
+/* UTILITIES (replace former inline styles) */
+.ec-cur-center{text-align:center;padding:40px 20px}
+.ec-cur-loading{font-size:14px;color:var(--lang-ink-soft);font-weight:700}
+.ec-cur-hint{margin:0;font-size:12.5px;color:var(--lang-ink-soft);font-weight:700}
+.ec-cur-stack{display:flex;flex-direction:column;gap:10px}
+.ec-cur-filter-group--spaced{margin-bottom:12px}
+.ec-cur-pill--sm{padding:8px 14px;font-size:11.5px;flex-shrink:0}
+.ec-cur-pill--md{padding:10px 18px;font-size:12.5px;margin-top:12px}
+.ec-cur-pill--start{padding:11px 20px;font-size:13px;align-self:flex-start}
+.ec-cur-pill--cap{text-transform:capitalize}
+.ec-lesson-list{display:flex;flex-direction:column;gap:8px}
+.ec-cur-board-item{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:12px 14px;border-radius:14px;
+  background:var(--lang-lime-soft);border:2px solid var(--lang-line);
+  box-shadow:0 2px 0 var(--lang-line);
+}
+.ec-cur-board-title{margin:0 0 4px;font-weight:900;font-size:13px;color:var(--lang-ink)}
+.ec-cur-board-tag{
+  font-size:10px;font-weight:900;color:var(--lang-ink);
+  background:var(--lang-pink);padding:3px 9px;border-radius:999px;
+  border:2px solid var(--lang-line);text-transform:uppercase;letter-spacing:.05em;
+}
+.ec-cur-session-col{display:flex;flex-direction:column;gap:12px}
+.ec-cur-session-dim{color:var(--lang-ink-soft)}
+.ec-cur-session-val{color:var(--lang-ink)}
+.ec-cur-meter{height:14px;border-radius:999px;background:#E8E5F2;overflow:hidden;border:2px solid var(--lang-line)}
+.ec-cur-meter-fill{height:100%;background:linear-gradient(90deg,#D4F55C,#B8E62E);border-radius:999px;transition:width .8s ease}
+.ec-cur-score-chip{
+  font-size:12px;font-weight:900;color:var(--lang-ink);background:var(--lang-lime);
+  border:2px solid var(--lang-line);padding:6px 12px;border-radius:999px;
+  align-self:flex-end;box-shadow:0 2px 0 var(--lang-line);letter-spacing:.04em;
+}
+
 /* RESPONSIVE */
 @media (max-width:1080px){.ec-cur-grid{grid-template-columns:minmax(0,1fr) 280px;gap:18px}}
 @media (max-width:900px){
@@ -471,10 +470,6 @@ const CURRICULUM_CSS = `
   .ec-cur-check{padding:8px 12px;font-size:12px;min-height:40px}
   .ec-cur-cat{padding:9px 13px;font-size:12px;min-height:42px}
   .ec-cur-cat svg{width:14px;height:14px}
-  .ec-cur-ielts-banner{padding:10px 13px;border-radius:16px;margin-bottom:12px}
-  .ec-cur-ielts-banner-icon{width:32px;height:32px;font-size:14px}
-  .ec-cur-ielts-banner-title{font-size:12.5px}
-  .ec-cur-ielts-banner-sub{font-size:11px}
   .ec-cur-section{padding:16px;border-radius:20px;box-shadow:0 4px 0 var(--lang-line);margin-bottom:14px}
   .ec-cur-section-title{font-size:14.5px}
   .ec-lesson{padding:16px;border-radius:20px}
@@ -515,8 +510,8 @@ const CURRICULUM_CSS = `
 `;
 
 /* ============================================================
-   QUESTION BANK — core + IELTS categories
-   Each category: name, icon, class ('all'|'IELTS'), lesson, questions
+   QUESTION BANK
+   Each category: name, icon, class ('all'), lesson, questions
    ============================================================ */
 const QUESTION_BANK = {
   /* ================= CORE GENERAL ================= */
@@ -1646,7 +1641,7 @@ const QUESTION_BANK = {
       rules: [
         'Idioms have figurative meanings — not literal.',
         'Common ones: a piece of cake, break the ice, hit the books.',
-        'Frequently tested in SSC/HSC/IELTS comprehension.',
+        'Frequently tested in SSC/HSC comprehension.',
       ],
       examples: [
         'A piece of cake = <strong>very easy</strong>.',
@@ -2197,318 +2192,22 @@ const QUESTION_BANK = {
       { p:'Both my parents ___ teachers.', o:['is','are','was','be'], a:'are', e:'Plural subject.', b:'Plural subject।' },
     ],
   },
-
-  /* ================= IELTS-SPECIFIC ================= */
-  ieltsListening: {
-    name: 'IELTS Listening', icon: 'chat', class: 'IELTS',
-    lesson: {
-      rules: [
-        'IELTS Listening has 4 sections, 40 questions, ~30 minutes.',
-        'Sections 1–2 are everyday/social; 3–4 are academic.',
-        'Listen for <strong>signpost words</strong>: "first", "next", "finally".',
-        'Watch for <strong>numbers, dates, names</strong> — spelling matters!',
-        'Transfer answers carefully in the 10-minute transfer time.',
-        '<strong>Common traps</strong>: corrections ("actually", "sorry"), change of plan.',
-      ],
-      examples: [
-        'Notice: "The museum is closed <strong>on Mondays</strong>."',
-        'Date: "The festival begins on <strong>15th March</strong>."',
-        'Number: "The course costs <strong>£450</strong>."',
-        'Spelling: "Her surname is <strong>Thomson</strong> — T-H-O-M-S-O-N."',
-      ],
-      bangla: 'IELTS Listening এ সংখ্যা, তারিখ, নাম মনোযোগ দিয়ে শুনতে হয়। বানান সঠিক রাখা জরুরি। "Actually/Sorry" দিয়ে সংশোধন এলে শেষ তথ্যটি সঠিক।',
-    },
-    questions: [
-      { p:'"The museum is closed on ___."', o:['Monday','Sunday','Saturday','Friday'], a:'Monday', e:'Notice signpost.', b:'Notice signpost।' },
-      { p:'"Her surname is ___."', o:['Thomson','Thompson','Tomsan','Thomsan'], a:'Thomson', e:'Spelling test.', b:'বানান পরীক্ষা।' },
-      { p:'"The course costs ___."', o:['£450','£415','£540','£405'], a:'£450', e:'Numbers listen.', b:'সংখ্যা শোনা।' },
-      { p:'"The festival begins on ___."', o:['15th March','5th March','15th May','50th March'], a:'15th March', e:'Date format.', b:'তারিখ ফরম্যাট।' },
-      { p:'"Departure time is ___."', o:['6:15','6:50','6:05','6:45'], a:'6:15', e:'Time listening.', b:'সময় শোনা।' },
-      { p:'"It costs £___."', o:['9.50','9.15','9.90','9.05'], a:'9.50', e:'Price listening.', b:'মূল্য শোনা।' },
-      { p:'"She lives on ___ Street."', o:['Green','Grean','Greene','Grene'], a:'Green', e:'Spelling.', b:'বানান।' },
-      { p:'"The phone number is ___."', o:['07544 233 890','07544 223 890','07544 233 980','07504 233 890'], a:'07544 233 890', e:'Numbers.', b:'সংখ্যা।' },
-      { p:'"The tour lasts ___ hours."', o:['three','two','four','five'], a:'three', e:'Number word.', b:'সংখ্যা শব্দ।' },
-      { p:'"The flight departs at ___."', o:['14:30','15:30','13:30','14:13'], a:'14:30', e:'24-hour time.', b:'24-ঘণ্টা সময়।' },
-      { p:'Signpost: "___ we will visit the library."', o:['Next','Actually','Sorry','Never'], a:'Next', e:'Sequence marker.', b:'ক্রম চিহ্ন।' },
-      { p:'"Actually, the meeting is on ___."', o:['Tuesday','Thursday','Monday','Wednesday'], a:'Tuesday', e:'Correction.', b:'সংশোধন।' },
-      { p:'"The students will meet at the ___."', o:['cafeteria','library','gym','hall'], a:'cafeteria', e:'Place word.', b:'স্থান শব্দ।' },
-      { p:'"Please bring your ___."', o:['passport','ticket','notebook','umbrella'], a:'passport', e:'Item to bring.', b:'আনার জিনিস।' },
-      { p:'"The lecture begins at ___."', o:['9:00 AM','8:00 AM','10:00 AM','7:00 AM'], a:'9:00 AM', e:'Schedule.', b:'সময়সূচি।' },
-      { p:'"There are ___ students in the class."', o:['30','13','40','50'], a:'30', e:'Numbers.', b:'সংখ্যা।' },
-      { p:'"The library is on the ___ floor."', o:['second','first','third','fourth'], a:'second', e:'Ordinal number.', b:'ক্রম সংখ্যা।' },
-      { p:'"You need to pay £___."', o:['25.50','25.15','52.50','20.50'], a:'25.50', e:'Price.', b:'মূল্য।' },
-      { p:'"The train leaves from platform ___."', o:['4','2','3','5'], a:'4', e:'Platform number.', b:'প্ল্যাটফর্ম নম্বর।' },
-      { p:'"Her email is kate___@email.com."', o:['.smith','_smith','smith','smth'], a:'.smith', e:'Email listening.', b:'ইমেইল শোনা।' },
-    ],
-  },
-
-  ieltsReading: {
-    name: 'IELTS Reading', icon: 'book', class: 'IELTS',
-    lesson: {
-      rules: [
-        'IELTS Reading: 3 passages, 40 questions, 60 minutes.',
-        'Question types: T/F/NG, Matching Headings, MCQ, Sentence Completion.',
-        'Skim for <strong>main idea</strong>, scan for <strong>keywords</strong>.',
-        'True = stated; False = opposite stated; Not Given = no info.',
-        'Do NOT spend more than 1.5 minutes per question.',
-        'Watch for paraphrases — synonyms in question vs text.',
-      ],
-      examples: [
-        'Text: "Many scientists agree…" Q: "All scientists agree" → <strong>False</strong>.',
-        'Text does not mention "cost" → answer to cost question is <strong>Not Given</strong>.',
-        'Skim paragraph 1 for the main idea.',
-      ],
-      bangla: 'IELTS Reading এ skim ও scan কৌশল ব্যবহার করুন। True মানে হুবহু বলা, False মানে বিপরীত বলা, Not Given মানে কোনো তথ্য নেই।',
-    },
-    questions: [
-      { p:'Text: "Many scientists agree that climate is changing." Q: "All scientists agree climate is changing."', o:['True','False','Not Given','Cannot say'], a:'False', e:'"Many" ≠ "All".', b:'"Many" ≠ "All"।' },
-      { p:'Text does not mention the cost. Q: "The cost is high."', o:['True','False','Not Given','Maybe'], a:'Not Given', e:'No info.', b:'তথ্য নেই।' },
-      { p:'Text: "The company was founded in 1990." Q: "The company was founded in 1990."', o:['True','False','Not Given','Cannot say'], a:'True', e:'Direct statement.', b:'সরাসরি বক্তব্য।' },
-      { p:'Text: "He rarely visits." Q: "He visits often."', o:['True','False','Not Given','Cannot say'], a:'False', e:'Opposite.', b:'বিপরীত।' },
-      { p:'Text: "Most students pass." Q: "Some students pass."', o:['True','False','Not Given','Cannot say'], a:'True', e:'"Most" implies "some".', b:'"Most" → "some" ধরে।' },
-      { p:'Text says nothing about the price. Q: "The price is expensive."', o:['True','False','Not Given','Cannot say'], a:'Not Given', e:'No price info.', b:'মূল্যের তথ্য নেই।' },
-      { p:'Text: "The film was released in 2019." Q: "The film was released in 2020."', o:['True','False','Not Given','Cannot say'], a:'False', e:'Wrong year.', b:'ভুল বছর।' },
-      { p:'Text: "Only a few people attended." Q: "The event was poorly attended."', o:['True','False','Not Given','Cannot say'], a:'True', e:'Synonym paraphrase.', b:'Synonym paraphrase।' },
-      { p:'Text: "It might rain tomorrow." Q: "It will definitely rain tomorrow."', o:['True','False','Not Given','Cannot say'], a:'False', e:'"Might" ≠ "definitely".', b:'"Might" ≠ "definitely"।' },
-      { p:'Text: "The building is old." Q: "The building is historic."', o:['True','False','Not Given','Cannot say'], a:'Not Given', e:'"Old" ≠ "historic" without info.', b:'তথ্য ছাড়া অনুমান নয়।' },
-      { p:'Text: "She loves reading." Q: "She enjoys books."', o:['True','False','Not Given','Cannot say'], a:'True', e:'Synonym.', b:'Synonym।' },
-      { p:'Text: "It was built in 1900." Q: "It is over 100 years old."', o:['True','False','Not Given','Cannot say'], a:'True', e:'Inference from year.', b:'বছর থেকে অনুমান।' },
-      { p:'Text: "This solution has been widely criticized." Q: "The solution is popular."', o:['True','False','Not Given','Cannot say'], a:'False', e:'Opposite.', b:'বিপরীত।' },
-      { p:'Text: "The study was conducted in 3 countries." Q: "The study was international."', o:['True','False','Not Given','Cannot say'], a:'True', e:'Inference.', b:'অনুমান।' },
-      { p:'Text: "The movie is 2 hours long." Q: "The movie is boring."', o:['True','False','Not Given','Cannot say'], a:'Not Given', e:'No opinion.', b:'মতামত নেই।' },
-      { p:'Text: "There are two versions." Q: "There are more than one version."', o:['True','False','Not Given','Cannot say'], a:'True', e:'Two > one.', b:'দুই মানে একাধিক।' },
-      { p:'Text: "The product costs $50." Q: "The product costs less than $100."', o:['True','False','Not Given','Cannot say'], a:'True', e:'Comparison.', b:'তুলনা।' },
-      { p:'Text says the man is a teacher. Q: "The man works at a school."', o:['True','False','Not Given','Cannot say'], a:'Not Given', e:'Teacher may not work at school.', b:'শিক্ষক মানেই স্কুলে নয়।' },
-      { p:'Text: "The museum is free on Sundays." Q: "You pay to enter on Sundays."', o:['True','False','Not Given','Cannot say'], a:'False', e:'Opposite.', b:'বিপরীত।' },
-      { p:'Text: "The number of visitors doubled last year." Q: "Visitor numbers increased significantly."', o:['True','False','Not Given','Cannot say'], a:'True', e:'Doubled = significant.', b:'দ্বিগুণ = উল্লেখযোগ্য।' },
-    ],
-  },
-
-  ieltsWritingTask1: {
-    name: 'IELTS Writing Task 1', icon: 'target', class: 'IELTS',
-    lesson: {
-      rules: [
-        'Task 1 = <strong>150 words minimum</strong>, 20 minutes.',
-        'Describe graphs, charts, tables, maps, or processes.',
-        'Structure: <strong>Introduction → Overview → Details (2 paragraphs)</strong>.',
-        'Use <strong>comparative language</strong>: more than, higher, doubled, in contrast.',
-        'Never give opinions in Task 1 — only describe data.',
-        'Use accurate tense: past for past years, present for general trends.',
-      ],
-      examples: [
-        'The graph <strong>illustrates</strong>… (not "shows").',
-        '<strong>Overall</strong>, the number of cars increased steadily.',
-        'X <strong>rose sharply</strong> from 100 to 300 between 2010 and 2020.',
-        '<strong>In contrast</strong>, Y declined by 20%.',
-      ],
-      bangla: 'Task 1 এ graph/chart বর্ণনা করতে হয়। Introduction → Overview → Details কাঠামো অনুসরণ করুন। মতামত দেওয়া যাবে না।',
-    },
-    questions: [
-      { p:'The graph ___ the number of cars sold.', o:['shows','illustrates','Both are correct','None'], a:'illustrates', e:'Formal verb.', b:'আনুষ্ঠানিক verb।' },
-      { p:'"Overall," introduces the ___.', o:['introduction','overview','conclusion','opinion'], a:'overview', e:'Task 1 structure.', b:'Task 1 গঠন।' },
-      { p:'"X rose sharply from 100 to 300." This is a ___.', o:['detail','opinion','overview','recommendation'], a:'detail', e:'Data detail.', b:'তথ্য বিবরণ।' },
-      { p:'The graph shows a rise in sales. Which is correct?', o:['Sales decreased.','Sales increased.','Sales stayed the same.','Sales fell.'], a:'Sales increased.', e:'Rise = increase.', b:'Rise = বাড়া।' },
-      { p:'To describe two opposite trends:', o:['In contrast','Similarly','Moreover','For instance'], a:'In contrast', e:'Contrast linker.', b:'বৈপরীত্য সংযোগ।' },
-      { p:'"The figure ___ at 500."', o:['peaked','dropped','started','ended'], a:'peaked', e:'Peak vocabulary.', b:'শীর্ষ শব্দ।' },
-      { p:'"The number of visitors ___ by 20%."', o:['declined','rose','peaked','remained'], a:'declined', e:'Fall verb.', b:'পতন verb।' },
-      { p:'"The data shows a ___ trend from 2010 to 2020."', o:['upward','downward','Both possible','None'], a:'upward', e:'Depends on data.', b:'তথ্যের উপর নির্ভরশীল।' },
-      { p:'"A gradual increase" means:', o:['Slow, steady growth','Sudden growth','Decrease','No change'], a:'Slow, steady growth', e:'Vocabulary.', b:'শব্দভাণ্ডার।' },
-      { p:'Which verb means "stay the same"?', o:['remain stable','rise','fall','peak'], a:'remain stable', e:'No change.', b:'পরিবর্তন নেই।' },
-      { p:'Task 1 minimum word count:', o:['150','120','200','250'], a:'150', e:'IELTS rules.', b:'IELTS নিয়ম।' },
-      { p:'Which is NOT allowed in Task 1?', o:['Opinions','Comparisons','Overview','Facts'], a:'Opinions', e:'No opinion.', b:'মতামত নিষিদ্ধ।' },
-      { p:'"X doubled" means:', o:['It increased twice','It halved','It stayed','It decreased'], a:'It increased twice', e:'Vocabulary.', b:'শব্দ।' },
-      { p:'"Compared to 2010, 2020 saw a…"', o:['rise','decrease only','rise or decrease','None'], a:'rise', e:'Depends on context.', b:'প্রেক্ষাপট অনুযায়ী।' },
-      { p:'To introduce a graph, use:', o:['The chart illustrates','The chart shows me','I think the chart','The chart says'], a:'The chart illustrates', e:'Formal.', b:'আনুষ্ঠানিক।' },
-      { p:'"A sharp decline" means:', o:['Fast decrease','Slow decrease','Increase','No change'], a:'Fast decrease', e:'Vocabulary.', b:'শব্দ।' },
-      { p:'Which is a proper overview?', o:['Overall, sales rose steadily.','I think sales rose.','Sales rose.','Rise in sales.'], a:'Overall, sales rose steadily.', e:'Overview.', b:'সারসংক্ষেপ।' },
-      { p:'Task 1 writing time:', o:['20 minutes','30 minutes','15 minutes','25 minutes'], a:'20 minutes', e:'Recommended time.', b:'সুপারিশকৃত সময়।' },
-      { p:'"Slightly increased" means:', o:['A small rise','A big rise','A fall','No change'], a:'A small rise', e:'Small = slightly.', b:'Small = সামান্য।' },
-      { p:'For processes, use:', o:['Passive voice','Opinion verbs','Future tense only','None'], a:'Passive voice', e:'Process description.', b:'প্রক্রিয়া বর্ণনা।' },
-    ],
-  },
-
-  ieltsWritingTask2: {
-    name: 'IELTS Writing Task 2', icon: 'book', class: 'IELTS',
-    lesson: {
-      rules: [
-        'Task 2 = <strong>250 words minimum</strong>, 40 minutes.',
-        'Essay types: Opinion, Discussion, Problem-Solution, Two-part.',
-        'Structure: <strong>Intro → Body 1 → Body 2 → Conclusion</strong>.',
-        'Intro = paraphrase question + thesis statement.',
-        'Body paragraphs = 1 main idea + explanation + example.',
-        'Conclusion = restate thesis + summary (no new ideas).',
-      ],
-      examples: [
-        'Intro: "Some people argue that… while others believe… This essay will discuss both views."',
-        'Body: "Firstly, one major advantage is…"',
-        'Conclusion: "In conclusion, although… I firmly believe that…"',
-      ],
-      bangla: 'Task 2 এ opinion/discussion/problem-solution essay লিখতে হয়। Intro → 2 body → conclusion কাঠামোতে লিখুন।',
-    },
-    questions: [
-      { p:'Minimum word count Task 2:', o:['250','200','150','300'], a:'250', e:'IELTS rules.', b:'IELTS নিয়ম।' },
-      { p:'Task 2 time:', o:['40 minutes','20 minutes','60 minutes','30 minutes'], a:'40 minutes', e:'Recommended.', b:'সুপারিশ।' },
-      { p:'Essay structure:', o:['Intro, 2 bodies, conclusion','Only body','Intro, conclusion','Body only'], a:'Intro, 2 bodies, conclusion', e:'Standard structure.', b:'প্রামাণ্য গঠন।' },
-      { p:'Thesis statement goes in the ___.', o:['Introduction','Body 1','Conclusion','Nowhere'], a:'Introduction', e:'Intro element.', b:'Intro উপাদান।' },
-      { p:'Which linker introduces the first point?', o:['Firstly','However','In conclusion','Nonetheless'], a:'Firstly', e:'Sequence.', b:'ক্রম।' },
-      { p:'"In conclusion" is used in the ___.', o:['Conclusion','Intro','Body','Nowhere'], a:'Conclusion', e:'Conclusion phrase.', b:'শেষ অনুচ্ছেদ।' },
-      { p:'"Some people believe X, while others think Y." This essay type is:', o:['Discussion','Problem-Solution','Advantage-Disadvantage','Two-part'], a:'Discussion', e:'Both views.', b:'উভয় মত।' },
-      { p:'Body paragraphs should contain:', o:['1 main idea + explanation + example','Only main idea','Only example','Only conclusion'], a:'1 main idea + explanation + example', e:'PEEL structure.', b:'PEEL গঠন।' },
-      { p:'Which is a strong thesis?', o:['I firmly believe that education should be free.','I think so.','Education is good.','Maybe yes.'], a:'I firmly believe that education should be free.', e:'Clear position.', b:'স্পষ্ট অবস্থান।' },
-      { p:'Concluding paragraph should NOT contain:', o:['New ideas','Summary','Thesis restatement','Conclusion'], a:'New ideas', e:'No new ideas.', b:'নতুন আইডিয়া নয়।' },
-      { p:'Which linker shows contrast?', o:['However','Furthermore','Additionally','For example'], a:'However', e:'Contrast.', b:'বৈপরীত্য।' },
-      { p:'"The main advantage is…" introduces:', o:['Advantage','Disadvantage','Conclusion','Definition'], a:'Advantage', e:'Advantage.', b:'সুবিধা।' },
-      { p:'Opinion essays require:', o:['Your clear opinion','No opinion','Two views','Only arguments'], a:'Your clear opinion', e:'Opinion essay.', b:'মতামত প্রবন্ধ।' },
-      { p:'Which is a proper example phrase?', o:['For example, in Japan…','I think Japan…','Japan is…','Japan yes…'], a:'For example, in Japan…', e:'Example marker.', b:'উদাহরণ চিহ্ন।' },
-      { p:'Which linker adds information?', o:['Furthermore','However','Yet','Although'], a:'Furthermore', e:'Addition.', b:'সংযোজন।' },
-      { p:'Task 2 essay types include all EXCEPT:', o:['Poetry','Opinion','Discussion','Problem-Solution'], a:'Poetry', e:'Not academic.', b:'একাডেমিক নয়।' },
-      { p:'A topic sentence appears at the start of:', o:['Body paragraph','Conclusion','Intro','Nowhere'], a:'Body paragraph', e:'Paragraph opener.', b:'অনুচ্ছেদ শুরু।' },
-      { p:'"This essay will discuss both views" is:', o:['Thesis statement','Conclusion','Example','Opinion'], a:'Thesis statement', e:'Intro element.', b:'Intro উপাদান।' },
-      { p:'Should you use contractions like "don\'t"?', o:['No, use "do not"','Yes, always','Only in intro','Only in conclusion'], a:'No, use "do not"', e:'Formal register.', b:'আনুষ্ঠানিক ভাষা।' },
-      { p:'Which is a strong conclusion?', o:['In conclusion, education should be free for all.','I think maybe education.','Education free.','The end.'], a:'In conclusion, education should be free for all.', e:'Strong close.', b:'শক্তিশালী সমাপ্তি।' },
-    ],
-  },
-
-  ieltsSpeaking: {
-    name: 'IELTS Speaking', icon: 'users', class: 'IELTS',
-    lesson: {
-      rules: [
-        'Speaking has 3 parts: Interview, Long Turn, Discussion.',
-        'Part 1 = 4–5 min personal questions.',
-        'Part 2 = 1-minute prep + 2-minute talk from cue card.',
-        'Part 3 = 4–5 min abstract discussion.',
-        'Use varied vocabulary, no one-word answers.',
-        'Develop answers with reasons + examples + feelings.',
-      ],
-      examples: [
-        'Part 1: "Where are you from?" → "I come from Dhaka, which is the capital of Bangladesh."',
-        'Part 2: "Describe a book you enjoyed." → Structure: What, When, Why, How you felt.',
-        'Part 3: "How has reading changed in modern society?"',
-      ],
-      bangla: 'IELTS Speaking এ এক-শব্দের উত্তর দেবেন না। কারণ + উদাহরণ + অনুভূতি যোগ করে উত্তর দিন।',
-    },
-    questions: [
-      { p:'Part 1 of IELTS Speaking lasts:', o:['4–5 minutes','2–3 minutes','10 minutes','20 minutes'], a:'4–5 minutes', e:'Timing.', b:'সময়।' },
-      { p:'Part 2 has a preparation time of:', o:['1 minute','2 minutes','3 minutes','No prep'], a:'1 minute', e:'Prep time.', b:'প্রস্তুতি সময়।' },
-      { p:'Part 3 is a:', o:['Discussion','Interview','Story','Game'], a:'Discussion', e:'Abstract.', b:'বিমূর্ত আলোচনা।' },
-      { p:'Best answer to "Where are you from?"', o:['I come from Dhaka, the capital of Bangladesh.','Dhaka.','I don\'t know.','Pass.'], a:'I come from Dhaka, the capital of Bangladesh.', e:'Developed.', b:'বিস্তৃত।' },
-      { p:'Cue card tasks are in:', o:['Part 2','Part 1','Part 3','All parts'], a:'Part 2', e:'Long turn.', b:'দীর্ঘ উত্তর।' },
-      { p:'Which is a strong answer?', o:['Yes, I love sports because they keep me fit.','Yes.','No.','Maybe.'], a:'Yes, I love sports because they keep me fit.', e:'Developed.', b:'বিস্তৃত।' },
-      { p:'Speaking test total duration:', o:['11–14 minutes','5 minutes','20 minutes','30 minutes'], a:'11–14 minutes', e:'Overall.', b:'মোট।' },
-      { p:'Which one-word answers are OK?', o:['None — always develop','Yes','No','Always'], a:'None — always develop', e:'Develop.', b:'বিস্তৃত করুন।' },
-      { p:'Part 2 talk time:', o:['2 minutes','5 minutes','1 minute','3 minutes'], a:'2 minutes', e:'Talk time.', b:'কথার সময়।' },
-      { p:'Which is best for Part 3?', o:['Analytical, extended answers','Yes/no answers','Simple one-liners','Silence'], a:'Analytical, extended answers', e:'Abstract.', b:'বিমূর্ত।' },
-      { p:'A good response includes:', o:['Reason + example + feeling','Only fact','Only yes','Only no'], a:'Reason + example + feeling', e:'Depth.', b:'গভীরতা।' },
-      { p:'Which is polite?', o:['Could you repeat that, please?','What?','Eh?','Say again.'], a:'Could you repeat that, please?', e:'Polite.', b:'ভদ্র।' },
-      { p:'For Part 2, you should take notes on:', o:['Cue card points','Nothing','Only name','Only date'], a:'Cue card points', e:'Structure.', b:'গঠন।' },
-      { p:'If you don\'t understand:', o:['Politely ask for clarification','Ignore','Say "next"','Stop'], a:'Politely ask for clarification', e:'Strategy.', b:'কৌশল।' },
-      { p:'Speaking fluently means:', o:['Smooth, natural speech','Fast talking','Long words','No pauses'], a:'Smooth, natural speech', e:'Fluency.', b:'সাবলীলতা।' },
-      { p:'Part 1 questions are usually about:', o:['Personal topics','Science topics','Abstract ideas','None'], a:'Personal topics', e:'Everyday.', b:'প্রাত্যহিক।' },
-      { p:'Which is a good opener for Part 2?', o:['The book I\'d like to talk about is…','Book.','Hmm.','Yes.'], a:'The book I\'d like to talk about is…', e:'Opener.', b:'শুরু।' },
-      { p:'Part 3 topics are typically:', o:['Abstract and societal','Personal','About family only','Random'], a:'Abstract and societal', e:'Abstract.', b:'বিমূর্ত।' },
-      { p:'Should you memorize full answers?', o:['No — natural speech is better','Yes, always','Sometimes','Always'], a:'No — natural speech is better', e:'Natural.', b:'স্বাভাবিক।' },
-      { p:'Which is a good closing phrase?', o:['That\'s all about my…','Done.','Over.','Finish.'], a:'That\'s all about my…', e:'Close.', b:'সমাপ্তি।' },
-    ],
-  },
-
-  ieltsVocab: {
-    name: 'IELTS Vocabulary', icon: 'trophy', class: 'IELTS',
-    lesson: {
-      rules: [
-        'IELTS tests <strong>academic vocabulary</strong> across all skills.',
-        'Learn word families: analyse, analysis, analytical, analytically.',
-        'Use topic vocabulary: environment, education, technology, health.',
-        'Avoid informal words: "kids" → "children", "a lot of" → "numerous".',
-        'Use collocations: "conduct research", "make progress".',
-      ],
-      examples: [
-        'Education: curriculum, pedagogy, literacy, tertiary.',
-        'Environment: sustainable, biodiversity, emissions, conservation.',
-        'Technology: innovation, automation, digital, artificial intelligence.',
-      ],
-      bangla: 'IELTS এ একাডেমিক শব্দভাণ্ডার গুরুত্বপূর্ণ। Word families শিখুন, অনানুষ্ঠানিক শব্দ এড়িয়ে চলুন।',
-    },
-    questions: [
-      { p:'IELTS-appropriate synonym for "kids":', o:['Children','Youngsters','Brats','Tykes'], a:'Children', e:'Formal.', b:'আনুষ্ঠানিক।' },
-      { p:'Which word is academic?', o:['Analyse','Check out','Look at','Peek'], a:'Analyse', e:'Academic.', b:'একাডেমিক।' },
-      { p:'Which collocation is correct?', o:['Conduct research','Do research on','Make research','Take research'], a:'Conduct research', e:'Collocation.', b:'Collocation।' },
-      { p:'Formal synonym for "a lot of":', o:['Numerous','Tons of','Loads of','Lots of'], a:'Numerous', e:'Formal.', b:'আনুষ্ঠানিক।' },
-      { p:'Word family of "analyse" — the noun is:', o:['Analysis','Analytical','Analytically','Analysing'], a:'Analysis', e:'Word family.', b:'শব্দ পরিবার।' },
-      { p:'Which is environment topic vocabulary?', o:['Sustainability','Happiness','Emotion','Art'], a:'Sustainability', e:'Topic vocab.', b:'বিষয় শব্দ।' },
-      { p:'Formal synonym for "buy":', o:['Purchase','Get','Grab','Snag'], a:'Purchase', e:'Formal.', b:'আনুষ্ঠানিক।' },
-      { p:'Which is technology vocabulary?', o:['Automation','Farming','Poetry','Cooking'], a:'Automation', e:'Topic.', b:'বিষয়।' },
-      { p:'Which word is INCORRECT for academic writing?', o:['Gonna','Therefore','Subsequently','Moreover'], a:'Gonna', e:'Informal.', b:'অনানুষ্ঠানিক।' },
-      { p:'Which collocation is correct?', o:['Make progress','Do progress','Take progress','Have progress'], a:'Make progress', e:'Collocation.', b:'Collocation।' },
-      { p:'Health vocabulary:', o:['Well-being','Banking','Shopping','Flying'], a:'Well-being', e:'Topic.', b:'বিষয়।' },
-      { p:'Formal synonym for "so":', o:['Therefore','Like','Yeah','Umm'], a:'Therefore', e:'Formal linker.', b:'আনুষ্ঠানিক।' },
-      { p:'Which is NOT a word family member of "decide"?', o:['Decisionably','Decision','Decisive','Decisively'], a:'Decisionably', e:'Not a word.', b:'শব্দ নয়।' },
-      { p:'Formal synonym for "give":', o:['Provide','Hand out','Dish out','Pass'], a:'Provide', e:'Formal.', b:'আনুষ্ঠানিক।' },
-      { p:'Education vocab:', o:['Pedagogy','Pleasure','Picnic','Puzzle'], a:'Pedagogy', e:'Topic.', b:'বিষয়।' },
-      { p:'Formal phrase for "find out":', o:['Discover','Figure out','Get it','Catch on'], a:'Discover', e:'Formal.', b:'আনুষ্ঠানিক।' },
-      { p:'Which collocation is correct?', o:['Take measures','Do measures','Make measures','Have measures'], a:'Take measures', e:'Collocation.', b:'Collocation।' },
-      { p:'Formal synonym for "show":', o:['Demonstrate','Show off','Put up','Display up'], a:'Demonstrate', e:'Formal.', b:'আনুষ্ঠানিক।' },
-      { p:'Academic vocabulary for "important":', o:['Significant','Big deal','Cool','Neat'], a:'Significant', e:'Academic.', b:'একাডেমিক।' },
-      { p:'Which is NOT a word family member of "succeed"?', o:['Successment','Success','Successful','Successfully'], a:'Successment', e:'Not a word.', b:'শব্দ নয়।' },
-    ],
-  },
-
-  ieltsGrammar: {
-    name: 'IELTS Grammar', icon: 'target', class: 'IELTS',
-    lesson: {
-      rules: [
-        'IELTS uses all tenses but <strong>present perfect</strong> and <strong>passive</strong> heavily.',
-        'Complex sentences with relative clauses boost your score.',
-        'Correct use of <strong>articles</strong> (a/an/the) matters for accuracy.',
-        'Use <strong>linking words</strong>: however, therefore, moreover, in addition.',
-        'Avoid comma splices and run-on sentences.',
-        'Use consistent tense within a paragraph.',
-      ],
-      examples: [
-        '<strong>Passive</strong>: "The report was published in 2020."',
-        '<strong>Relative clause</strong>: "The study, which was conducted in 2020, showed…"',
-        '<strong>Linking</strong>: "However, this trend has recently reversed."',
-      ],
-      bangla: 'IELTS এ passive, present perfect, complex sentence, article সঠিকভাবে ব্যবহার করতে হয়। Linking words ব্যবহার জরুরি।',
-    },
-    questions: [
-      { p:'"The report ___ published in 2020."', o:['was','were','is','has'], a:'was', e:'Passive past.', b:'Past passive।' },
-      { p:'"The study ___ conducted by researchers."', o:['was','were','are','have'], a:'was', e:'Passive.', b:'Passive।' },
-      { p:'"Many students ___ graduated this year."', o:['have','has','had','having'], a:'have', e:'Present perfect plural.', b:'Present perfect plural।' },
-      { p:'"She ___ living here since 2015."', o:['has been','have been','is','was'], a:'has been', e:'Present perfect continuous.', b:'Present perfect continuous।' },
-      { p:'Best linking word: "The plan failed. ___, we learned a lot."', o:['However','Therefore','Moreover','Similarly'], a:'However', e:'Contrast.', b:'বৈপরীত্য।' },
-      { p:'Which sentence is grammatically correct?', o:['The data suggest a trend.','The data suggests a trends.','The data suggest a trends.','Data suggest trend.'], a:'The data suggest a trend.', e:'Data plural.', b:'Data plural।' },
-      { p:'Relative clause: "The book ___ I read was excellent."', o:['which','who','whose','whom'], a:'which', e:'For things.', b:'বস্তুর জন্য।' },
-      { p:'"Since 2015" is used with:', o:['Present perfect','Past simple','Future','Present simple'], a:'Present perfect', e:'Since + perfect.', b:'Since + perfect।' },
-      { p:'Which sentence is correct?', o:['She has been working here for years.','She has been work here for years.','She has work here for years.','She work here for years.'], a:'She has been working here for years.', e:'Perfect continuous.', b:'Perfect continuous।' },
-      { p:'Best linker: "The cost rose. ___, demand fell."', o:['In contrast','Therefore','Similarly','Moreover'], a:'In contrast', e:'Contrast.', b:'বৈপরীত্য।' },
-      { p:'"The company ___ by a foreign investor in 2019."', o:['was bought','were bought','is bought','has bought'], a:'was bought', e:'Passive past.', b:'Past passive।' },
-      { p:'"I have ___ in Dhaka for 10 years."', o:['lived','live','living','lives'], a:'lived', e:'Perfect.', b:'Perfect।' },
-      { p:'Correct: "If I ___ more time, I would learn another language."', o:['had','have','had had','has'], a:'had', e:'Second conditional.', b:'Second conditional।' },
-      { p:'Which is correct?', o:['Hardly had I arrived when it started raining.','Hardly I had arrived when it started raining.','Hardly had I arrived than it started raining.','Hardly I had arrived than it started raining.'], a:'Hardly had I arrived when it started raining.', e:'Inversion.', b:'Inversion।' },
-      { p:'"The rise in prices ___ caused by inflation."', o:['was','were','have','has'], a:'was', e:'Singular.', b:'একবচন।' },
-      { p:'Best linker for addition:', o:['Moreover','However','Therefore','Nevertheless'], a:'Moreover', e:'Addition.', b:'সংযোজন।' },
-      { p:'"Scientists ___ that the climate is changing."', o:['believe','believes','believing','believed now'], a:'believe', e:'Plural verb.', b:'বহুবচন verb।' },
-      { p:'"The results of the survey ___ surprising."', o:['were','was','is','has'], a:'were', e:'Plural subject.', b:'বহুবচন subject।' },
-      { p:'Which is correct?', o:['Neither of the answers is correct.','Neither of the answers are correct.','Neither answers is correct.','Neither answer are correct.'], a:'Neither of the answers is correct.', e:'Neither + singular.', b:'Neither + একবচন।' },
-      { p:'Best linking for result:', o:['Therefore','However','Although','Whereas'], a:'Therefore', e:'Result.', b:'ফলাফল।' },
-    ],
-  },
 };
 
 /* ============================================================
-   Build TABS — filtered by class
+   Static data derived once at module load
    ============================================================ */
-const ALL_TABS = Object.entries(QUESTION_BANK).map(([id, cat]) => ({
+const TABS = Object.entries(QUESTION_BANK).map(([id, cat]) => ({
   id,
   label: cat.name,
   icon: cat.icon,
   count: cat.questions.length,
-  class: cat.class || 'all',
 }));
 
-const CLASSES = ['SSC', 'HSC', 'IELTS', 'General'];
+const CLASSES = ['SSC', 'HSC', 'General'];
 const PAPERS = ['1st Paper', '2nd Paper', 'General'];
 const BOARDS = ['Dhaka', 'Rajshahi', 'Chattogram', 'Sylhet', 'Barishal', 'Cumilla', 'Jashore', 'Dinajpur', 'Mymensingh'];
+const WRITING_TYPES = ['paragraph', 'composition', 'letter'];
 
 const FALLBACK_TOPICS = [
   { id: 't1', title: 'Seen Comprehension', tag: 'Reading' },
@@ -2521,15 +2220,21 @@ const FALLBACK_WRITING = [
   { id: 'w2', title: 'A Letter to a Friend about SSC Results' },
 ];
 
-const TOTAL_QUESTIONS = Object.values(QUESTION_BANK).reduce((s, c) => s + c.questions.length, 0);
-const IELTS_QUESTIONS = Object.values(QUESTION_BANK)
-  .filter((c) => c.class === 'IELTS')
-  .reduce((s, c) => s + c.questions.length, 0);
+const TOTAL_QUESTIONS = TABS.reduce((sum, t) => sum + t.count, 0);
+const ANSWER_DELAY_MS = 900;
+const XP_PER_CORRECT = 10;
+const DEFAULT_CAT = 'verbs';
+
+const isWeak = (stat) => !!stat && stat.total >= 3 && stat.correct / stat.total < 0.6;
 
 /* ============================================================
-   Mascot
+   Presentational pieces (memoised so quiz ticks don't re-render them)
    ============================================================ */
-function LangutMascot({ size = 160 }) {
+const Styles = memo(function Styles() {
+  return <style>{CURRICULUM_CSS}</style>;
+});
+
+const LangutMascot = memo(function LangutMascot({ size = 160 }) {
   return (
     <svg viewBox="0 0 170 170" width={size} height={size} fill="none" aria-hidden="true">
       <ellipse cx="85" cy="158" rx="46" ry="7" fill="#000" opacity="0.22" />
@@ -2558,7 +2263,299 @@ function LangutMascot({ size = 160 }) {
       <path d="M148 46l2.5-6 2.5 6-6 2.5 6 2.5-2.5 6-2.5-6-6-2.5z" fill="#FF8FCB" />
     </svg>
   );
-}
+});
+
+const PageHead = memo(function PageHead() {
+  return (
+    <div className="ec-cur-head">
+      <div>
+        <p className="ec-cur-eyebrow">Curriculum</p>
+        <h1 className="ec-page-title">English Grammar Mastery</h1>
+        <p className="ec-page-sub">SSC, HSC &amp; General — {TOTAL_QUESTIONS}+ exercises.</p>
+      </div>
+    </div>
+  );
+});
+
+const Hero = memo(function Hero() {
+  return (
+    <div className="ec-cur-hero">
+      <div className="ec-cur-hero-copy">
+        <span className="ec-cur-hero-badge">Bangladesh Boards</span>
+        <h1>Grammar practice, <em>board-style</em></h1>
+        <p>Every grammar rule, gap-filling type, translation pattern and writing form — lessons + practice for school and board exams.</p>
+        <div className="ec-cur-hero-stats">
+          <div className="ec-cur-hero-stat"><strong>{TOTAL_QUESTIONS}</strong><span>Exercises</span></div>
+          <div className="ec-cur-hero-stat"><strong>{TABS.length}</strong><span>Topics</span></div>
+          <div className="ec-cur-hero-stat"><strong>{BOARDS.length}</strong><span>Boards</span></div>
+        </div>
+      </div>
+      <div className="ec-cur-hero-mascot">
+        <LangutMascot size={150} />
+      </div>
+    </div>
+  );
+});
+
+const ModeSwitch = memo(function ModeSwitch({ mode, onChange }) {
+  return (
+    <div className="ec-cur-modes">
+      <button
+        className={`ec-cur-mode${mode === 'practice' ? ' ec-cur-mode--active' : ''}`}
+        onClick={() => onChange('practice')}
+      >
+        <Icon name="target" /> Practice
+      </button>
+      <button
+        className={`ec-cur-mode${mode === 'lesson' ? ' ec-cur-mode--active' : ''}`}
+        onClick={() => onChange('lesson')}
+      >
+        <Icon name="book" /> Lessons
+      </button>
+    </div>
+  );
+});
+
+const Filters = memo(function Filters({ cls, paper, board, banglaHelp, onCls, onPaper, onBoard, onBangla }) {
+  return (
+    <div className="ec-cur-filters">
+      <div className="ec-cur-filter-group">
+        {CLASSES.map((c) => (
+          <button key={c} className={`ec-cur-pill${cls === c ? ' ec-cur-pill--active' : ''}`} onClick={() => onCls(c)}>{c}</button>
+        ))}
+      </div>
+      <div className="ec-cur-filter-group">
+        {PAPERS.map((p) => (
+          <button key={p} className={`ec-cur-pill${paper === p ? ' ec-cur-pill--active' : ''}`} onClick={() => onPaper(p)}>{p}</button>
+        ))}
+      </div>
+      <select className="ec-cur-select" value={board} onChange={(e) => onBoard(e.target.value)}>
+        {BOARDS.map((b) => <option key={b} value={b}>{b} Board</option>)}
+      </select>
+      <label className="ec-cur-check">
+        <input type="checkbox" checked={banglaHelp} onChange={(e) => onBangla(e.target.checked)} />
+        🇧🇩 বাংলা
+      </label>
+    </div>
+  );
+});
+
+const CategoryTabs = memo(function CategoryTabs({ catId, onSelect }) {
+  return (
+    <div className="ec-cur-cats">
+      {TABS.map((t) => (
+        <button
+          key={t.id}
+          className={`ec-cur-cat${catId === t.id ? ' ec-cur-cat--active' : ''}`}
+          onClick={() => onSelect(t.id)}
+        >
+          <Icon name={t.icon} />
+          {t.label}
+          <span className="ec-cur-cat-count">{t.count}</span>
+        </button>
+      ))}
+    </div>
+  );
+});
+
+const Lesson = memo(function Lesson({ cat, onStart }) {
+  const { lesson } = cat;
+  return (
+    <div className="ec-lesson">
+      <div className="ec-lesson-head">
+        <h2 className="ec-lesson-title">{cat.name} — Lesson</h2>
+        <span className="ec-cur-chip">{cat.questions.length} exercises</span>
+      </div>
+      <div className="ec-lesson-body">
+        <div className="ec-lesson-block">
+          <h4>📘 Key Rules</h4>
+          <ul>
+            {lesson.rules.map((r, i) => (
+              <li key={i} dangerouslySetInnerHTML={{ __html: r }} />
+            ))}
+          </ul>
+        </div>
+        <div className="ec-lesson-block">
+          <h4>✨ Examples</h4>
+          <div className="ec-lesson-list">
+            {lesson.examples.map((ex, i) => (
+              <div key={i} className="ec-lesson-example" dangerouslySetInnerHTML={{ __html: ex }} />
+            ))}
+          </div>
+        </div>
+        <div className="ec-lesson-bn">🇧🇩 {lesson.bangla}</div>
+        <button className="ec-cur-pill ec-cur-pill--active ec-cur-pill--start" onClick={onStart}>
+          ▶ Start practice →
+        </button>
+      </div>
+    </div>
+  );
+});
+
+const Quiz = memo(function Quiz({ cat, question, qIndex, selected, banglaHelp, onAnswer }) {
+  const total = cat.questions.length;
+  const answered = selected !== null;
+  const isGood = answered && selected === question.a;
+
+  return (
+    <div className="ec-cur-section">
+      <div className="ec-quiz-top">
+        <span className="ec-quiz-badge">{cat.name}</span>
+        <span className="ec-quiz-counter">Question {qIndex + 1} / {total}</span>
+      </div>
+      <div className="ec-quiz-progress">
+        <div className="ec-quiz-progress-fill" style={{ width: `${((qIndex + 1) / total) * 100}%` }} />
+      </div>
+      <p className="ec-quiz-question">{question.p}</p>
+      <div className="ec-quiz-options">
+        {question.o.map((opt, i) => {
+          const isSelected = selected === opt;
+          const isCorrect = opt === question.a;
+          const state = isSelected
+            ? isCorrect ? ' ec-quiz-option--correct ec-pop' : ' ec-quiz-option--incorrect'
+            : '';
+          return (
+            <button
+              key={`${opt}-${i}`}
+              className={`ec-quiz-option${state}`}
+              onClick={() => onAnswer(opt)}
+              disabled={answered && !isSelected && !isCorrect}
+            >
+              {opt}
+            </button>
+          );
+        })}
+      </div>
+      <div className={`ec-quiz-feedback${isGood ? ' ec-quiz-feedback--good' : answered ? ' ec-quiz-feedback--bad' : ''}`}>
+        {answered && (isGood ? '✨ Correct!' : `Correct answer: ${question.a}`)}
+      </div>
+      {answered && (
+        <p className="ec-quiz-explain">💡 {banglaHelp ? question.b : question.e}</p>
+      )}
+    </div>
+  );
+});
+
+const BoardSets = memo(function BoardSets({ topics, cls, paper }) {
+  const list = topics.length ? topics : FALLBACK_TOPICS;
+  return (
+    <div className="ec-cur-section">
+      <div className="ec-cur-section-head">
+        <h2 className="ec-cur-section-title">Board-style question sets</h2>
+        <span className="ec-cur-chip">{cls} · {paper}</span>
+      </div>
+      <div className="ec-cur-stack">
+        {list.map((t) => (
+          <div key={t.id} className="ec-cur-board-item">
+            <div>
+              <p className="ec-cur-board-title">{t.title}</p>
+              <span className="ec-cur-board-tag">{t.tag}</span>
+            </div>
+            <button className="ec-cur-pill ec-cur-pill--active ec-cur-pill--sm">Practice</button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+});
+
+const Translation = memo(function Translation() {
+  return (
+    <div className="ec-cur-section ec-cur-translation">
+      <div className="ec-cur-section-head">
+        <h2 className="ec-cur-section-title">Translation practice</h2>
+        <span className="ec-cur-chip">Bangla ↔ English</span>
+      </div>
+      <p className="ec-cur-hint">Translate the sentence below:</p>
+      <p className="bn">সে প্রতিদিন সকালে হাঁটে।</p>
+      <textarea rows={2} placeholder="Type the English translation…" />
+      <button className="ec-cur-pill ec-cur-pill--active ec-cur-pill--md">Check</button>
+    </div>
+  );
+});
+
+const TopicList = memo(function TopicList({ catId, catStats, onSelect }) {
+  return (
+    <div className="ec-cur-section">
+      <div className="ec-cur-section-head">
+        <h2 className="ec-cur-section-title">All topics</h2>
+        <span className="ec-cur-chip">{TABS.length}</span>
+      </div>
+      <div className="ec-cur-topic-list">
+        {TABS.map((t) => {
+          const stat = catStats[t.id];
+          const pct = stat && stat.total ? Math.round((stat.correct / stat.total) * 100) : null;
+          return (
+            <button
+              key={t.id}
+              className={`ec-cur-topic-btn${catId === t.id ? ' ec-cur-topic-btn--active' : ''}`}
+              onClick={() => onSelect(t.id)}
+            >
+              <span className="ec-cur-topic-name">{t.label}</span>
+              {pct !== null && (
+                <span
+                  className="ec-cur-topic-count"
+                  style={isWeak(stat) ? { background: 'var(--lang-pink-2)', color: '#fff' } : undefined}
+                >
+                  {pct}%
+                </span>
+              )}
+              <span className="ec-cur-topic-count">{t.count}</span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+});
+
+const WritingBank = memo(function WritingBank({ writingType, items, onType }) {
+  const list = items.length ? items : FALLBACK_WRITING;
+  return (
+    <div className="ec-cur-section">
+      <div className="ec-cur-section-head">
+        <h2 className="ec-cur-section-title">Writing bank</h2>
+      </div>
+      <div className="ec-cur-filter-group ec-cur-filter-group--spaced">
+        {WRITING_TYPES.map((t) => (
+          <button
+            key={t}
+            className={`ec-cur-pill ec-cur-pill--cap${writingType === t ? ' ec-cur-pill--active' : ''}`}
+            onClick={() => onType(t)}
+          >
+            {t}
+          </button>
+        ))}
+      </div>
+      <div className="ec-cur-stack">
+        {list.map((w) => (
+          <div key={w.id} className="ec-cur-bank-item">{w.title}</div>
+        ))}
+      </div>
+    </div>
+  );
+});
+
+const SessionCard = memo(function SessionCard({ score }) {
+  const pct = score.total ? Math.round((score.correct / score.total) * 100) : 0;
+  return (
+    <div className="ec-cur-section">
+      <div className="ec-cur-section-head">
+        <h2 className="ec-cur-section-title">Your session</h2>
+      </div>
+      <div className="ec-cur-session-col">
+        <div className="ec-cur-session-label">
+          <span className="ec-cur-session-dim">Correct</span>
+          <span className="ec-cur-session-val">{score.correct} / {score.total}</span>
+        </div>
+        <div className="ec-cur-meter">
+          <div className="ec-cur-meter-fill" style={{ width: `${pct}%` }} />
+        </div>
+        <span className="ec-cur-score-chip">{pct}% accuracy</span>
+      </div>
+    </div>
+  );
+});
 
 /* ============================================================
    MAIN COMPONENT
@@ -2574,95 +2571,94 @@ export function Curriculum() {
   const [writingType, setWritingType] = useState('paragraph');
   const [writingBank, setWritingBank] = useState([]);
 
-  const [catId, setCatId] = useState('verbs');
-  const [qIndex, setQIndex] = useState(0);
-  const [selected, setSelected] = useState(null);
-  const [feel, setFeel] = useState(null);
-  const [score, setScore] = useState({ correct: 0, total: 0 });
-  const [xpToast, setXpToast] = useState(null);
+  /* Quiz state — one object so each answer/advance is a single render */
+  const [quiz, setQuiz] = useState({ catId: DEFAULT_CAT, qIndex: 0, selected: null });
   const [catStats, setCatStats] = useState({});
+  const [xpToast, setXpToast] = useState(null);
 
+  const advanceTimer = useRef(null);
+  const toastTimer = useRef(null);
+
+  /* Clear pending timers on unmount */
+  useEffect(() => () => {
+    clearTimeout(advanceTimer.current);
+    clearTimeout(toastTimer.current);
+  }, []);
+
+  /* Fetch topics (ignore stale responses) */
   useEffect(() => {
+    let cancelled = false;
     curriculumApi.topics({ class: cls, paper, board })
-      .then((t) => setTopics(t || []))
-      .catch(() => setTopics([]));
+      .then((t) => { if (!cancelled) setTopics(t || []); })
+      .catch(() => { if (!cancelled) setTopics([]); });
+    return () => { cancelled = true; };
   }, [cls, paper, board]);
 
+  /* Fetch writing bank (ignore stale responses) */
   useEffect(() => {
+    let cancelled = false;
     curriculumApi.writingBank(writingType)
-      .then((w) => setWritingBank(w || []))
-      .catch(() => setWritingBank([]));
+      .then((w) => { if (!cancelled) setWritingBank(w || []); })
+      .catch(() => { if (!cancelled) setWritingBank([]); });
+    return () => { cancelled = true; };
   }, [writingType]);
 
-  /* --- Filter tabs by selected class --- */
-  const tabs = useMemo(() => {
-    if (cls === 'IELTS') {
-      return ALL_TABS.filter((t) => t.class === 'IELTS');
-    }
-    return ALL_TABS.filter((t) => t.class === 'all' || t.class === cls);
-  }, [cls]);
-
-  /* Ensure selected category exists in the filtered list */
-  useEffect(() => {
-    if (!tabs.some((t) => t.id === catId) && tabs.length) {
-      setCatId(tabs[0].id);
-      setQIndex(0);
-      setSelected(null);
-      setFeel(null);
-    }
-  }, [tabs, catId]);
-
-  const cat = QUESTION_BANK[catId] || tabs[0] && QUESTION_BANK[tabs[0].id];
+  const { catId, qIndex, selected } = quiz;
+  const cat = QUESTION_BANK[catId] || QUESTION_BANK[DEFAULT_CAT];
   const question = cat ? cat.questions[qIndex] : null;
   const totalForCat = cat ? cat.questions.length : 0;
-  const isIeltsCat = cat && cat.class === 'IELTS';
 
-  const showXp = (amount) => {
+  /* Session score is derived from per-category stats — no duplicate state */
+  const score = useMemo(() => {
+    let correct = 0;
+    let total = 0;
+    for (const id in catStats) {
+      correct += catStats[id].correct;
+      total += catStats[id].total;
+    }
+    return { correct, total };
+  }, [catStats]);
+
+  const showXp = useCallback((amount) => {
+    clearTimeout(toastTimer.current);
     setXpToast(amount);
-    setTimeout(() => setXpToast(null), 900);
-  };
+    toastTimer.current = setTimeout(() => setXpToast(null), ANSWER_DELAY_MS);
+  }, []);
 
-  const answer = (opt) => {
-    if (!question || selected) return;
-    setSelected(opt);
+  const answer = useCallback((opt) => {
+    if (!question || selected !== null) return;
     const correct = opt === question.a;
-    setFeel(correct ? 'good' : 'bad');
-    setScore((s) => ({ correct: s.correct + (correct ? 1 : 0), total: s.total + 1 }));
+
+    setQuiz((q) => ({ ...q, selected: opt }));
     setCatStats((st) => {
       const prev = st[catId] || { correct: 0, total: 0 };
       return { ...st, [catId]: { correct: prev.correct + (correct ? 1 : 0), total: prev.total + 1 } };
     });
-    if (correct) showXp(10);
-    setTimeout(() => {
-      setSelected(null);
-      setFeel(null);
-      setQIndex((i) => (i + 1 < totalForCat ? i + 1 : 0));
-    }, 900);
-  };
+    if (correct) showXp(XP_PER_CORRECT);
 
-  const switchCat = (id) => {
-    setCatId(id);
-    setQIndex(0);
-    setSelected(null);
-    setFeel(null);
-  };
+    clearTimeout(advanceTimer.current);
+    advanceTimer.current = setTimeout(() => {
+      setQuiz((q) => ({
+        ...q,
+        selected: null,
+        qIndex: q.qIndex + 1 < totalForCat ? q.qIndex + 1 : 0,
+      }));
+    }, ANSWER_DELAY_MS);
+  }, [question, selected, catId, totalForCat, showXp]);
 
-  const isWeakCat = (id) => {
-    const s = catStats[id];
-    return !!s && s.total >= 3 && s.correct / s.total < 0.6;
-  };
+  const switchCat = useCallback((id) => {
+    clearTimeout(advanceTimer.current); // don't let a pending advance hit the new category
+    setQuiz({ catId: id, qIndex: 0, selected: null });
+  }, []);
 
-  const overallPct = score.total ? Math.round((score.correct / score.total) * 100) : 0;
-  const showIeltsBanner = cls === 'IELTS';
+  const startPractice = useCallback(() => setMode('practice'), []);
 
   if (!cat || !question) {
     return (
       <div className="ec-cur">
-        <style>{CURRICULUM_CSS}</style>
-        <div className="ec-cur-section" style={{ textAlign: 'center', padding: '40px 20px' }}>
-          <p style={{ fontSize: 14, color: 'var(--lang-ink-soft)', fontWeight: 700 }}>
-            Loading curriculum…
-          </p>
+        <Styles />
+        <div className="ec-cur-section ec-cur-center">
+          <p className="ec-cur-loading">Loading curriculum…</p>
         </div>
       </div>
     );
@@ -2670,345 +2666,54 @@ export function Curriculum() {
 
   return (
     <div className="ec-cur">
-      <style>{CURRICULUM_CSS}</style>
+      <Styles />
 
-      <div className="ec-cur-head">
-        <div>
-          <p className="ec-cur-eyebrow">Curriculum</p>
-          <h1 className="ec-page-title">English Grammar Mastery</h1>
-          <p className="ec-page-sub">
-            SSC, HSC, IELTS & General — {TOTAL_QUESTIONS}+ exercises.
-            {cls === 'IELTS' && ` IELTS section: ${IELTS_QUESTIONS}+ questions.`}
-          </p>
-        </div>
-      </div>
-
-      <div className="ec-cur-hero">
-        <div className="ec-cur-hero-copy">
-          <span className="ec-cur-hero-badge">Bangladesh + International</span>
-          <h1>Grammar practice, <em>board-style</em></h1>
-          <p>Every grammar rule, gap-filling type, translation pattern and writing form — lessons + practice for school, board and IELTS.</p>
-          <div className="ec-cur-hero-stats">
-            <div className="ec-cur-hero-stat"><strong>{TOTAL_QUESTIONS}</strong><span>Exercises</span></div>
-            <div className="ec-cur-hero-stat"><strong>{tabs.length}</strong><span>Topics</span></div>
-            <div className="ec-cur-hero-stat"><strong>{cls === 'IELTS' ? IELTS_QUESTIONS : BOARDS.length}</strong><span>{cls === 'IELTS' ? 'IELTS Qs' : 'Boards'}</span></div>
-          </div>
-        </div>
-        <div className="ec-cur-hero-mascot">
-          <LangutMascot size={150} />
-        </div>
-      </div>
-
-      <div className="ec-cur-modes">
-        <button
-          className={`ec-cur-mode${mode === 'practice' ? ' ec-cur-mode--active' : ''}`}
-          onClick={() => setMode('practice')}
-        >
-          <Icon name="target" /> Practice
-        </button>
-        <button
-          className={`ec-cur-mode${mode === 'lesson' ? ' ec-cur-mode--active' : ''}`}
-          onClick={() => setMode('lesson')}
-        >
-          <Icon name="book" /> Lessons
-        </button>
-      </div>
-
-      <div className="ec-cur-filters">
-        <div className="ec-cur-filter-group">
-          {CLASSES.map((c) => (
-            <button key={c} className={`ec-cur-pill${cls === c ? ' ec-cur-pill--active' : ''}`} onClick={() => setCls(c)}>{c}</button>
-          ))}
-        </div>
-        {cls !== 'IELTS' && (
-          <div className="ec-cur-filter-group">
-            {PAPERS.map((p) => (
-              <button key={p} className={`ec-cur-pill${paper === p ? ' ec-cur-pill--active' : ''}`} onClick={() => setPaper(p)}>{p}</button>
-            ))}
-          </div>
-        )}
-        {cls !== 'IELTS' && (
-          <select className="ec-cur-select" value={board} onChange={(e) => setBoard(e.target.value)}>
-            {BOARDS.map((b) => <option key={b} value={b}>{b} Board</option>)}
-          </select>
-        )}
-        <label className="ec-cur-check">
-          <input type="checkbox" checked={banglaHelp} onChange={(e) => setBanglaHelp(e.target.checked)} />
-          🇧🇩 বাংলা
-        </label>
-      </div>
-
-      {showIeltsBanner && (
-        <div className="ec-cur-ielts-banner">
-          <div className="ec-cur-ielts-banner-icon">🎯</div>
-          <div className="ec-cur-ielts-banner-body">
-            <p className="ec-cur-ielts-banner-title">IELTS Mode Active</p>
-            <p className="ec-cur-ielts-banner-sub">
-              Listening · Reading · Writing Task 1 & 2 · Speaking · Vocabulary · Grammar
-            </p>
-          </div>
-        </div>
-      )}
-
-      <div className="ec-cur-cats">
-        {tabs.map((t) => (
-          <button
-            key={t.id}
-            className={`ec-cur-cat${catId === t.id ? ' ec-cur-cat--active' : ''}${t.class === 'IELTS' ? ' ec-cur-cat--ielts' : ''}`}
-            onClick={() => switchCat(t.id)}
-          >
-            <Icon name={t.icon} />
-            {t.label}
-            <span className="ec-cur-cat-count">{t.count}</span>
-          </button>
-        ))}
-      </div>
+      <PageHead />
+      <Hero />
+      <ModeSwitch mode={mode} onChange={setMode} />
+      <Filters
+        cls={cls}
+        paper={paper}
+        board={board}
+        banglaHelp={banglaHelp}
+        onCls={setCls}
+        onPaper={setPaper}
+        onBoard={setBoard}
+        onBangla={setBanglaHelp}
+      />
+      <CategoryTabs catId={catId} onSelect={switchCat} />
 
       {xpToast && <div className="ec-cur-xp-toast">+{xpToast} XP ✨</div>}
 
       <div className="ec-cur-grid">
         <section>
-          {mode === 'lesson' && cat.lesson && (
-            <div className="ec-lesson">
-              <div className="ec-lesson-head">
-                <h2 className="ec-lesson-title">{cat.name} — Lesson</h2>
-                <span className="ec-cur-chip">{cat.questions.length} exercises</span>
-              </div>
-              <div className="ec-lesson-body">
-                <div className="ec-lesson-block">
-                  <h4>📘 Key Rules</h4>
-                  <ul>
-                    {cat.lesson.rules.map((r, i) => (
-                      <li key={i} dangerouslySetInnerHTML={{ __html: r }} />
-                    ))}
-                  </ul>
-                </div>
-                <div className="ec-lesson-block">
-                  <h4>✨ Examples</h4>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    {cat.lesson.examples.map((ex, i) => (
-                      <div key={i} className="ec-lesson-example" dangerouslySetInnerHTML={{ __html: ex }} />
-                    ))}
-                  </div>
-                </div>
-                <div className="ec-lesson-bn">
-                  🇧🇩 {cat.lesson.bangla}
-                </div>
-                <button
-                  className="ec-cur-pill ec-cur-pill--active"
-                  style={{ padding: '11px 20px', fontSize: 13, alignSelf: 'flex-start' }}
-                  onClick={() => setMode('practice')}
-                >
-                  ▶ Start practice →
-                </button>
-              </div>
+          {mode === 'lesson' && cat.lesson && <Lesson cat={cat} onStart={startPractice} />}
+
+          {mode === 'lesson' && !cat.lesson && (
+            <div className="ec-cur-section ec-cur-center">
+              <p className="ec-cur-loading">Lesson coming soon for {cat.name}.</p>
             </div>
           )}
 
           {mode === 'practice' && (
-            <div className="ec-cur-section">
-              <div className="ec-quiz-top">
-                <span className={`ec-quiz-badge${isIeltsCat ? ' ec-quiz-badge--ielts' : ''}`}>
-                  {isIeltsCat ? '🎯 ' : ''}{cat.name}
-                </span>
-                <span className="ec-quiz-counter">Question {qIndex + 1} / {totalForCat}</span>
-              </div>
-              <div className="ec-quiz-progress">
-                <div className="ec-quiz-progress-fill" style={{ width: `${((qIndex + 1) / totalForCat) * 100}%` }} />
-              </div>
-              <p className="ec-quiz-question">{question.p}</p>
-              <div className="ec-quiz-options">
-                {question.o.map((opt, i) => {
-                  const isSelected = selected === opt;
-                  const isCorrect = opt === question.a;
-                  const cls = `ec-quiz-option${isSelected ? (isCorrect ? ' ec-quiz-option--correct ec-pop' : ' ec-quiz-option--incorrect') : ''}`;
-                  return (
-                    <button
-                      key={`${opt}-${i}`}
-                      className={cls}
-                      onClick={() => answer(opt)}
-                      disabled={!!selected && !isSelected && !isCorrect}
-                    >
-                      {opt}
-                    </button>
-                  );
-                })}
-              </div>
-              <div className={`ec-quiz-feedback${feel === 'good' ? ' ec-quiz-feedback--good' : feel === 'bad' ? ' ec-quiz-feedback--bad' : ''}`}>
-                {feel === 'good' && '✨ Correct!'}
-                {feel === 'bad' && `Correct answer: ${question.a}`}
-              </div>
-              {feel && (
-                <p className="ec-quiz-explain">
-                  💡 {banglaHelp ? question.b : question.e}
-                </p>
-              )}
-            </div>
+            <Quiz
+              cat={cat}
+              question={question}
+              qIndex={qIndex}
+              selected={selected}
+              banglaHelp={banglaHelp}
+              onAnswer={answer}
+            />
           )}
 
-          {mode === 'lesson' && !cat.lesson && (
-            <div className="ec-cur-section" style={{ textAlign: 'center', padding: '40px 20px' }}>
-              <p style={{ fontSize: 14, color: 'var(--lang-ink-soft)', fontWeight: 700 }}>
-                Lesson coming soon for {cat.name}.
-              </p>
-            </div>
-          )}
-
-          <div className="ec-cur-section">
-            <div className="ec-cur-section-head">
-              <h2 className="ec-cur-section-title">Board-style question sets</h2>
-              <span className="ec-cur-chip">{cls} · {paper}</span>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {(topics.length ? topics : FALLBACK_TOPICS).map((t) => (
-                <div
-                  key={t.id}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: 12,
-                    padding: '12px 14px',
-                    borderRadius: 14,
-                    background: 'var(--lang-lime-soft)',
-                    border: '2px solid var(--lang-line)',
-                    boxShadow: '0 2px 0 var(--lang-line)',
-                  }}
-                >
-                  <div style={{ minWidth: 0 }}>
-                    <p style={{ margin: '0 0 4px', fontWeight: 900, fontSize: 13, color: 'var(--lang-ink)' }}>{t.title}</p>
-                    <span style={{
-                      fontSize: 10, fontWeight: 900,
-                      color: 'var(--lang-ink)', background: 'var(--lang-pink)',
-                      padding: '3px 9px', borderRadius: 999,
-                      border: '2px solid var(--lang-line)',
-                      textTransform: 'uppercase', letterSpacing: '.05em',
-                    }}>{t.tag}</span>
-                  </div>
-                  <button
-                    className="ec-cur-pill ec-cur-pill--active"
-                    style={{ padding: '8px 14px', fontSize: 11.5, flexShrink: 0 }}
-                  >
-                    Practice
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="ec-cur-section ec-cur-translation">
-            <div className="ec-cur-section-head">
-              <h2 className="ec-cur-section-title">Translation practice</h2>
-              <span className="ec-cur-chip">Bangla ↔ English</span>
-            </div>
-            <p style={{ margin: 0, fontSize: 12.5, color: 'var(--lang-ink-soft)', fontWeight: 700 }}>
-              Translate the sentence below:
-            </p>
-            <p className="bn">সে প্রতিদিন সকালে হাঁটে।</p>
-            <textarea rows={2} placeholder="Type the English translation…" />
-            <button
-              className="ec-cur-pill ec-cur-pill--active"
-              style={{ marginTop: 12, padding: '10px 18px', fontSize: 12.5 }}
-            >
-              Check
-            </button>
-          </div>
+          <BoardSets topics={topics} cls={cls} paper={paper} />
+          <Translation />
         </section>
 
         <aside>
-          <div className="ec-cur-section">
-            <div className="ec-cur-section-head">
-              <h2 className="ec-cur-section-title">
-                {cls === 'IELTS' ? 'IELTS Skills' : 'All topics'}
-              </h2>
-              <span className="ec-cur-chip">{tabs.length}</span>
-            </div>
-            <div className="ec-cur-topic-list">
-              {tabs.map((t) => {
-                const stat = catStats[t.id];
-                const pct = stat && stat.total ? Math.round((stat.correct / stat.total) * 100) : null;
-                const weak = isWeakCat(t.id);
-                const isIelts = t.class === 'IELTS';
-                return (
-                  <button
-                    key={t.id}
-                    className={`ec-cur-topic-btn${catId === t.id ? ' ec-cur-topic-btn--active' : ''}${isIelts ? ' ec-cur-topic-btn--ielts' : ''}`}
-                    onClick={() => switchCat(t.id)}
-                  >
-                    <span className="ec-cur-topic-name">{t.label}</span>
-                    {pct !== null && (
-                      <span
-                        className="ec-cur-topic-count"
-                        style={weak ? { background: 'var(--lang-pink-2)', color: '#fff' } : undefined}
-                      >
-                        {pct}%
-                      </span>
-                    )}
-                    <span className="ec-cur-topic-count">{t.count}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="ec-cur-section">
-            <div className="ec-cur-section-head">
-              <h2 className="ec-cur-section-title">Writing bank</h2>
-            </div>
-            <div className="ec-cur-filter-group" style={{ marginBottom: 12 }}>
-              {['paragraph', 'composition', 'letter'].map((t) => (
-                <button
-                  key={t}
-                  className={`ec-cur-pill${writingType === t ? ' ec-cur-pill--active' : ''}`}
-                  onClick={() => setWritingType(t)}
-                  style={{ textTransform: 'capitalize' }}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {(writingBank.length ? writingBank : FALLBACK_WRITING).map((w) => (
-                <div key={w.id} className="ec-cur-bank-item">{w.title}</div>
-              ))}
-            </div>
-          </div>
-
-          <div className="ec-cur-section">
-            <div className="ec-cur-section-head">
-              <h2 className="ec-cur-section-title">Your session</h2>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <div className="ec-cur-session-label">
-                <span style={{ color: 'var(--lang-ink-soft)' }}>Correct</span>
-                <span style={{ color: 'var(--lang-ink)' }}>{score.correct} / {score.total}</span>
-              </div>
-              <div style={{
-                height: 14, borderRadius: 999,
-                background: '#E8E5F2', overflow: 'hidden',
-                border: '2px solid var(--lang-line)',
-              }}>
-                <div style={{
-                  height: '100%',
-                  width: `${overallPct}%`,
-                  background: 'linear-gradient(90deg, #D4F55C, #B8E62E)',
-                  borderRadius: 999,
-                  transition: 'width .8s ease',
-                }} />
-              </div>
-              <span style={{
-                fontSize: 12, fontWeight: 900,
-                color: 'var(--lang-ink)', background: 'var(--lang-lime)',
-                border: '2px solid var(--lang-line)',
-                padding: '6px 12px', borderRadius: 999,
-                alignSelf: 'flex-end',
-                boxShadow: '0 2px 0 var(--lang-line)',
-                letterSpacing: '.04em',
-              }}>
-                {overallPct}% accuracy
-              </span>
-            </div>
-          </div>
+          <TopicList catId={catId} catStats={catStats} onSelect={switchCat} />
+          <WritingBank writingType={writingType} items={writingBank} onType={setWritingType} />
+          <SessionCard score={score} />
         </aside>
       </div>
     </div>
