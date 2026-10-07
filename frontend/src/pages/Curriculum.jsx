@@ -1,4 +1,4 @@
-vimport { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { curriculumApi } from '../api/curriculum';
 import { Icon } from '../components/Icon';
 
