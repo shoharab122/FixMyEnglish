@@ -68,7 +68,7 @@ async function streamOpenAI(opts: ChatOptions): Promise<ReadableStream<Uint8Arra
     model,
     stream: true,
     temperature: 0.6,
-    max_tokens: 500,
+    max_tokens: 800,
     messages: [
       { role: 'system', content: SYSTEM_PROMPT + '\n\n' + buildContext(opts) },
       ...trimHistory(opts.messages),
@@ -100,7 +100,7 @@ async function streamAnthropic(opts: ChatOptions): Promise<ReadableStream<Uint8A
   const body = {
     model,
     stream: true,
-    max_tokens: 500,
+    max_tokens: 800,
     system: SYSTEM_PROMPT + '\n\n' + buildContext(opts),
     messages: trimHistory(opts.messages)
       .filter((m) => m.role !== 'system')
