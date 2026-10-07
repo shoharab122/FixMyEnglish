@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
+\import { useEffect, useMemo, useState } from 'react';
 import { curriculumApi } from '../api/curriculum';
 import { Icon } from '../components/Icon';
 
 /* ============================================================
    CURRICULUM — Langut-inspired, mobile-first
-   2000+ exercises · 30 categories · Lessons + Practice
+   2000+ exercises · 35+ categories · Lessons + Practice
+   Includes dedicated IELTS categories.
    ============================================================ */
 
 const CURRICULUM_CSS = `
@@ -177,12 +178,43 @@ const CURRICULUM_CSS = `
 .ec-cur-cat:active{transform:translateY(1px);box-shadow:0 1px 0 var(--lang-line)}
 .ec-cur-cat--active{background:var(--lang-ink);color:var(--lang-lime);box-shadow:0 3px 0 var(--lang-ink)}
 .ec-cur-cat--active:hover{background:var(--lang-ink);color:var(--lang-lime)}
+.ec-cur-cat--ielts{background:linear-gradient(160deg,#FFB3D1,#FF8FCB);color:#fff;border-color:var(--lang-line)}
+.ec-cur-cat--ielts:hover{background:linear-gradient(160deg,#FFA0C6,#FF7BBF)}
+.ec-cur-cat--ielts.ec-cur-cat--active{background:linear-gradient(160deg,#9B7BFF,#7B5CF0);color:#fff;box-shadow:0 3px 0 var(--lang-ink)}
 .ec-cur-cat svg{width:15px;height:15px;flex-shrink:0}
 .ec-cur-cat-count{
   font-size:10px;font-weight:900;
   padding:2px 7px;border-radius:999px;
   background:var(--lang-lime);color:var(--lang-ink);
   border:2px solid var(--lang-line);
+}
+
+/* IELTS BANNER */
+.ec-cur-ielts-banner{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 16px;margin-bottom:14px;
+  background:linear-gradient(160deg,#FFB3D1,#FF8FCB);
+  border:2px solid var(--lang-line);
+  border-radius:18px;
+  box-shadow:0 4px 0 var(--lang-line);
+  animation:ec-cur-fade .45s ease both;
+}
+.ec-cur-ielts-banner-icon{
+  width:36px;height:36px;border-radius:12px;
+  background:#fff;color:var(--lang-ink);
+  border:2px solid var(--lang-line);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;
+  box-shadow:0 2px 0 var(--lang-line);
+}
+.ec-cur-ielts-banner-body{flex:1;min-width:0}
+.ec-cur-ielts-banner-title{
+  margin:0 0 2px;font-size:13px;font-weight:900;color:#fff;
+  letter-spacing:.01em;
+}
+.ec-cur-ielts-banner-sub{
+  margin:0;font-size:11.5px;font-weight:700;color:rgba(255,255,255,.9);
+  line-height:1.4;
 }
 
 /* GRID */
@@ -272,6 +304,7 @@ const CURRICULUM_CSS = `
   box-shadow:0 2px 0 var(--lang-line);
   max-width:100%;
 }
+.ec-quiz-badge--ielts{background:linear-gradient(160deg,#FFB3D1,#FF8FCB);color:#fff}
 .ec-quiz-counter{
   font-size:11.5px;font-weight:900;
   color:var(--lang-ink-soft);
@@ -341,6 +374,8 @@ const CURRICULUM_CSS = `
 .ec-cur-topic-btn:hover{background:var(--lang-lime-soft);transform:translateY(-1px);box-shadow:0 4px 0 var(--lang-line)}
 .ec-cur-topic-btn--active{background:var(--lang-ink);color:var(--lang-lime)}
 .ec-cur-topic-btn--active:hover{background:var(--lang-ink);color:var(--lang-lime)}
+.ec-cur-topic-btn--ielts{background:linear-gradient(160deg,#FFE0EE,#FFD0E5)}
+.ec-cur-topic-btn--ielts.ec-cur-topic-btn--active{background:linear-gradient(160deg,#9B7BFF,#7B5CF0);color:#fff}
 .ec-cur-topic-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ec-cur-topic-count{
   font-size:10.5px;font-weight:900;
@@ -436,6 +471,10 @@ const CURRICULUM_CSS = `
   .ec-cur-check{padding:8px 12px;font-size:12px;min-height:40px}
   .ec-cur-cat{padding:9px 13px;font-size:12px;min-height:42px}
   .ec-cur-cat svg{width:14px;height:14px}
+  .ec-cur-ielts-banner{padding:10px 13px;border-radius:16px;margin-bottom:12px}
+  .ec-cur-ielts-banner-icon{width:32px;height:32px;font-size:14px}
+  .ec-cur-ielts-banner-title{font-size:12.5px}
+  .ec-cur-ielts-banner-sub{font-size:11px}
   .ec-cur-section{padding:16px;border-radius:20px;box-shadow:0 4px 0 var(--lang-line);margin-bottom:14px}
   .ec-cur-section-title{font-size:14.5px}
   .ec-lesson{padding:16px;border-radius:20px}
@@ -476,14 +515,13 @@ const CURRICULUM_CSS = `
 `;
 
 /* ============================================================
-   QUESTION BANK — 2000+ exercises across 30 categories
-   Each category has: name, icon, lesson (rules + examples),
-   questions array.
+   QUESTION BANK — core + IELTS categories
+   Each category: name, icon, class ('all'|'IELTS'), lesson, questions
    ============================================================ */
 const QUESTION_BANK = {
-  /* ---------- 1. RIGHT FORM OF VERBS ---------- */
+  /* ================= CORE GENERAL ================= */
   verbs: {
-    name: 'Right Form of Verbs', icon: 'target',
+    name: 'Right Form of Verbs', icon: 'target', class: 'all',
     lesson: {
       rules: [
         'Present simple: add <code>-s</code> for he/she/it (He goes).',
@@ -561,12 +599,7 @@ const QUESTION_BANK = {
       { p:'He ___ the answer.', o:['know','knows','will know','knew'], a:'will know', e:'Future simple.', b:'Future simple।' },
       { p:'It ___ rain tomorrow.', o:['will','is','was','does'], a:'will', e:'Future.', b:'ভবিষ্যৎ।' },
       { p:'I promise I ___ late.', o:["won't be",'is not','was not','are not'], a:"won't be", e:'Future negative.', b:'Future negative।' },
-      { p:'She ___ help you with the work.', o:['will','is','was','does'], a:'will', e:'Future.', b:'ভবিষ্যৎ।' },
-      { p:'They ___ arrive at 10.', o:['will','is','was','does'], a:'will', e:'Future.', b:'ভবিষ্যৎ।' },
-      { p:'We ___ the meeting tomorrow.', o:['attend','attends','will attend','attended'], a:'will attend', e:'Future simple.', b:'Future simple।' },
       { p:'This time tomorrow, I ___ on a beach.', o:['lie','lies','will be lying','lay'], a:'will be lying', e:'Future continuous.', b:'Future continuous।' },
-      { p:'At 8 PM, we ___ dinner.', o:['have','has','will be having','had'], a:'will be having', e:'Future continuous.', b:'Future continuous।' },
-      { p:'She ___ when you call.', o:['sleep','sleeps','will be sleeping','slept'], a:'will be sleeping', e:'Future continuous.', b:'Future continuous।' },
       { p:'By 2030, he ___ for 20 years.', o:['work','works','will have worked','worked'], a:'will have worked', e:'Future perfect.', b:'Future perfect।' },
       { p:'If it ___ tomorrow, we will stay home.', o:['rain','rains','rained','raining'], a:'rains', e:'First conditional.', b:'First conditional।' },
       { p:'If I ___ rich, I would travel.', o:['am','was','were','be'], a:'were', e:'Second conditional.', b:'Second conditional।' },
@@ -586,9 +619,8 @@ const QUESTION_BANK = {
     ],
   },
 
-  /* ---------- 2. ARTICLES ---------- */
   articles: {
-    name: 'Articles', icon: 'flag',
+    name: 'Articles', icon: 'flag', class: 'all',
     lesson: {
       rules: [
         '<code>a</code> before consonant sound; <code>an</code> before vowel sound.',
@@ -656,9 +688,8 @@ const QUESTION_BANK = {
     ],
   },
 
-  /* ---------- 3. PREPOSITIONS ---------- */
   prepositions: {
-    name: 'Prepositions', icon: 'chat',
+    name: 'Prepositions', icon: 'chat', class: 'all',
     lesson: {
       rules: [
         '<code>at</code> for clock time, points: at 5 PM, at the corner.',
@@ -730,9 +761,8 @@ const QUESTION_BANK = {
     ],
   },
 
-  /* ---------- 4. CONNECTORS ---------- */
   connectors: {
-    name: 'Sentence Connectors', icon: 'zap',
+    name: 'Sentence Connectors', icon: 'zap', class: 'all',
     lesson: {
       rules: [
         '<code>so</code> — result; <code>because</code> — cause.',
@@ -803,9 +833,8 @@ const QUESTION_BANK = {
     ],
   },
 
-  /* ---------- 5. MODIFIERS ---------- */
   modifiers: {
-    name: 'Modifiers', icon: 'book',
+    name: 'Modifiers', icon: 'book', class: 'all',
     lesson: {
       rules: [
         '<code>much</code> + uncountable; <code>many</code> + countable plural.',
@@ -877,9 +906,8 @@ const QUESTION_BANK = {
     ],
   },
 
-  /* ---------- 6. COMPLETING SENTENCES ---------- */
   completing: {
-    name: 'Completing Sentences', icon: 'users',
+    name: 'Completing Sentences', icon: 'users', class: 'all',
     lesson: {
       rules: [
         '<code>It is high time / It is time</code> → past subjunctive (did).',
@@ -951,9 +979,8 @@ const QUESTION_BANK = {
     ],
   },
 
-  /* ---------- 7. VOICE CHANGE ---------- */
   voice: {
-    name: 'Voice Change', icon: 'chat',
+    name: 'Voice Change', icon: 'chat', class: 'all',
     lesson: {
       rules: [
         'Active → Passive: object + be + V3 + by + subject.',
@@ -1024,9 +1051,8 @@ const QUESTION_BANK = {
     ],
   },
 
-  /* ---------- 8. NARRATION ---------- */
   narration: {
-    name: 'Narration', icon: 'chat',
+    name: 'Narration', icon: 'chat', class: 'all',
     lesson: {
       rules: [
         'Present → Past; Past → Past Perfect.',
@@ -1097,9 +1123,8 @@ const QUESTION_BANK = {
     ],
   },
 
-  /* ---------- 9. TRANSFORMATION ---------- */
   transformation: {
-    name: 'Transformation', icon: 'target',
+    name: 'Transformation', icon: 'target', class: 'all',
     lesson: {
       rules: [
         'Superlative ↔ Positive/Comparative: No other…as…; better than any other.',
@@ -1171,9 +1196,8 @@ const QUESTION_BANK = {
     ],
   },
 
-  /* ---------- 10. SYNONYMS ---------- */
   synonyms: {
-    name: 'Synonyms', icon: 'book',
+    name: 'Synonyms', icon: 'book', class: 'all',
     lesson: {
       rules: [
         'Synonyms are words with similar meanings.',
@@ -1218,33 +1242,11 @@ const QUESTION_BANK = {
       { p:'Synonym of "strong"?', o:['robust','weak','frail','feeble'], a:'robust', e:'= robust.', b:'= শক্তিশালী।' },
       { p:'Synonym of "tired"?', o:['exhausted','fresh','energetic','lively'], a:'exhausted', e:'= exhausted.', b:'= ক্লান্ত।' },
       { p:'Synonym of "dangerous"?', o:['perilous','safe','harmless','secure'], a:'perilous', e:'= perilous.', b:'= বিপজ্জনক।' },
-      { p:'Synonym of "calm"?', o:['tranquil','agitated','nervous','wild'], a:'tranquil', e:'= tranquil.', b:'= শান্ত।' },
-      { p:'Synonym of "eager"?', o:['keen','unwilling','reluctant','indifferent'], a:'keen', e:'= keen.', b:'= উৎসুক।' },
-      { p:'Synonym of "foolish"?', o:['silly','wise','clever','smart'], a:'silly', e:'= silly.', b:'= মূর্খ।' },
-      { p:'Synonym of "generous"?', o:['liberal','stingy','mean','greedy'], a:'liberal', e:'= liberal.', b:'= উদার।' },
-      { p:'Synonym of "honest"?', o:['truthful','deceitful','false','lying'], a:'truthful', e:'= truthful.', b:'= সৎ।' },
-      { p:'Synonym of "large"?', o:['immense','tiny','little','narrow'], a:'immense', e:'= immense.', b:'= বিশাল।' },
-      { p:'Synonym of "mad"?', o:['insane','sane','normal','rational'], a:'insane', e:'= insane.', b:'= পাগল।' },
-      { p:'Synonym of "nervous"?', o:['anxious','calm','relaxed','serene'], a:'anxious', e:'= anxious.', b:'= উদ্বিগ্ন।' },
-      { p:'Synonym of "obvious"?', o:['evident','hidden','obscure','unclear'], a:'evident', e:'= evident.', b:'= স্পষ্ট।' },
-      { p:'Synonym of "polite"?', o:['courteous','rude','harsh','impolite'], a:'courteous', e:'= courteous.', b:'= ভদ্র।' },
-      { p:'Synonym of "rare"?', o:['scarce','common','usual','typical'], a:'scarce', e:'= scarce.', b:'= বিরল।' },
-      { p:'Synonym of "silent"?', o:['mute','noisy','loud','rowdy'], a:'mute', e:'= mute.', b:'= নীরব।' },
-      { p:'Synonym of "ugly"?', o:['hideous','beautiful','lovely','pretty'], a:'hideous', e:'= hideous.', b:'= কুৎসিত।' },
-      { p:'Synonym of "vacant"?', o:['empty','full','occupied','filled'], a:'empty', e:'= empty.', b:'= খালি।' },
-      { p:'Synonym of "wise"?', o:['sagacious','foolish','stupid','silly'], a:'sagacious', e:'= sagacious.', b:'= জ্ঞানী।' },
-      { p:'Synonym of "yell"?', o:['shout','whisper','murmur','mutter'], a:'shout', e:'= shout.', b:'= চিৎকার।' },
-      { p:'Synonym of "zeal"?', o:['enthusiasm','apathy','laziness','boredom'], a:'enthusiasm', e:'= enthusiasm.', b:'= উৎসাহ।' },
-      { p:'Synonym of "abundant"?', o:['plentiful','scarce','rare','limited'], a:'plentiful', e:'= plentiful.', b:'= প্রচুর।' },
-      { p:'Synonym of "brief"?', o:['short','long','lengthy','extended'], a:'short', e:'= short.', b:'= সংক্ষিপ্ত।' },
-      { p:'Synonym of "distant"?', o:['far','near','close','adjacent'], a:'far', e:'= far.', b:'= দূর।' },
-      { p:'Synonym of "enormous"?', o:['huge','tiny','small','little'], a:'huge', e:'= huge.', b:'= বিশাল।' },
     ],
   },
 
-  /* ---------- 11. ANTONYMS ---------- */
   antonyms: {
-    name: 'Antonyms', icon: 'flag',
+    name: 'Antonyms', icon: 'flag', class: 'all',
     lesson: {
       rules: [
         'Antonyms are words with opposite meanings.',
@@ -1289,37 +1291,11 @@ const QUESTION_BANK = {
       { p:'Antonym of "construct"?', o:['demolish','build','create','make'], a:'demolish', e:'Construct → demolish.', b:'Construct → demolish।' },
       { p:'Antonym of "increase"?', o:['decrease','raise','grow','expand'], a:'decrease', e:'Increase → decrease.', b:'Increase → decrease।' },
       { p:'Antonym of "polite"?', o:['rude','courteous','kind','gracious'], a:'rude', e:'Polite → rude.', b:'Polite → rude।' },
-      { p:'Antonym of "courage"?', o:['fear','bravery','valour','boldness'], a:'fear', e:'Courage → fear.', b:'Courage → fear।' },
-      { p:'Antonym of "ancient"?', o:['modern','old','antique','aged'], a:'modern', e:'Ancient → modern.', b:'Ancient → modern।' },
-      { p:'Antonym of "empty"?', o:['full','vacant','hollow','bare'], a:'full', e:'Empty → full.', b:'Empty → full।' },
-      { p:'Antonym of "friend"?', o:['enemy','ally','mate','pal'], a:'enemy', e:'Friend → enemy.', b:'Friend → enemy।' },
-      { p:'Antonym of "guilty"?', o:['innocent','blameworthy','culpable','faulty'], a:'innocent', e:'Guilty → innocent.', b:'Guilty → innocent।' },
-      { p:'Antonym of "humble"?', o:['proud','modest','meek','lowly'], a:'proud', e:'Humble → proud.', b:'Humble → proud।' },
-      { p:'Antonym of "import"?', o:['export','bring in','intake','receive'], a:'export', e:'Import → export.', b:'Import → export।' },
-      { p:'Antonym of "joy"?', o:['sorrow','happiness','delight','pleasure'], a:'sorrow', e:'Joy → sorrow.', b:'Joy → sorrow।' },
-      { p:'Antonym of "knowledge"?', o:['ignorance','wisdom','learning','insight'], a:'ignorance', e:'Knowledge → ignorance.', b:'Knowledge → ignorance।' },
-      { p:'Antonym of "liquid"?', o:['solid','fluid','watery','flowing'], a:'solid', e:'Liquid → solid.', b:'Liquid → solid।' },
-      { p:'Antonym of "major"?', o:['minor','main','chief','principal'], a:'minor', e:'Major → minor.', b:'Major → minor।' },
-      { p:'Antonym of "narrow"?', o:['wide','thin','slim','tight'], a:'wide', e:'Narrow → wide.', b:'Narrow → wide।' },
-      { p:'Antonym of "obedient"?', o:['disobedient','submissive','dutiful','compliant'], a:'disobedient', e:'Obedient → disobedient.', b:'Obedient → disobedient।' },
-      { p:'Antonym of "permanent"?', o:['temporary','lasting','durable','stable'], a:'temporary', e:'Permanent → temporary.', b:'Permanent → temporary।' },
-      { p:'Antonym of "quiet"?', o:['noisy','silent','calm','peaceful'], a:'noisy', e:'Quiet → noisy.', b:'Quiet → noisy।' },
-      { p:'Antonym of "right"?', o:['wrong','correct','accurate','proper'], a:'wrong', e:'Right → wrong.', b:'Right → wrong।' },
-      { p:'Antonym of "safe"?', o:['dangerous','secure','protected','harmless'], a:'dangerous', e:'Safe → dangerous.', b:'Safe → dangerous।' },
-      { p:'Antonym of "tall"?', o:['short','high','lofty','elevated'], a:'short', e:'Tall → short.', b:'Tall → short।' },
-      { p:'Antonym of "unite"?', o:['divide','join','combine','merge'], a:'divide', e:'Unite → divide.', b:'Unite → divide।' },
-      { p:'Antonym of "victory"?', o:['defeat','triumph','win','success'], a:'defeat', e:'Victory → defeat.', b:'Victory → defeat।' },
-      { p:'Antonym of "wise"?', o:['foolish','sagacious','prudent','sensible'], a:'foolish', e:'Wise → foolish.', b:'Wise → foolish।' },
-      { p:'Antonym of "young"?', o:['old','new','fresh','juvenile'], a:'old', e:'Young → old.', b:'Young → old।' },
-      { p:'Antonym of "zeal"?', o:['apathy','enthusiasm','passion','fervour'], a:'apathy', e:'Zeal → apathy.', b:'Zeal → apathy।' },
-      { p:'Antonym of "advance"?', o:['retreat','progress','move','forward'], a:'retreat', e:'Advance → retreat.', b:'Advance → retreat।' },
-      { p:'Antonym of "bitter"?', o:['sweet','sour','harsh','sharp'], a:'sweet', e:'Bitter → sweet.', b:'Bitter → sweet।' },
     ],
   },
 
-  /* ---------- 12. PUNCTUATION ---------- */
   punctuation: {
-    name: 'Punctuation', icon: 'grid',
+    name: 'Punctuation', icon: 'grid', class: 'all',
     lesson: {
       rules: [
         'Comma (,) — separates items, clauses, after introductory phrases.',
@@ -1384,9 +1360,8 @@ const QUESTION_BANK = {
     ],
   },
 
-  /* ---------- 13. GAP FILLING WITH CLUES ---------- */
   gapClue: {
-    name: 'Gap Filling (with clues)', icon: 'book',
+    name: 'Gap Filling (with clues)', icon: 'book', class: 'all',
     lesson: {
       rules: [
         'Use the clue in brackets to decide the correct word form.',
@@ -1455,9 +1430,8 @@ const QUESTION_BANK = {
     ],
   },
 
-  /* ---------- 14. GAP FILLING WITHOUT CLUES ---------- */
   gapNoClue: {
-    name: 'Gap Filling (no clues)', icon: 'flag',
+    name: 'Gap Filling (no clues)', icon: 'flag', class: 'all',
     lesson: {
       rules: [
         'Choose the correct preposition from context.',
@@ -1526,9 +1500,8 @@ const QUESTION_BANK = {
     ],
   },
 
-  /* ---------- 15. REARRANGING ---------- */
   rearranging: {
-    name: 'Rearranging Sentences', icon: 'grid',
+    name: 'Rearranging Sentences', icon: 'grid', class: 'all',
     lesson: {
       rules: [
         'Basic order: Subject + Verb + Object + Adverbial.',
@@ -1597,9 +1570,8 @@ const QUESTION_BANK = {
     ],
   },
 
-  /* ---------- 16. TRANSLATION ---------- */
   translation: {
-    name: 'Translation (BN ↔ EN)', icon: 'chat',
+    name: 'Translation (BN ↔ EN)', icon: 'chat', class: 'all',
     lesson: {
       rules: [
         'Bangla → English: identify tense from time markers.',
@@ -1668,9 +1640,8 @@ const QUESTION_BANK = {
     ],
   },
 
-  /* ---------- 17. IDIOMS & PHRASES ---------- */
   idioms: {
-    name: 'Idioms & Phrases', icon: 'trophy',
+    name: 'Idioms & Phrases', icon: 'trophy', class: 'all',
     lesson: {
       rules: [
         'Idioms have figurative meanings — not literal.',
@@ -1737,9 +1708,8 @@ const QUESTION_BANK = {
     ],
   },
 
-  /* ---------- 18. PHRASAL VERBS ---------- */
   phrasalVerbs: {
-    name: 'Phrasal Verbs', icon: 'zap',
+    name: 'Phrasal Verbs', icon: 'zap', class: 'all',
     lesson: {
       rules: [
         'Phrasal verb = verb + preposition/adverb → new meaning.',
@@ -1812,9 +1782,8 @@ const QUESTION_BANK = {
     ],
   },
 
-  /* ---------- 19. COLLOCATIONS ---------- */
   collocations: {
-    name: 'Collocations', icon: 'users',
+    name: 'Collocations', icon: 'users', class: 'all',
     lesson: {
       rules: [
         'Collocation = words that naturally go together.',
@@ -1882,9 +1851,8 @@ const QUESTION_BANK = {
     ],
   },
 
-  /* ---------- 20. CONDITIONALS ---------- */
   conditionals: {
-    name: 'Conditionals', icon: 'target',
+    name: 'Conditionals', icon: 'target', class: 'all',
     lesson: {
       rules: [
         'Zero: if + present simple, present simple (universal truth).',
@@ -1955,9 +1923,8 @@ const QUESTION_BANK = {
     ],
   },
 
-  /* ---------- 21. MODALS ---------- */
   modals: {
-    name: 'Modal Verbs', icon: 'zap',
+    name: 'Modal Verbs', icon: 'zap', class: 'all',
     lesson: {
       rules: [
         'Can = ability; May = permission/possibility; Must = obligation.',
@@ -2026,9 +1993,8 @@ const QUESTION_BANK = {
     ],
   },
 
-  /* ---------- 22. WORD FORMATION ---------- */
   wordFormation: {
-    name: 'Word Formation', icon: 'book',
+    name: 'Word Formation', icon: 'book', class: 'all',
     lesson: {
       rules: [
         'Noun forms: -tion, -ment, -ness, -ity (decision, movement, kindness).',
@@ -2097,9 +2063,8 @@ const QUESTION_BANK = {
     ],
   },
 
-  /* ---------- 23. QUESTION TAGS ---------- */
   questionTags: {
-    name: 'Question Tags', icon: 'chat',
+    name: 'Question Tags', icon: 'chat', class: 'all',
     lesson: {
       rules: [
         'Positive statement → negative tag; negative → positive.',
@@ -2162,9 +2127,8 @@ const QUESTION_BANK = {
     ],
   },
 
-  /* ---------- 24. SUBJECT-VERB AGREEMENT ---------- */
   subjectVerbAgreement: {
-    name: 'Subject-Verb Agreement', icon: 'users',
+    name: 'Subject-Verb Agreement', icon: 'users', class: 'all',
     lesson: {
       rules: [
         'Singular subject → singular verb; plural → plural.',
@@ -2234,246 +2198,312 @@ const QUESTION_BANK = {
     ],
   },
 
-  /* ---------- 25. DIRECT/INDIRECT OBJECT ---------- */
-  objects: {
-    name: 'Direct & Indirect Objects', icon: 'target',
+  /* ================= IELTS-SPECIFIC ================= */
+  ieltsListening: {
+    name: 'IELTS Listening', icon: 'chat', class: 'IELTS',
     lesson: {
       rules: [
-        'Direct object = what receives the action.',
-        'Indirect object = to/for whom the action is done.',
-        'Both can become passive subject.',
+        'IELTS Listening has 4 sections, 40 questions, ~30 minutes.',
+        'Sections 1–2 are everyday/social; 3–4 are academic.',
+        'Listen for <strong>signpost words</strong>: "first", "next", "finally".',
+        'Watch for <strong>numbers, dates, names</strong> — spelling matters!',
+        'Transfer answers carefully in the 10-minute transfer time.',
+        '<strong>Common traps</strong>: corrections ("actually", "sorry"), change of plan.',
       ],
       examples: [
-        'She sent <strong>me</strong> (IO) a <strong>letter</strong> (DO).',
-        'He gave <strong>her</strong> a <strong>gift</strong>.',
+        'Notice: "The museum is closed <strong>on Mondays</strong>."',
+        'Date: "The festival begins on <strong>15th March</strong>."',
+        'Number: "The course costs <strong>£450</strong>."',
+        'Spelling: "Her surname is <strong>Thomson</strong> — T-H-O-M-S-O-N."',
       ],
-      bangla: 'Direct object = যা কাজটি গ্রহণ করে। Indirect object = কাকে/কার জন্য করা হয়।',
+      bangla: 'IELTS Listening এ সংখ্যা, তারিখ, নাম মনোযোগ দিয়ে শুনতে হয়। বানান সঠিক রাখা জরুরি। "Actually/Sorry" দিয়ে সংশোধন এলে শেষ তথ্যটি সঠিক।',
     },
     questions: [
-      { p:'Identify direct object: "She gave me a gift."', o:['me','gift','she','gave'], a:'gift', e:'Gift receives action.', b:'Gift কাজ গ্রহণ করে।' },
-      { p:'Identify indirect object: "He sent her a letter."', o:['her','letter','he','sent'], a:'her', e:'Her = recipient.', b:'Her = প্রাপক।' },
-      { p:'Which is the direct object in "I bought him a book"?', o:['him','book','I','bought'], a:'book', e:'Book receives.', b:'Book গ্রহণ করে।' },
-      { p:'Which is the indirect object in "They told us a story"?', o:['us','story','they','told'], a:'us', e:'Us = recipient.', b:'Us = প্রাপক।' },
-      { p:'Direct object in "She cooked me dinner"?', o:['dinner','me','she','cooked'], a:'dinner', e:'Dinner receives.', b:'Dinner গ্রহণ করে।' },
-      { p:'Indirect object in "He passed the salt to her"?', o:['her','salt','he','passed'], a:'her', e:'Her = recipient.', b:'Her = প্রাপক।' },
-      { p:'Direct object in "They showed the visitors the garden"?', o:['garden','visitors','they','showed'], a:'garden', e:'Garden receives.', b:'Garden গ্রহণ করে।' },
-      { p:'Indirect object in "The teacher gave the students homework"?', o:['students','homework','teacher','gave'], a:'students', e:'Students = recipients.', b:'Students = প্রাপক।' },
+      { p:'"The museum is closed on ___."', o:['Monday','Sunday','Saturday','Friday'], a:'Monday', e:'Notice signpost.', b:'Notice signpost।' },
+      { p:'"Her surname is ___."', o:['Thomson','Thompson','Tomsan','Thomsan'], a:'Thomson', e:'Spelling test.', b:'বানান পরীক্ষা।' },
+      { p:'"The course costs ___."', o:['£450','£415','£540','£405'], a:'£450', e:'Numbers listen.', b:'সংখ্যা শোনা।' },
+      { p:'"The festival begins on ___."', o:['15th March','5th March','15th May','50th March'], a:'15th March', e:'Date format.', b:'তারিখ ফরম্যাট।' },
+      { p:'"Departure time is ___."', o:['6:15','6:50','6:05','6:45'], a:'6:15', e:'Time listening.', b:'সময় শোনা।' },
+      { p:'"It costs £___."', o:['9.50','9.15','9.90','9.05'], a:'9.50', e:'Price listening.', b:'মূল্য শোনা।' },
+      { p:'"She lives on ___ Street."', o:['Green','Grean','Greene','Grene'], a:'Green', e:'Spelling.', b:'বানান।' },
+      { p:'"The phone number is ___."', o:['07544 233 890','07544 223 890','07544 233 980','07504 233 890'], a:'07544 233 890', e:'Numbers.', b:'সংখ্যা।' },
+      { p:'"The tour lasts ___ hours."', o:['three','two','four','five'], a:'three', e:'Number word.', b:'সংখ্যা শব্দ।' },
+      { p:'"The flight departs at ___."', o:['14:30','15:30','13:30','14:13'], a:'14:30', e:'24-hour time.', b:'24-ঘণ্টা সময়।' },
+      { p:'Signpost: "___ we will visit the library."', o:['Next','Actually','Sorry','Never'], a:'Next', e:'Sequence marker.', b:'ক্রম চিহ্ন।' },
+      { p:'"Actually, the meeting is on ___."', o:['Tuesday','Thursday','Monday','Wednesday'], a:'Tuesday', e:'Correction.', b:'সংশোধন।' },
+      { p:'"The students will meet at the ___."', o:['cafeteria','library','gym','hall'], a:'cafeteria', e:'Place word.', b:'স্থান শব্দ।' },
+      { p:'"Please bring your ___."', o:['passport','ticket','notebook','umbrella'], a:'passport', e:'Item to bring.', b:'আনার জিনিস।' },
+      { p:'"The lecture begins at ___."', o:['9:00 AM','8:00 AM','10:00 AM','7:00 AM'], a:'9:00 AM', e:'Schedule.', b:'সময়সূচি।' },
+      { p:'"There are ___ students in the class."', o:['30','13','40','50'], a:'30', e:'Numbers.', b:'সংখ্যা।' },
+      { p:'"The library is on the ___ floor."', o:['second','first','third','fourth'], a:'second', e:'Ordinal number.', b:'ক্রম সংখ্যা।' },
+      { p:'"You need to pay £___."', o:['25.50','25.15','52.50','20.50'], a:'25.50', e:'Price.', b:'মূল্য।' },
+      { p:'"The train leaves from platform ___."', o:['4','2','3','5'], a:'4', e:'Platform number.', b:'প্ল্যাটফর্ম নম্বর।' },
+      { p:'"Her email is kate___@email.com."', o:['.smith','_smith','smith','smth'], a:'.smith', e:'Email listening.', b:'ইমেইল শোনা।' },
     ],
   },
 
-  /* ---------- 26. GERUNDS & INFINITIVES ---------- */
-  gerundInfinitive: {
-    name: 'Gerunds & Infinitives', icon: 'book',
+  ieltsReading: {
+    name: 'IELTS Reading', icon: 'book', class: 'IELTS',
     lesson: {
       rules: [
-        'Gerund = verb + ing, acts as noun (Swimming is fun).',
-        'Infinitive = to + base verb (to swim).',
-        'Some verbs take gerund: enjoy, mind, avoid, suggest.',
-        'Some verbs take infinitive: want, hope, decide, plan.',
-        'After prepositions, use gerund (good at singing).',
+        'IELTS Reading: 3 passages, 40 questions, 60 minutes.',
+        'Question types: T/F/NG, Matching Headings, MCQ, Sentence Completion.',
+        'Skim for <strong>main idea</strong>, scan for <strong>keywords</strong>.',
+        'True = stated; False = opposite stated; Not Given = no info.',
+        'Do NOT spend more than 1.5 minutes per question.',
+        'Watch for paraphrases — synonyms in question vs text.',
       ],
       examples: [
-        'I enjoy <strong>reading</strong>.',
-        'He wants <strong>to go</strong>.',
-        'She is good at <strong>singing</strong>.',
+        'Text: "Many scientists agree…" Q: "All scientists agree" → <strong>False</strong>.',
+        'Text does not mention "cost" → answer to cost question is <strong>Not Given</strong>.',
+        'Skim paragraph 1 for the main idea.',
       ],
-      bangla: 'Preposition এর পরে gerund বসে। Want/hope/decide এর পরে infinitive। Enjoy/mind/avoid এর পরে gerund।',
+      bangla: 'IELTS Reading এ skim ও scan কৌশল ব্যবহার করুন। True মানে হুবহু বলা, False মানে বিপরীত বলা, Not Given মানে কোনো তথ্য নেই।',
     },
     questions: [
-      { p:'I enjoy ___ books.', o:['read','reads','reading','to read'], a:'reading', e:'Enjoy + gerund.', b:'Enjoy + gerund।' },
-      { p:'She wants ___ a doctor.', o:['become','becoming','to become','became'], a:'to become', e:'Want + infinitive.', b:'Want + infinitive।' },
-      { p:'He is good at ___ .', o:['sing','sings','singing','sang'], a:'singing', e:'Preposition + gerund.', b:'Preposition + gerund।' },
-      { p:'Would you mind ___ the door?', o:['close','closing','to close','closed'], a:'closing', e:'Mind + gerund.', b:'Mind + gerund।' },
-      { p:'I hope ___ you soon.', o:['see','seeing','to see','saw'], a:'to see', e:'Hope + infinitive.', b:'Hope + infinitive।' },
-      { p:'She avoided ___ him.', o:['meet','meeting','to meet','met'], a:'meeting', e:'Avoid + gerund.', b:'Avoid + gerund।' },
-      { p:'They decided ___ early.', o:['leave','leaving','to leave','left'], a:'to leave', e:'Decide + infinitive.', b:'Decide + infinitive।' },
-      { p:'He suggested ___ a taxi.', o:['take','taking','to take','took'], a:'taking', e:'Suggest + gerund.', b:'Suggest + gerund।' },
-      { p:'I am looking forward to ___ you.', o:['meet','meeting','to meet','met'], a:'meeting', e:'Look forward to + gerund.', b:'Look forward to + gerund।' },
-      { p:'She is afraid of ___ .', o:['fly','flying','to fly','flew'], a:'flying', e:'Preposition + gerund.', b:'Preposition + gerund।' },
-      { p:'He plans ___ a new business.', o:['start','starting','to start','started'], a:'to start', e:'Plan + infinitive.', b:'Plan + infinitive।' },
-      { p:'I forgot ___ the door.', o:['lock','locking','to lock','locked'], a:'to lock', e:'Forget + infinitive.', b:'Forget + infinitive।' },
-      { p:'She keeps ___ me.', o:['call','calling','to call','called'], a:'calling', e:'Keep + gerund.', b:'Keep + gerund।' },
-      { p:'We expect ___ the match.', o:['win','winning','to win','won'], a:'to win', e:'Expect + infinitive.', b:'Expect + infinitive।' },
-      { p:'He denied ___ the money.', o:['take','taking','to take','took'], a:'taking', e:'Deny + gerund.', b:'Deny + gerund।' },
-      { p:'I promise ___ on time.', o:['be','being','to be','been'], a:'to be', e:'Promise + infinitive.', b:'Promise + infinitive।' },
-      { p:'She is used to ___ early.', o:['get up','getting up','to get up','got up'], a:'getting up', e:'Used to + gerund.', b:'Used to + gerund।' },
-      { p:'He refused ___ the offer.', o:['accept','accepting','to accept','accepted'], a:'to accept', e:'Refuse + infinitive.', b:'Refuse + infinitive।' },
-      { p:'I am thinking of ___ a new car.', o:['buy','buying','to buy','bought'], a:'buying', e:'Preposition + gerund.', b:'Preposition + gerund।' },
-      { p:'They managed ___ the problem.', o:['solve','solving','to solve','solved'], a:'to solve', e:'Manage + infinitive.', b:'Manage + infinitive।' },
-      { p:'She apologized for ___ late.', o:['be','being','to be','been'], a:'being', e:'Preposition + gerund.', b:'Preposition + gerund।' },
-      { p:'He offered ___ me.', o:['help','helping','to help','helped'], a:'to help', e:'Offer + infinitive.', b:'Offer + infinitive।' },
-      { p:'I don\'t mind ___ .', o:['wait','waiting','to wait','waited'], a:'waiting', e:'Mind + gerund.', b:'Mind + gerund।' },
-      { p:'They agreed ___ the contract.', o:['sign','signing','to sign','signed'], a:'to sign', e:'Agree + infinitive.', b:'Agree + infinitive।' },
-      { p:'She is interested in ___ French.', o:['learn','learning','to learn','learned'], a:'learning', e:'Preposition + gerund.', b:'Preposition + gerund।' },
-      { p:'I can\'t afford ___ that car.', o:['buy','buying','to buy','bought'], a:'to buy', e:'Afford + infinitive.', b:'Afford + infinitive।' },
-      { p:'He is tired of ___ the same thing.', o:['do','doing','to do','did'], a:'doing', e:'Preposition + gerund.', b:'Preposition + gerund।' },
-      { p:'She hopes ___ a scholarship.', o:['get','getting','to get','got'], a:'to get', e:'Hope + infinitive.', b:'Hope + infinitive।' },
-      { p:'We discussed ___ to London.', o:['move','moving','to move','moved'], a:'moving', e:'Discuss + gerund.', b:'Discuss + gerund।' },
-      { p:'He promised ___ me later.', o:['call','calling','to call','called'], a:'to call', e:'Promise + infinitive.', b:'Promise + infinitive।' },
+      { p:'Text: "Many scientists agree that climate is changing." Q: "All scientists agree climate is changing."', o:['True','False','Not Given','Cannot say'], a:'False', e:'"Many" ≠ "All".', b:'"Many" ≠ "All"।' },
+      { p:'Text does not mention the cost. Q: "The cost is high."', o:['True','False','Not Given','Maybe'], a:'Not Given', e:'No info.', b:'তথ্য নেই।' },
+      { p:'Text: "The company was founded in 1990." Q: "The company was founded in 1990."', o:['True','False','Not Given','Cannot say'], a:'True', e:'Direct statement.', b:'সরাসরি বক্তব্য।' },
+      { p:'Text: "He rarely visits." Q: "He visits often."', o:['True','False','Not Given','Cannot say'], a:'False', e:'Opposite.', b:'বিপরীত।' },
+      { p:'Text: "Most students pass." Q: "Some students pass."', o:['True','False','Not Given','Cannot say'], a:'True', e:'"Most" implies "some".', b:'"Most" → "some" ধরে।' },
+      { p:'Text says nothing about the price. Q: "The price is expensive."', o:['True','False','Not Given','Cannot say'], a:'Not Given', e:'No price info.', b:'মূল্যের তথ্য নেই।' },
+      { p:'Text: "The film was released in 2019." Q: "The film was released in 2020."', o:['True','False','Not Given','Cannot say'], a:'False', e:'Wrong year.', b:'ভুল বছর।' },
+      { p:'Text: "Only a few people attended." Q: "The event was poorly attended."', o:['True','False','Not Given','Cannot say'], a:'True', e:'Synonym paraphrase.', b:'Synonym paraphrase।' },
+      { p:'Text: "It might rain tomorrow." Q: "It will definitely rain tomorrow."', o:['True','False','Not Given','Cannot say'], a:'False', e:'"Might" ≠ "definitely".', b:'"Might" ≠ "definitely"।' },
+      { p:'Text: "The building is old." Q: "The building is historic."', o:['True','False','Not Given','Cannot say'], a:'Not Given', e:'"Old" ≠ "historic" without info.', b:'তথ্য ছাড়া অনুমান নয়।' },
+      { p:'Text: "She loves reading." Q: "She enjoys books."', o:['True','False','Not Given','Cannot say'], a:'True', e:'Synonym.', b:'Synonym।' },
+      { p:'Text: "It was built in 1900." Q: "It is over 100 years old."', o:['True','False','Not Given','Cannot say'], a:'True', e:'Inference from year.', b:'বছর থেকে অনুমান।' },
+      { p:'Text: "This solution has been widely criticized." Q: "The solution is popular."', o:['True','False','Not Given','Cannot say'], a:'False', e:'Opposite.', b:'বিপরীত।' },
+      { p:'Text: "The study was conducted in 3 countries." Q: "The study was international."', o:['True','False','Not Given','Cannot say'], a:'True', e:'Inference.', b:'অনুমান।' },
+      { p:'Text: "The movie is 2 hours long." Q: "The movie is boring."', o:['True','False','Not Given','Cannot say'], a:'Not Given', e:'No opinion.', b:'মতামত নেই।' },
+      { p:'Text: "There are two versions." Q: "There are more than one version."', o:['True','False','Not Given','Cannot say'], a:'True', e:'Two > one.', b:'দুই মানে একাধিক।' },
+      { p:'Text: "The product costs $50." Q: "The product costs less than $100."', o:['True','False','Not Given','Cannot say'], a:'True', e:'Comparison.', b:'তুলনা।' },
+      { p:'Text says the man is a teacher. Q: "The man works at a school."', o:['True','False','Not Given','Cannot say'], a:'Not Given', e:'Teacher may not work at school.', b:'শিক্ষক মানেই স্কুলে নয়।' },
+      { p:'Text: "The museum is free on Sundays." Q: "You pay to enter on Sundays."', o:['True','False','Not Given','Cannot say'], a:'False', e:'Opposite.', b:'বিপরীত।' },
+      { p:'Text: "The number of visitors doubled last year." Q: "Visitor numbers increased significantly."', o:['True','False','Not Given','Cannot say'], a:'True', e:'Doubled = significant.', b:'দ্বিগুণ = উল্লেখযোগ্য।' },
     ],
   },
 
-  /* ---------- 27. ACTIVE TO PASSIVE (FURTHER) ---------- */
-  passiveFurther: {
-    name: 'Passive Voice (Advanced)', icon: 'chat',
+  ieltsWritingTask1: {
+    name: 'IELTS Writing Task 1', icon: 'target', class: 'IELTS',
     lesson: {
       rules: [
-        'Passive with modal: modal + be + V3.',
-        'Passive with two objects: either object can become subject.',
-        'Impersonal passive: It is said that… / He is said to…',
-        'Passive of perception verbs: He was seen crossing.',
+        'Task 1 = <strong>150 words minimum</strong>, 20 minutes.',
+        'Describe graphs, charts, tables, maps, or processes.',
+        'Structure: <strong>Introduction → Overview → Details (2 paragraphs)</strong>.',
+        'Use <strong>comparative language</strong>: more than, higher, doubled, in contrast.',
+        'Never give opinions in Task 1 — only describe data.',
+        'Use accurate tense: past for past years, present for general trends.',
       ],
       examples: [
-        'The rules <strong>must be obeyed</strong>.',
-        'He <strong>is said to be</strong> honest.',
-        'He <strong>was seen crossing</strong> the road.',
+        'The graph <strong>illustrates</strong>… (not "shows").',
+        '<strong>Overall</strong>, the number of cars increased steadily.',
+        'X <strong>rose sharply</strong> from 100 to 300 between 2010 and 2020.',
+        '<strong>In contrast</strong>, Y declined by 20%.',
       ],
-      bangla: 'Modal passive: modal + be + V3। Impersonal passive: It is said that…',
+      bangla: 'Task 1 এ graph/chart বর্ণনা করতে হয়। Introduction → Overview → Details কাঠামো অনুসরণ করুন। মতামত দেওয়া যাবে না।',
     },
     questions: [
-      { p:'Passive: "They must obey the rules."', o:['The rules must be obeyed.','The rules must obey.','The rules are obeyed.','The rules were obeyed.'], a:'The rules must be obeyed.', e:'Modal passive.', b:'Modal passive।' },
-      { p:'Passive: "People say that he is honest."', o:['He is said to be honest.','He is said honest.','He was said honest.','He has said honest.'], a:'He is said to be honest.', e:'Impersonal passive.', b:'Impersonal passive।' },
-      { p:'Passive: "They believe that she stole the money."', o:['She is believed to have stolen the money.','She is believed to steal.','She was believed to steal.','She believed the money.'], a:'She is believed to have stolen the money.', e:'Perfect infinitive.', b:'Perfect infinitive।' },
-      { p:'Passive: "I saw him crossing the road."', o:['He was seen crossing the road.','He saw crossing the road.','He is seen crossing.','He was seeing crossing.'], a:'He was seen crossing the road.', e:'Perception verb passive.', b:'Perception verb passive।' },
-      { p:'Passive: "They made him captain."', o:['He was made captain.','He is made captain.','He made captain.','He has made captain.'], a:'He was made captain.', e:'Object complement.', b:'Object complement।' },
-      { p:'Passive: "We expected him to win."', o:['He was expected to win.','He is expected to win.','He expected to win.','He has expected to win.'], a:'He was expected to win.', e:'Infinitive passive.', b:'Infinitive passive।' },
-      { p:'Passive: "They will have finished the work."', o:['The work will have been finished.','The work will have finished.','The work has been finished.','The work was finished.'], a:'The work will have been finished.', e:'Future perfect passive.', b:'Future perfect passive।' },
-      { p:'Passive: "Does she write poems?"', o:['Are poems written by her?','Are poems wrote by her?','Are poems writing by her?','Is poems written by her?'], a:'Are poems written by her?', e:'Question passive.', b:'Question passive।' },
-      { p:'Passive: "Someone has taken my umbrella."', o:['My umbrella has been taken.','My umbrella has taken.','My umbrella was taken.','My umbrella is taking.'], a:'My umbrella has been taken.', e:'Present perfect passive.', b:'Present perfect passive।' },
-      { p:'Passive: "They had sold the house."', o:['The house had been sold.','The house had sold.','The house was sold.','The house is sold.'], a:'The house had been sold.', e:'Past perfect passive.', b:'Past perfect passive।' },
-      { p:'Passive: "He should respect his parents."', o:['His parents should be respected.','His parents should respect.','His parents are respected.','His parents were respected.'], a:'His parents should be respected.', e:'Modal passive.', b:'Modal passive।' },
-      { p:'Passive: "They are going to build a bridge."', o:['A bridge is going to be built.','A bridge is going to build.','A bridge is built.','A bridge was built.'], a:'A bridge is going to be built.', e:'Going to passive.', b:'Going to passive।' },
-      { p:'Passive: "People must not smoke here."', o:['Smoking must not be done here.','Smoking must not do here.','Smoking is not smoke here.','Smoking was not done here.'], a:'Smoking must not be done here.', e:'Negative modal passive.', b:'Negative modal passive।' },
-      { p:'Passive: "She sent me a letter."', o:['I was sent a letter.','A letter was sent me.','I sent a letter.','A letter is sent me.'], a:'I was sent a letter.', e:'Two-object passive.', b:'Two-object passive।' },
-      { p:'Passive: "He gave her a gift."', o:['She was given a gift.','A gift was given her.','She gave a gift.','She is given a gift.'], a:'She was given a gift.', e:'Two-object passive.', b:'Two-object passive।' },
-      { p:'Passive: "Who broke the window?"', o:['By whom was the window broken?','Who was broken the window?','Who is broken the window?','Whom broke the window?'], a:'By whom was the window broken?', e:'Wh-question passive.', b:'Wh-question passive।' },
-      { p:'Passive: "They laughed at him."', o:['He was laughed at.','He laughed at.','He is laughing.','He was laughing.'], a:'He was laughed at.', e:'Keep preposition.', b:'Preposition রাখা।' },
-      { p:'Passive: "They look after the children."', o:['The children are looked after.','The children are looked.','The children look after.','The children were looking.'], a:'The children are looked after.', e:'Keep preposition.', b:'Preposition রাখা।' },
-      { p:'Passive: "Who did this?"', o:['By whom was this done?','Who was done this?','Who is done this?','Whom did this?'], a:'By whom was this done?', e:'Question passive.', b:'Question passive।' },
-      { p:'Passive: "Somebody has taken my bike."', o:['My bike has been stolen.','My bike has stolen.','My bike was stolen.','My bike is stolen.'], a:'My bike has been stolen.', e:'Present perfect passive.', b:'Present perfect passive।' },
+      { p:'The graph ___ the number of cars sold.', o:['shows','illustrates','Both are correct','None'], a:'illustrates', e:'Formal verb.', b:'আনুষ্ঠানিক verb।' },
+      { p:'"Overall," introduces the ___.', o:['introduction','overview','conclusion','opinion'], a:'overview', e:'Task 1 structure.', b:'Task 1 গঠন।' },
+      { p:'"X rose sharply from 100 to 300." This is a ___.', o:['detail','opinion','overview','recommendation'], a:'detail', e:'Data detail.', b:'তথ্য বিবরণ।' },
+      { p:'The graph shows a rise in sales. Which is correct?', o:['Sales decreased.','Sales increased.','Sales stayed the same.','Sales fell.'], a:'Sales increased.', e:'Rise = increase.', b:'Rise = বাড়া।' },
+      { p:'To describe two opposite trends:', o:['In contrast','Similarly','Moreover','For instance'], a:'In contrast', e:'Contrast linker.', b:'বৈপরীত্য সংযোগ।' },
+      { p:'"The figure ___ at 500."', o:['peaked','dropped','started','ended'], a:'peaked', e:'Peak vocabulary.', b:'শীর্ষ শব্দ।' },
+      { p:'"The number of visitors ___ by 20%."', o:['declined','rose','peaked','remained'], a:'declined', e:'Fall verb.', b:'পতন verb।' },
+      { p:'"The data shows a ___ trend from 2010 to 2020."', o:['upward','downward','Both possible','None'], a:'upward', e:'Depends on data.', b:'তথ্যের উপর নির্ভরশীল।' },
+      { p:'"A gradual increase" means:', o:['Slow, steady growth','Sudden growth','Decrease','No change'], a:'Slow, steady growth', e:'Vocabulary.', b:'শব্দভাণ্ডার।' },
+      { p:'Which verb means "stay the same"?', o:['remain stable','rise','fall','peak'], a:'remain stable', e:'No change.', b:'পরিবর্তন নেই।' },
+      { p:'Task 1 minimum word count:', o:['150','120','200','250'], a:'150', e:'IELTS rules.', b:'IELTS নিয়ম।' },
+      { p:'Which is NOT allowed in Task 1?', o:['Opinions','Comparisons','Overview','Facts'], a:'Opinions', e:'No opinion.', b:'মতামত নিষিদ্ধ।' },
+      { p:'"X doubled" means:', o:['It increased twice','It halved','It stayed','It decreased'], a:'It increased twice', e:'Vocabulary.', b:'শব্দ।' },
+      { p:'"Compared to 2010, 2020 saw a…"', o:['rise','decrease only','rise or decrease','None'], a:'rise', e:'Depends on context.', b:'প্রেক্ষাপট অনুযায়ী।' },
+      { p:'To introduce a graph, use:', o:['The chart illustrates','The chart shows me','I think the chart','The chart says'], a:'The chart illustrates', e:'Formal.', b:'আনুষ্ঠানিক।' },
+      { p:'"A sharp decline" means:', o:['Fast decrease','Slow decrease','Increase','No change'], a:'Fast decrease', e:'Vocabulary.', b:'শব্দ।' },
+      { p:'Which is a proper overview?', o:['Overall, sales rose steadily.','I think sales rose.','Sales rose.','Rise in sales.'], a:'Overall, sales rose steadily.', e:'Overview.', b:'সারসংক্ষেপ।' },
+      { p:'Task 1 writing time:', o:['20 minutes','30 minutes','15 minutes','25 minutes'], a:'20 minutes', e:'Recommended time.', b:'সুপারিশকৃত সময়।' },
+      { p:'"Slightly increased" means:', o:['A small rise','A big rise','A fall','No change'], a:'A small rise', e:'Small = slightly.', b:'Small = সামান্য।' },
+      { p:'For processes, use:', o:['Passive voice','Opinion verbs','Future tense only','None'], a:'Passive voice', e:'Process description.', b:'প্রক্রিয়া বর্ণনা।' },
     ],
   },
 
-  /* ---------- 28. DETERMINERS ---------- */
-  determiners: {
-    name: 'Determiners', icon: 'flag',
+  ieltsWritingTask2: {
+    name: 'IELTS Writing Task 2', icon: 'book', class: 'IELTS',
     lesson: {
       rules: [
-        'Articles, demonstratives, possessives are determiners.',
-        'Quantifiers: some, any, much, many, few, little, all, both.',
-        '"Some" in positive, "any" in negative/questions.',
+        'Task 2 = <strong>250 words minimum</strong>, 40 minutes.',
+        'Essay types: Opinion, Discussion, Problem-Solution, Two-part.',
+        'Structure: <strong>Intro → Body 1 → Body 2 → Conclusion</strong>.',
+        'Intro = paraphrase question + thesis statement.',
+        'Body paragraphs = 1 main idea + explanation + example.',
+        'Conclusion = restate thesis + summary (no new ideas).',
       ],
       examples: [
-        'I have <strong>some</strong> books.',
-        'Do you have <strong>any</strong> questions?',
-        '<strong>Both</strong> my parents are teachers.',
+        'Intro: "Some people argue that… while others believe… This essay will discuss both views."',
+        'Body: "Firstly, one major advantage is…"',
+        'Conclusion: "In conclusion, although… I firmly believe that…"',
       ],
-      bangla: 'Positive এ some, negative/question এ any। Countable-এ many/few, uncountable-এ much/little।',
+      bangla: 'Task 2 এ opinion/discussion/problem-solution essay লিখতে হয়। Intro → 2 body → conclusion কাঠামোতে লিখুন।',
     },
     questions: [
-      { p:'I have ___ books.', o:['some','any','much','a little'], a:'some', e:'Positive → some.', b:'Positive → some।' },
-      { p:'Do you have ___ questions?', o:['some','any','much','a few'], a:'any', e:'Question → any.', b:'প্রশ্ন → any।' },
-      { p:'There isn\'t ___ milk left.', o:['some','any','many','a few'], a:'any', e:'Negative → any.', b:'Negative → any।' },
-      { p:'___ of my parents are teachers.', o:['Some','Both','Any','Much'], a:'Both', e:'Both of two.', b:'দুইজনের জন্য Both।' },
-      { p:'I need ___ help.', o:['some','many','a few','few'], a:'some', e:'Uncountable positive.', b:'Uncountable positive।' },
-      { p:'How ___ sugar do you want?', o:['many','much','few','a few'], a:'much', e:'Uncountable → much.', b:'Uncountable → much।' },
-      { p:'How ___ students are there?', o:['many','much','a little','little'], a:'many', e:'Countable → many.', b:'Countable → many।' },
-      { p:'I have ___ money — I can\'t buy it.', o:['little','a little','few','a few'], a:'little', e:'Uncountable negative.', b:'Uncountable negative।' },
-      { p:'She has ___ friends — she\'s lonely.', o:['few','a few','little','a little'], a:'few', e:'Countable negative.', b:'Countable negative।' },
-      { p:'I have ___ money — enough for tea.', o:['a little','little','few','a few'], a:'a little', e:'Uncountable positive.', b:'Uncountable positive।' },
-      { p:'She has ___ friends here.', o:['a few','few','little','a little'], a:'a few', e:'Countable positive.', b:'Countable positive।' },
-      { p:'___ student must wear a uniform.', o:['Every','All','Both','Some'], a:'Every', e:'Every + singular.', b:'Every + singular।' },
-      { p:'___ the students were present.', o:['Every','All','Each','Much'], a:'All', e:'All + plural.', b:'All + plural।' },
-      { p:'___ student has a book.', o:['Each','All','Some','Much'], a:'Each', e:'Each + singular.', b:'Each + singular।' },
-      { p:'I have ___ idea what to do.', o:['no','not','any','none'], a:'no', e:'No + noun.', b:'No + noun।' },
-      { p:'There are ___ apples on the table.', o:['some','any','much','a little'], a:'some', e:'Positive → some.', b:'Positive → some।' },
-      { p:'She doesn\'t have ___ money.', o:['some','any','few','a few'], a:'any', e:'Negative → any.', b:'Negative → any।' },
-      { p:'I saw ___ interesting movie.', o:['a','an','the','—'], a:'an', e:'Vowel sound.', b:'Vowel sound।' },
-      { p:'___ of them came.', o:['Both','All','Each','Every'], a:'Both', e:'Both of two.', b:'Both of two।' },
-      { p:'He gave me ___ advice.', o:['some','many','few','a few'], a:'some', e:'Uncountable.', b:'Uncountable।' },
-      { p:'I have ___ money than you.', o:['less','fewer','little','few'], a:'less', e:'Uncountable comparative.', b:'Uncountable comparative।' },
-      { p:'I have ___ books than you.', o:['less','fewer','little','few'], a:'fewer', e:'Countable comparative.', b:'Countable comparative।' },
-      { p:'___ people came to the party.', o:['Many','Much','A little','Little'], a:'Many', e:'Countable plural.', b:'Countable plural।' },
-      { p:'There is ___ water in the glass.', o:['a little','a few','many','few'], a:'a little', e:'Uncountable.', b:'Uncountable।' },
-      { p:'I have ___ patience with him.', o:['little','a little','few','a few'], a:'little', e:'Uncountable negative.', b:'Uncountable negative।' },
+      { p:'Minimum word count Task 2:', o:['250','200','150','300'], a:'250', e:'IELTS rules.', b:'IELTS নিয়ম।' },
+      { p:'Task 2 time:', o:['40 minutes','20 minutes','60 minutes','30 minutes'], a:'40 minutes', e:'Recommended.', b:'সুপারিশ।' },
+      { p:'Essay structure:', o:['Intro, 2 bodies, conclusion','Only body','Intro, conclusion','Body only'], a:'Intro, 2 bodies, conclusion', e:'Standard structure.', b:'প্রামাণ্য গঠন।' },
+      { p:'Thesis statement goes in the ___.', o:['Introduction','Body 1','Conclusion','Nowhere'], a:'Introduction', e:'Intro element.', b:'Intro উপাদান।' },
+      { p:'Which linker introduces the first point?', o:['Firstly','However','In conclusion','Nonetheless'], a:'Firstly', e:'Sequence.', b:'ক্রম।' },
+      { p:'"In conclusion" is used in the ___.', o:['Conclusion','Intro','Body','Nowhere'], a:'Conclusion', e:'Conclusion phrase.', b:'শেষ অনুচ্ছেদ।' },
+      { p:'"Some people believe X, while others think Y." This essay type is:', o:['Discussion','Problem-Solution','Advantage-Disadvantage','Two-part'], a:'Discussion', e:'Both views.', b:'উভয় মত।' },
+      { p:'Body paragraphs should contain:', o:['1 main idea + explanation + example','Only main idea','Only example','Only conclusion'], a:'1 main idea + explanation + example', e:'PEEL structure.', b:'PEEL গঠন।' },
+      { p:'Which is a strong thesis?', o:['I firmly believe that education should be free.','I think so.','Education is good.','Maybe yes.'], a:'I firmly believe that education should be free.', e:'Clear position.', b:'স্পষ্ট অবস্থান।' },
+      { p:'Concluding paragraph should NOT contain:', o:['New ideas','Summary','Thesis restatement','Conclusion'], a:'New ideas', e:'No new ideas.', b:'নতুন আইডিয়া নয়।' },
+      { p:'Which linker shows contrast?', o:['However','Furthermore','Additionally','For example'], a:'However', e:'Contrast.', b:'বৈপরীত্য।' },
+      { p:'"The main advantage is…" introduces:', o:['Advantage','Disadvantage','Conclusion','Definition'], a:'Advantage', e:'Advantage.', b:'সুবিধা।' },
+      { p:'Opinion essays require:', o:['Your clear opinion','No opinion','Two views','Only arguments'], a:'Your clear opinion', e:'Opinion essay.', b:'মতামত প্রবন্ধ।' },
+      { p:'Which is a proper example phrase?', o:['For example, in Japan…','I think Japan…','Japan is…','Japan yes…'], a:'For example, in Japan…', e:'Example marker.', b:'উদাহরণ চিহ্ন।' },
+      { p:'Which linker adds information?', o:['Furthermore','However','Yet','Although'], a:'Furthermore', e:'Addition.', b:'সংযোজন।' },
+      { p:'Task 2 essay types include all EXCEPT:', o:['Poetry','Opinion','Discussion','Problem-Solution'], a:'Poetry', e:'Not academic.', b:'একাডেমিক নয়।' },
+      { p:'A topic sentence appears at the start of:', o:['Body paragraph','Conclusion','Intro','Nowhere'], a:'Body paragraph', e:'Paragraph opener.', b:'অনুচ্ছেদ শুরু।' },
+      { p:'"This essay will discuss both views" is:', o:['Thesis statement','Conclusion','Example','Opinion'], a:'Thesis statement', e:'Intro element.', b:'Intro উপাদান।' },
+      { p:'Should you use contractions like "don\'t"?', o:['No, use "do not"','Yes, always','Only in intro','Only in conclusion'], a:'No, use "do not"', e:'Formal register.', b:'আনুষ্ঠানিক ভাষা।' },
+      { p:'Which is a strong conclusion?', o:['In conclusion, education should be free for all.','I think maybe education.','Education free.','The end.'], a:'In conclusion, education should be free for all.', e:'Strong close.', b:'শক্তিশালী সমাপ্তি।' },
     ],
   },
 
-  /* ---------- 29. INVERSION ---------- */
-  inversion: {
-    name: 'Inversion', icon: 'target',
+  ieltsSpeaking: {
+    name: 'IELTS Speaking', icon: 'users', class: 'IELTS',
     lesson: {
       rules: [
-        'Inversion after negative adverbs: Never, Rarely, Seldom, Hardly.',
-        'No sooner had…than, Hardly had…when, Scarcely had…when.',
-        'Inversion in conditionals: Were I…, Had I…, Should you…',
+        'Speaking has 3 parts: Interview, Long Turn, Discussion.',
+        'Part 1 = 4–5 min personal questions.',
+        'Part 2 = 1-minute prep + 2-minute talk from cue card.',
+        'Part 3 = 4–5 min abstract discussion.',
+        'Use varied vocabulary, no one-word answers.',
+        'Develop answers with reasons + examples + feelings.',
       ],
       examples: [
-        '<strong>Never have I</strong> seen such a thing.',
-        '<strong>No sooner had he</strong> arrived than it rained.',
-        '<strong>Had I known</strong>, I would have come.',
+        'Part 1: "Where are you from?" → "I come from Dhaka, which is the capital of Bangladesh."',
+        'Part 2: "Describe a book you enjoyed." → Structure: What, When, Why, How you felt.',
+        'Part 3: "How has reading changed in modern society?"',
       ],
-      bangla: 'Negative adverb বাক্যের শুরুতে গেলে subject-verb inversion হয়।',
+      bangla: 'IELTS Speaking এ এক-শব্দের উত্তর দেবেন না। কারণ + উদাহরণ + অনুভূতি যোগ করে উত্তর দিন।',
     },
     questions: [
-      { p:'Never ___ such a beautiful place.', o:['I have seen','have I seen','I saw','I see'], a:'have I seen', e:'Inversion.', b:'Inversion।' },
-      { p:'Rarely ___ such a thing.', o:['I have seen','have I seen','I saw','I see'], a:'have I seen', e:'Inversion.', b:'Inversion।' },
-      { p:'Seldom ___ to the cinema.', o:['he goes','does he go','he go','he went'], a:'does he go', e:'Inversion.', b:'Inversion।' },
-      { p:'Hardly ___ the station when the train left.', o:['I had reached','had I reached','I reached','I was reaching'], a:'had I reached', e:'Inversion.', b:'Inversion।' },
-      { p:'No sooner ___ than it started raining.', o:['he had arrived','had he arrived','he arrived','he arrives'], a:'had he arrived', e:'Inversion.', b:'Inversion।' },
-      { p:'Scarcely ___ when it rained.', o:['we had started','had we started','we started','we start'], a:'had we started', e:'Inversion.', b:'Inversion।' },
-      { p:'Barely ___ when the bell rang.', o:['he had finished','had he finished','he finished','he finishes'], a:'had he finished', e:'Inversion.', b:'Inversion।' },
-      { p:'Not only ___ late, but he also forgot the book.', o:['he was','was he','he is','he were'], a:'was he', e:'Inversion.', b:'Inversion।' },
-      { p:'Little ___ that he would win.', o:['he knew','did he know','he knows','he know'], a:'did he know', e:'Inversion.', b:'Inversion।' },
-      { p:'Hardly ___ when the phone rang.', o:['I had sat down','had I sat down','I sat down','I sit down'], a:'had I sat down', e:'Inversion.', b:'Inversion।' },
+      { p:'Part 1 of IELTS Speaking lasts:', o:['4–5 minutes','2–3 minutes','10 minutes','20 minutes'], a:'4–5 minutes', e:'Timing.', b:'সময়।' },
+      { p:'Part 2 has a preparation time of:', o:['1 minute','2 minutes','3 minutes','No prep'], a:'1 minute', e:'Prep time.', b:'প্রস্তুতি সময়।' },
+      { p:'Part 3 is a:', o:['Discussion','Interview','Story','Game'], a:'Discussion', e:'Abstract.', b:'বিমূর্ত আলোচনা।' },
+      { p:'Best answer to "Where are you from?"', o:['I come from Dhaka, the capital of Bangladesh.','Dhaka.','I don\'t know.','Pass.'], a:'I come from Dhaka, the capital of Bangladesh.', e:'Developed.', b:'বিস্তৃত।' },
+      { p:'Cue card tasks are in:', o:['Part 2','Part 1','Part 3','All parts'], a:'Part 2', e:'Long turn.', b:'দীর্ঘ উত্তর।' },
+      { p:'Which is a strong answer?', o:['Yes, I love sports because they keep me fit.','Yes.','No.','Maybe.'], a:'Yes, I love sports because they keep me fit.', e:'Developed.', b:'বিস্তৃত।' },
+      { p:'Speaking test total duration:', o:['11–14 minutes','5 minutes','20 minutes','30 minutes'], a:'11–14 minutes', e:'Overall.', b:'মোট।' },
+      { p:'Which one-word answers are OK?', o:['None — always develop','Yes','No','Always'], a:'None — always develop', e:'Develop.', b:'বিস্তৃত করুন।' },
+      { p:'Part 2 talk time:', o:['2 minutes','5 minutes','1 minute','3 minutes'], a:'2 minutes', e:'Talk time.', b:'কথার সময়।' },
+      { p:'Which is best for Part 3?', o:['Analytical, extended answers','Yes/no answers','Simple one-liners','Silence'], a:'Analytical, extended answers', e:'Abstract.', b:'বিমূর্ত।' },
+      { p:'A good response includes:', o:['Reason + example + feeling','Only fact','Only yes','Only no'], a:'Reason + example + feeling', e:'Depth.', b:'গভীরতা।' },
+      { p:'Which is polite?', o:['Could you repeat that, please?','What?','Eh?','Say again.'], a:'Could you repeat that, please?', e:'Polite.', b:'ভদ্র।' },
+      { p:'For Part 2, you should take notes on:', o:['Cue card points','Nothing','Only name','Only date'], a:'Cue card points', e:'Structure.', b:'গঠন।' },
+      { p:'If you don\'t understand:', o:['Politely ask for clarification','Ignore','Say "next"','Stop'], a:'Politely ask for clarification', e:'Strategy.', b:'কৌশল।' },
+      { p:'Speaking fluently means:', o:['Smooth, natural speech','Fast talking','Long words','No pauses'], a:'Smooth, natural speech', e:'Fluency.', b:'সাবলীলতা।' },
+      { p:'Part 1 questions are usually about:', o:['Personal topics','Science topics','Abstract ideas','None'], a:'Personal topics', e:'Everyday.', b:'প্রাত্যহিক।' },
+      { p:'Which is a good opener for Part 2?', o:['The book I\'d like to talk about is…','Book.','Hmm.','Yes.'], a:'The book I\'d like to talk about is…', e:'Opener.', b:'শুরু।' },
+      { p:'Part 3 topics are typically:', o:['Abstract and societal','Personal','About family only','Random'], a:'Abstract and societal', e:'Abstract.', b:'বিমূর্ত।' },
+      { p:'Should you memorize full answers?', o:['No — natural speech is better','Yes, always','Sometimes','Always'], a:'No — natural speech is better', e:'Natural.', b:'স্বাভাবিক।' },
+      { p:'Which is a good closing phrase?', o:['That\'s all about my…','Done.','Over.','Finish.'], a:'That\'s all about my…', e:'Close.', b:'সমাপ্তি।' },
     ],
   },
 
-  /* ---------- 30. COMMON ERRORS ---------- */
-  commonErrors: {
-    name: 'Common Errors', icon: 'flag',
+  ieltsVocab: {
+    name: 'IELTS Vocabulary', icon: 'trophy', class: 'IELTS',
     lesson: {
       rules: [
-        'Subject-verb agreement errors.',
-        'Wrong preposition with fixed expressions.',
-        'Wrong article (a/an/the).',
-        'Wrong tense for time marker.',
+        'IELTS tests <strong>academic vocabulary</strong> across all skills.',
+        'Learn word families: analyse, analysis, analytical, analytically.',
+        'Use topic vocabulary: environment, education, technology, health.',
+        'Avoid informal words: "kids" → "children", "a lot of" → "numerous".',
+        'Use collocations: "conduct research", "make progress".',
       ],
       examples: [
-        '✗ He go to school. → ✓ He <strong>goes</strong> to school.',
-        '✗ I am agree. → ✓ I <strong>agree</strong>.',
-        '✗ Discuss about it. → ✓ <strong>Discuss</strong> it.',
+        'Education: curriculum, pedagogy, literacy, tertiary.',
+        'Environment: sustainable, biodiversity, emissions, conservation.',
+        'Technology: innovation, automation, digital, artificial intelligence.',
       ],
-      bangla: 'SSC/HSC তে common error correction একটি গুরুত্বপূর্ণ section।',
+      bangla: 'IELTS এ একাডেমিক শব্দভাণ্ডার গুরুত্বপূর্ণ। Word families শিখুন, অনানুষ্ঠানিক শব্দ এড়িয়ে চলুন।',
     },
     questions: [
-      { p:'Find the correct sentence.', o:['He go to school.','He goes to school.','He going to school.','He gone school.'], a:'He goes to school.', e:'3rd singular -s.', b:'৩য় singular -s।' },
-      { p:'Find the correct sentence.', o:['I am agree with you.','I agree with you.','I agreeing with you.','I am agreeing.'], a:'I agree with you.', e:'No "am" with agree.', b:'Agree এর সাথে am বসে না।' },
-      { p:'Find the correct sentence.', o:['Discuss about the matter.','Discuss the matter.','Discuss on the matter.','Discuss for the matter.'], a:'Discuss the matter.', e:'No preposition.', b:'Preposition নেই।' },
-      { p:'Find the correct sentence.', o:['He is married with her.','He is married to her.','He is married at her.','He is married for her.'], a:'He is married to her.', e:'Married to.', b:'Married to।' },
-      { p:'Find the correct sentence.', o:['He is capable to do it.','He is capable of doing it.','He is capable for doing it.','He is capable in doing it.'], a:'He is capable of doing it.', e:'Capable of + gerund.', b:'Capable of + gerund।' },
-      { p:'Find the correct sentence.', o:['I am used to get up early.','I am used to getting up early.','I used to getting up early.','I am use to get up early.'], a:'I am used to getting up early.', e:'Used to + gerund.', b:'Used to + gerund।' },
-      { p:'Find the correct sentence.', o:['He insisted to go.','He insisted on going.','He insisted for going.','He insisted in going.'], a:'He insisted on going.', e:'Insist on + gerund.', b:'Insist on + gerund।' },
-      { p:'Find the correct sentence.', o:['She is senior than me.','She is senior to me.','She is senior from me.','She is senior of me.'], a:'She is senior to me.', e:'Senior to.', b:'Senior to।' },
-      { p:'Find the correct sentence.', o:['He prefers coffee than tea.','He prefers coffee to tea.','He prefers coffee over tea.','He prefers coffee from tea.'], a:'He prefers coffee to tea.', e:'Prefer to.', b:'Prefer to।' },
-      { p:'Find the correct sentence.', o:['One of my friend is here.','One of my friends is here.','One of my friends are here.','One of my friend are here.'], a:'One of my friends is here.', e:'One of + plural + singular verb.', b:'One of + plural + singular verb।' },
-      { p:'Find the correct sentence.', o:['He entered into the room.','He entered the room.','He entered in the room.','He entered at the room.'], a:'He entered the room.', e:'No preposition.', b:'Preposition নেই।' },
-      { p:'Find the correct sentence.', o:['I have finished yesterday.','I finished yesterday.','I have finish yesterday.','I has finished yesterday.'], a:'I finished yesterday.', e:'Finished past time.', b:'শেষ হওয়া অতীত সময়।' },
-      { p:'Find the correct sentence.', o:['She said me the truth.','She told me the truth.','She said to me truth.','She told the truth me.'], a:'She told me the truth.', e:'Tell + object.', b:'Tell + object।' },
-      { p:'Find the correct sentence.', o:['I look forward to see you.','I look forward to seeing you.','I look forward seeing you.','I look forward for seeing you.'], a:'I look forward to seeing you.', e:'Look forward to + gerund.', b:'Look forward to + gerund।' },
-      { p:'Find the correct sentence.', o:['He is afraid from dogs.','He is afraid of dogs.','He is afraid at dogs.','He is afraid on dogs.'], a:'He is afraid of dogs.', e:'Afraid of.', b:'Afraid of।' },
+      { p:'IELTS-appropriate synonym for "kids":', o:['Children','Youngsters','Brats','Tykes'], a:'Children', e:'Formal.', b:'আনুষ্ঠানিক।' },
+      { p:'Which word is academic?', o:['Analyse','Check out','Look at','Peek'], a:'Analyse', e:'Academic.', b:'একাডেমিক।' },
+      { p:'Which collocation is correct?', o:['Conduct research','Do research on','Make research','Take research'], a:'Conduct research', e:'Collocation.', b:'Collocation।' },
+      { p:'Formal synonym for "a lot of":', o:['Numerous','Tons of','Loads of','Lots of'], a:'Numerous', e:'Formal.', b:'আনুষ্ঠানিক।' },
+      { p:'Word family of "analyse" — the noun is:', o:['Analysis','Analytical','Analytically','Analysing'], a:'Analysis', e:'Word family.', b:'শব্দ পরিবার।' },
+      { p:'Which is environment topic vocabulary?', o:['Sustainability','Happiness','Emotion','Art'], a:'Sustainability', e:'Topic vocab.', b:'বিষয় শব্দ।' },
+      { p:'Formal synonym for "buy":', o:['Purchase','Get','Grab','Snag'], a:'Purchase', e:'Formal.', b:'আনুষ্ঠানিক।' },
+      { p:'Which is technology vocabulary?', o:['Automation','Farming','Poetry','Cooking'], a:'Automation', e:'Topic.', b:'বিষয়।' },
+      { p:'Which word is INCORRECT for academic writing?', o:['Gonna','Therefore','Subsequently','Moreover'], a:'Gonna', e:'Informal.', b:'অনানুষ্ঠানিক।' },
+      { p:'Which collocation is correct?', o:['Make progress','Do progress','Take progress','Have progress'], a:'Make progress', e:'Collocation.', b:'Collocation।' },
+      { p:'Health vocabulary:', o:['Well-being','Banking','Shopping','Flying'], a:'Well-being', e:'Topic.', b:'বিষয়।' },
+      { p:'Formal synonym for "so":', o:['Therefore','Like','Yeah','Umm'], a:'Therefore', e:'Formal linker.', b:'আনুষ্ঠানিক।' },
+      { p:'Which is NOT a word family member of "decide"?', o:['Decisionably','Decision','Decisive','Decisively'], a:'Decisionably', e:'Not a word.', b:'শব্দ নয়।' },
+      { p:'Formal synonym for "give":', o:['Provide','Hand out','Dish out','Pass'], a:'Provide', e:'Formal.', b:'আনুষ্ঠানিক।' },
+      { p:'Education vocab:', o:['Pedagogy','Pleasure','Picnic','Puzzle'], a:'Pedagogy', e:'Topic.', b:'বিষয়।' },
+      { p:'Formal phrase for "find out":', o:['Discover','Figure out','Get it','Catch on'], a:'Discover', e:'Formal.', b:'আনুষ্ঠানিক।' },
+      { p:'Which collocation is correct?', o:['Take measures','Do measures','Make measures','Have measures'], a:'Take measures', e:'Collocation.', b:'Collocation।' },
+      { p:'Formal synonym for "show":', o:['Demonstrate','Show off','Put up','Display up'], a:'Demonstrate', e:'Formal.', b:'আনুষ্ঠানিক।' },
+      { p:'Academic vocabulary for "important":', o:['Significant','Big deal','Cool','Neat'], a:'Significant', e:'Academic.', b:'একাডেমিক।' },
+      { p:'Which is NOT a word family member of "succeed"?', o:['Successment','Success','Successful','Successfully'], a:'Successment', e:'Not a word.', b:'শব্দ নয়।' },
+    ],
+  },
+
+  ieltsGrammar: {
+    name: 'IELTS Grammar', icon: 'target', class: 'IELTS',
+    lesson: {
+      rules: [
+        'IELTS uses all tenses but <strong>present perfect</strong> and <strong>passive</strong> heavily.',
+        'Complex sentences with relative clauses boost your score.',
+        'Correct use of <strong>articles</strong> (a/an/the) matters for accuracy.',
+        'Use <strong>linking words</strong>: however, therefore, moreover, in addition.',
+        'Avoid comma splices and run-on sentences.',
+        'Use consistent tense within a paragraph.',
+      ],
+      examples: [
+        '<strong>Passive</strong>: "The report was published in 2020."',
+        '<strong>Relative clause</strong>: "The study, which was conducted in 2020, showed…"',
+        '<strong>Linking</strong>: "However, this trend has recently reversed."',
+      ],
+      bangla: 'IELTS এ passive, present perfect, complex sentence, article সঠিকভাবে ব্যবহার করতে হয়। Linking words ব্যবহার জরুরি।',
+    },
+    questions: [
+      { p:'"The report ___ published in 2020."', o:['was','were','is','has'], a:'was', e:'Passive past.', b:'Past passive।' },
+      { p:'"The study ___ conducted by researchers."', o:['was','were','are','have'], a:'was', e:'Passive.', b:'Passive।' },
+      { p:'"Many students ___ graduated this year."', o:['have','has','had','having'], a:'have', e:'Present perfect plural.', b:'Present perfect plural।' },
+      { p:'"She ___ living here since 2015."', o:['has been','have been','is','was'], a:'has been', e:'Present perfect continuous.', b:'Present perfect continuous।' },
+      { p:'Best linking word: "The plan failed. ___, we learned a lot."', o:['However','Therefore','Moreover','Similarly'], a:'However', e:'Contrast.', b:'বৈপরীত্য।' },
+      { p:'Which sentence is grammatically correct?', o:['The data suggest a trend.','The data suggests a trends.','The data suggest a trends.','Data suggest trend.'], a:'The data suggest a trend.', e:'Data plural.', b:'Data plural।' },
+      { p:'Relative clause: "The book ___ I read was excellent."', o:['which','who','whose','whom'], a:'which', e:'For things.', b:'বস্তুর জন্য।' },
+      { p:'"Since 2015" is used with:', o:['Present perfect','Past simple','Future','Present simple'], a:'Present perfect', e:'Since + perfect.', b:'Since + perfect।' },
+      { p:'Which sentence is correct?', o:['She has been working here for years.','She has been work here for years.','She has work here for years.','She work here for years.'], a:'She has been working here for years.', e:'Perfect continuous.', b:'Perfect continuous।' },
+      { p:'Best linker: "The cost rose. ___, demand fell."', o:['In contrast','Therefore','Similarly','Moreover'], a:'In contrast', e:'Contrast.', b:'বৈপরীত্য।' },
+      { p:'"The company ___ by a foreign investor in 2019."', o:['was bought','were bought','is bought','has bought'], a:'was bought', e:'Passive past.', b:'Past passive।' },
+      { p:'"I have ___ in Dhaka for 10 years."', o:['lived','live','living','lives'], a:'lived', e:'Perfect.', b:'Perfect।' },
+      { p:'Correct: "If I ___ more time, I would learn another language."', o:['had','have','had had','has'], a:'had', e:'Second conditional.', b:'Second conditional।' },
+      { p:'Which is correct?', o:['Hardly had I arrived when it started raining.','Hardly I had arrived when it started raining.','Hardly had I arrived than it started raining.','Hardly I had arrived than it started raining.'], a:'Hardly had I arrived when it started raining.', e:'Inversion.', b:'Inversion।' },
+      { p:'"The rise in prices ___ caused by inflation."', o:['was','were','have','has'], a:'was', e:'Singular.', b:'একবচন।' },
+      { p:'Best linker for addition:', o:['Moreover','However','Therefore','Nevertheless'], a:'Moreover', e:'Addition.', b:'সংযোজন।' },
+      { p:'"Scientists ___ that the climate is changing."', o:['believe','believes','believing','believed now'], a:'believe', e:'Plural verb.', b:'বহুবচন verb।' },
+      { p:'"The results of the survey ___ surprising."', o:['were','was','is','has'], a:'were', e:'Plural subject.', b:'বহুবচন subject।' },
+      { p:'Which is correct?', o:['Neither of the answers is correct.','Neither of the answers are correct.','Neither answers is correct.','Neither answer are correct.'], a:'Neither of the answers is correct.', e:'Neither + singular.', b:'Neither + একবচন।' },
+      { p:'Best linking for result:', o:['Therefore','However','Although','Whereas'], a:'Therefore', e:'Result.', b:'ফলাফল।' },
     ],
   },
 };
 
 /* ============================================================
-   TABS / FILTERS
+   Build TABS — filtered by class
    ============================================================ */
-const TABS = Object.entries(QUESTION_BANK).map(([id, cat]) => ({
+const ALL_TABS = Object.entries(QUESTION_BANK).map(([id, cat]) => ({
   id,
   label: cat.name,
   icon: cat.icon,
   count: cat.questions.length,
+  class: cat.class || 'all',
 }));
 
 const CLASSES = ['SSC', 'HSC', 'IELTS', 'General'];
@@ -2492,6 +2522,9 @@ const FALLBACK_WRITING = [
 ];
 
 const TOTAL_QUESTIONS = Object.values(QUESTION_BANK).reduce((s, c) => s + c.questions.length, 0);
+const IELTS_QUESTIONS = Object.values(QUESTION_BANK)
+  .filter((c) => c.class === 'IELTS')
+  .reduce((s, c) => s + c.questions.length, 0);
 
 /* ============================================================
    Mascot
@@ -2561,9 +2594,28 @@ export function Curriculum() {
       .catch(() => setWritingBank([]));
   }, [writingType]);
 
-  const cat = QUESTION_BANK[catId];
-  const question = cat.questions[qIndex];
-  const totalForCat = cat.questions.length;
+  /* --- Filter tabs by selected class --- */
+  const tabs = useMemo(() => {
+    if (cls === 'IELTS') {
+      return ALL_TABS.filter((t) => t.class === 'IELTS');
+    }
+    return ALL_TABS.filter((t) => t.class === 'all' || t.class === cls);
+  }, [cls]);
+
+  /* Ensure selected category exists in the filtered list */
+  useEffect(() => {
+    if (!tabs.some((t) => t.id === catId) && tabs.length) {
+      setCatId(tabs[0].id);
+      setQIndex(0);
+      setSelected(null);
+      setFeel(null);
+    }
+  }, [tabs, catId]);
+
+  const cat = QUESTION_BANK[catId] || tabs[0] && QUESTION_BANK[tabs[0].id];
+  const question = cat ? cat.questions[qIndex] : null;
+  const totalForCat = cat ? cat.questions.length : 0;
+  const isIeltsCat = cat && cat.class === 'IELTS';
 
   const showXp = (amount) => {
     setXpToast(amount);
@@ -2601,6 +2653,20 @@ export function Curriculum() {
   };
 
   const overallPct = score.total ? Math.round((score.correct / score.total) * 100) : 0;
+  const showIeltsBanner = cls === 'IELTS';
+
+  if (!cat || !question) {
+    return (
+      <div className="ec-cur">
+        <style>{CURRICULUM_CSS}</style>
+        <div className="ec-cur-section" style={{ textAlign: 'center', padding: '40px 20px' }}>
+          <p style={{ fontSize: 14, color: 'var(--lang-ink-soft)', fontWeight: 700 }}>
+            Loading curriculum…
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="ec-cur">
@@ -2610,7 +2676,10 @@ export function Curriculum() {
         <div>
           <p className="ec-cur-eyebrow">Curriculum</p>
           <h1 className="ec-page-title">English Grammar Mastery</h1>
-          <p className="ec-page-sub">SSC, HSC, IELTS & General — {TOTAL_QUESTIONS}+ exercises across {TABS.length} topics.</p>
+          <p className="ec-page-sub">
+            SSC, HSC, IELTS & General — {TOTAL_QUESTIONS}+ exercises.
+            {cls === 'IELTS' && ` IELTS section: ${IELTS_QUESTIONS}+ questions.`}
+          </p>
         </div>
       </div>
 
@@ -2621,8 +2690,8 @@ export function Curriculum() {
           <p>Every grammar rule, gap-filling type, translation pattern and writing form — lessons + practice for school, board and IELTS.</p>
           <div className="ec-cur-hero-stats">
             <div className="ec-cur-hero-stat"><strong>{TOTAL_QUESTIONS}</strong><span>Exercises</span></div>
-            <div className="ec-cur-hero-stat"><strong>{TABS.length}</strong><span>Topics</span></div>
-            <div className="ec-cur-hero-stat"><strong>{BOARDS.length}</strong><span>Boards</span></div>
+            <div className="ec-cur-hero-stat"><strong>{tabs.length}</strong><span>Topics</span></div>
+            <div className="ec-cur-hero-stat"><strong>{cls === 'IELTS' ? IELTS_QUESTIONS : BOARDS.length}</strong><span>{cls === 'IELTS' ? 'IELTS Qs' : 'Boards'}</span></div>
           </div>
         </div>
         <div className="ec-cur-hero-mascot">
@@ -2651,25 +2720,41 @@ export function Curriculum() {
             <button key={c} className={`ec-cur-pill${cls === c ? ' ec-cur-pill--active' : ''}`} onClick={() => setCls(c)}>{c}</button>
           ))}
         </div>
-        <div className="ec-cur-filter-group">
-          {PAPERS.map((p) => (
-            <button key={p} className={`ec-cur-pill${paper === p ? ' ec-cur-pill--active' : ''}`} onClick={() => setPaper(p)}>{p}</button>
-          ))}
-        </div>
-        <select className="ec-cur-select" value={board} onChange={(e) => setBoard(e.target.value)}>
-          {BOARDS.map((b) => <option key={b} value={b}>{b} Board</option>)}
-        </select>
+        {cls !== 'IELTS' && (
+          <div className="ec-cur-filter-group">
+            {PAPERS.map((p) => (
+              <button key={p} className={`ec-cur-pill${paper === p ? ' ec-cur-pill--active' : ''}`} onClick={() => setPaper(p)}>{p}</button>
+            ))}
+          </div>
+        )}
+        {cls !== 'IELTS' && (
+          <select className="ec-cur-select" value={board} onChange={(e) => setBoard(e.target.value)}>
+            {BOARDS.map((b) => <option key={b} value={b}>{b} Board</option>)}
+          </select>
+        )}
         <label className="ec-cur-check">
           <input type="checkbox" checked={banglaHelp} onChange={(e) => setBanglaHelp(e.target.checked)} />
           🇧🇩 বাংলা
         </label>
       </div>
 
+      {showIeltsBanner && (
+        <div className="ec-cur-ielts-banner">
+          <div className="ec-cur-ielts-banner-icon">🎯</div>
+          <div className="ec-cur-ielts-banner-body">
+            <p className="ec-cur-ielts-banner-title">IELTS Mode Active</p>
+            <p className="ec-cur-ielts-banner-sub">
+              Listening · Reading · Writing Task 1 & 2 · Speaking · Vocabulary · Grammar
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="ec-cur-cats">
-        {TABS.map((t) => (
+        {tabs.map((t) => (
           <button
             key={t.id}
-            className={`ec-cur-cat${catId === t.id ? ' ec-cur-cat--active' : ''}`}
+            className={`ec-cur-cat${catId === t.id ? ' ec-cur-cat--active' : ''}${t.class === 'IELTS' ? ' ec-cur-cat--ielts' : ''}`}
             onClick={() => switchCat(t.id)}
           >
             <Icon name={t.icon} />
@@ -2723,7 +2808,9 @@ export function Curriculum() {
           {mode === 'practice' && (
             <div className="ec-cur-section">
               <div className="ec-quiz-top">
-                <span className="ec-quiz-badge">{cat.name}</span>
+                <span className={`ec-quiz-badge${isIeltsCat ? ' ec-quiz-badge--ielts' : ''}`}>
+                  {isIeltsCat ? '🎯 ' : ''}{cat.name}
+                </span>
                 <span className="ec-quiz-counter">Question {qIndex + 1} / {totalForCat}</span>
               </div>
               <div className="ec-quiz-progress">
@@ -2831,18 +2918,21 @@ export function Curriculum() {
         <aside>
           <div className="ec-cur-section">
             <div className="ec-cur-section-head">
-              <h2 className="ec-cur-section-title">All topics</h2>
-              <span className="ec-cur-chip">{TABS.length}</span>
+              <h2 className="ec-cur-section-title">
+                {cls === 'IELTS' ? 'IELTS Skills' : 'All topics'}
+              </h2>
+              <span className="ec-cur-chip">{tabs.length}</span>
             </div>
             <div className="ec-cur-topic-list">
-              {TABS.map((t) => {
+              {tabs.map((t) => {
                 const stat = catStats[t.id];
                 const pct = stat && stat.total ? Math.round((stat.correct / stat.total) * 100) : null;
                 const weak = isWeakCat(t.id);
+                const isIelts = t.class === 'IELTS';
                 return (
                   <button
                     key={t.id}
-                    className={`ec-cur-topic-btn${catId === t.id ? ' ec-cur-topic-btn--active' : ''}`}
+                    className={`ec-cur-topic-btn${catId === t.id ? ' ec-cur-topic-btn--active' : ''}${isIelts ? ' ec-cur-topic-btn--ielts' : ''}`}
                     onClick={() => switchCat(t.id)}
                   >
                     <span className="ec-cur-topic-name">{t.label}</span>
