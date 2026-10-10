@@ -10,8 +10,23 @@ const WELCOME = {
   id: 'welcome',
   role: 'assistant',
   content:
-    "Hey! I'm **GiMi** 👋 — your FixMyEnglish guide.\n\nAsk me anything: how a page works, exam tips, pricing, streak rules… I know the whole app.",
+    "Hey! I'm **GiMi** 👋 — your FixMyEnglish guide.\n\nAsk me anything: how a page works, exam tips, pricing, streak rules… I know the whole app.\n\nTry a suggestion below to get started.",
   ts: Date.now(),
+};
+
+const FALLBACK_CHIPS = {
+  '/': ['What can I do first?', 'How does the streak work?', 'Show me pricing'],
+  '/vocabulary': ['How does spaced repetition work?', 'Tips to remember words', 'How does Blitz work?'],
+  '/grammar': ['Explain prepositions', 'When to use articles', 'Common tense mistakes'],
+  '/curriculum': ['SSC vs HSC writing', 'How to answer seen passages', 'Translation tips'],
+  '/exams': ['IELTS vs PTE', 'Which exam should I start with?', 'How are mocks scored?'],
+  '/speaking': ['IELTS Part 2 example', 'How to improve fluency', 'How am I scored?'],
+  '/progress': ['How do I earn XP fast?', 'What badges can I unlock?', 'How is my rank calculated?'],
+  '/community': ['Which room should I join?', 'How do squads work?', 'Community rules'],
+  '/live-rooms': ['How do live rooms work?', 'What is priority seating?', 'When do classes run?'],
+  '/pricing': ['Which plan is best for IELTS?', 'Can I cancel any time?', 'Payment methods'],
+  '/profile': ['How do I reset my password?', 'How do I upgrade?', 'Delete my account'],
+  '/login': ['How do I register?', 'Is there a free plan?', 'What is guest mode?'],
 };
 
 function loadHistory() {
@@ -22,7 +37,7 @@ function loadHistory() {
     if (Array.isArray(parsed) && parsed.length) {
       return parsed.map((m) => ({ ...m, streaming: false }));
     }
-  } catch {}
+  } catch { /* ignore */ }
   return [WELCOME];
 }
 
@@ -30,18 +45,8 @@ function saveHistory(msgs) {
   try {
     const clean = msgs.filter((m) => !m.streaming).slice(-MAX_STORED);
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(clean));
-  } catch {}
+  } catch { /* ignore */ }
 }
-
-const PAGE_FALLBACK_CHIPS = {
-  '/': ['What can I do first?', 'How does the streak work?', 'Show me pricing'],
-  '/vocabulary': ['How does spaced repetition work?', 'Tips to remember words'],
-  '/grammar': ['Explain prepositions', 'When to use articles'],
-  '/exams': ['IELTS vs PTE', 'Which exam should I start with?'],
-  '/speaking': ['IELTS Part 2 example', 'How to improve fluency'],
-  '/pricing': ['Which plan is best?', 'Payment methods'],
-  '/profile': ['How do I reset my password?', 'Delete my account'],
-};
 
 export function useGiMi() {
   const { user } = useAuth();
@@ -54,34 +59,32 @@ export function useGiMi() {
 
   const abortRef = useRef(null);
   const lastUserRef = useRef(null);
+  const messagesRef = useRef(messages);   // always the latest list (avoids stale closures)
+  const sendRef = useRef(null);
+  messagesRef.current = messages;
 
-  /* ─── Persist ─── */
+  /* Persist history */
   useEffect(() => { saveHistory(messages); }, [messages]);
 
-  /* ─── Fetch page-aware suggestions ─── */
+  /* Page-aware suggestions (server → fallback) */
   useEffect(() => {
     let cancelled = false;
+    const fallback = FALLBACK_CHIPS[pathname] || FALLBACK_CHIPS['/'];
     const url = `${API_URL}/api/gimi/suggestions?page=${encodeURIComponent(pathname)}`;
     fetch(url)
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (cancelled) return;
-        if (data && Array.isArray(data.suggestions) && data.suggestions.length) {
-          setSuggestions(data.suggestions);
-        } else {
-          setSuggestions(PAGE_FALLBACK_CHIPS[pathname] || PAGE_FALLBACK_CHIPS['/']);
-        }
+        const list = Array.isArray(data?.suggestions) ? data.suggestions : [];
+        setSuggestions(list.length ? list : fallback);
       })
-      .catch(() => {
-        if (!cancelled) setSuggestions(PAGE_FALLBACK_CHIPS[pathname] || PAGE_FALLBACK_CHIPS['/']);
-      });
+      .catch(() => { if (!cancelled) setSuggestions(fallback); });
     return () => { cancelled = true; };
   }, [pathname]);
 
-  /* ─── Abort on unmount ─── */
   useEffect(() => () => abortRef.current?.abort(), []);
 
-  /* ─── Core send ─── */
+  /* ---------- Core send (SSE) ---------- */
   const send = useCallback(async (text) => {
     const content = String(text || '').trim();
     if (!content || sending) return;
@@ -90,15 +93,21 @@ export function useGiMi() {
     lastUserRef.current = content;
 
     const userMsg = { id: `u-${Date.now()}`, role: 'user', content, ts: Date.now() };
-    const botId = `a-${Date.now()}`;
+    const botId = `a-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
     const botMsg = { id: botId, role: 'assistant', content: '', ts: Date.now(), streaming: true };
 
     setMessages((prev) => [...prev, userMsg, botMsg]);
     setSending(true);
 
-    const history = [...messages.filter((m) => m.id !== 'welcome'), userMsg]
+    // Only real, non-empty turns go to the server (empty or error bubbles would
+    // fail validation / poison the context), and the list must start with a user turn.
+    const history = [
+      ...messagesRef.current.filter((m) => m.id !== 'welcome' && !m.error && !m.streaming && m.content),
+      userMsg,
+    ]
       .slice(-12)
-      .map(({ role, content }) => ({ role, content }));
+      .map(({ role, content: c }) => ({ role, content: c }));
+    while (history.length > 1 && history[0].role !== 'user') history.shift();
 
     const controller = new AbortController();
     abortRef.current = controller;
@@ -123,6 +132,7 @@ export function useGiMi() {
       let buffer = '';
       let acc = '';
 
+      // eslint-disable-next-line no-constant-condition
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
@@ -130,18 +140,20 @@ export function useGiMi() {
         const lines = buffer.split('\n');
         buffer = lines.pop() || '';
 
-        for (const line of lines) {
-          const trimmed = line.trim();
-          if (!trimmed.startsWith('data:')) continue;
+        for (const raw of lines) {
+          const line = raw.trim();
+          if (!line.startsWith('data:')) continue;
+          const payload = line.slice(5).trim();
+          if (!payload) continue;
           try {
-            const payload = JSON.parse(trimmed.slice(5).trim());
-            if (payload.delta) {
-              acc += payload.delta;
+            const json = JSON.parse(payload);
+            if (json.delta) {
+              acc += json.delta;
               setMessages((prev) =>
-                prev.map((m) => m.id === botId ? { ...m, content: acc, streaming: true } : m)
+                prev.map((m) => (m.id === botId ? { ...m, content: acc, streaming: true } : m))
               );
             }
-            if (payload.error) throw new Error(payload.error);
+            if (json.error) throw new Error(json.error);
           } catch (err) {
             if (err instanceof SyntaxError) continue;
             throw err;
@@ -151,7 +163,9 @@ export function useGiMi() {
 
       setMessages((prev) =>
         prev.map((m) =>
-          m.id === botId ? { ...m, content: acc || '*(no response)*', streaming: false } : m
+          m.id === botId
+            ? { ...m, content: acc || "I didn't catch that — could you try again?", streaming: false }
+            : m
         )
       );
     } catch (err) {
@@ -160,7 +174,12 @@ export function useGiMi() {
       setMessages((prev) =>
         prev.map((m) =>
           m.id === botId
-            ? { ...m, content: "Sorry — I couldn't reach my brain just now. Try again in a moment.", streaming: false, error: true }
+            ? {
+                ...m,
+                content: "Sorry — I couldn't reach my brain just now. Try again in a moment.",
+                streaming: false,
+                error: true,
+              }
             : m
         )
       );
@@ -168,46 +187,35 @@ export function useGiMi() {
       setSending(false);
       abortRef.current = null;
     }
-  }, [messages, pathname, user, sending]);
+  }, [pathname, user, sending]);
+  sendRef.current = send;
 
-  /* ─── Stop generation ─── */
   const stop = useCallback(() => {
     abortRef.current?.abort();
     setSending(false);
-    setMessages((prev) => prev.map((m) => (m.streaming ? { ...m, streaming: false } : m)));
+    setMessages((prev) =>
+      prev.filter((m) => !(m.streaming && !m.content)).map((m) => (m.streaming ? { ...m, streaming: false } : m))
+    );
   }, []);
 
-  /* ─── Clear history ─── */
   const clear = useCallback(() => {
     setMessages([WELCOME]);
     setError(null);
   }, []);
 
-  /* ─── Regenerate last response ─── */
   const regenerate = useCallback(() => {
-    const lastUser = lastUserRef.current;
-    if (!lastUser || sending) return;
+    if (sending) return;
+    const current = messagesRef.current;
+    const lastUser =
+      lastUserRef.current || [...current].reverse().find((m) => m.role === 'user')?.content;
+    if (!lastUser) return;
+    const trimmed = [...current];
+    while (trimmed.length && trimmed[trimmed.length - 1].role === 'assistant') trimmed.pop();
+    if (trimmed.length && trimmed[trimmed.length - 1].role === 'user') trimmed.pop();
+    messagesRef.current = trimmed;
+    setMessages(trimmed.length ? trimmed : [WELCOME]);
+    setTimeout(() => sendRef.current?.(lastUser), 0);
+  }, [sending]);
 
-    // Remove last assistant message
-    setMessages((prev) => {
-      const copy = [...prev];
-      while (copy.length && copy[copy.length - 1].role === 'assistant') copy.pop();
-      return copy;
-    });
-
-    // Small delay so state settles
-    setTimeout(() => { send(lastUser); }, 80);
-  }, [send, sending]);
-
-  return {
-    messages,
-    suggestions,
-    sending,
-    error,
-    send,
-    stop,
-    clear,
-    regenerate,
-    page: pathname,
-  };
+  return { messages, suggestions, sending, error, send, stop, clear, regenerate, page: pathname };
 }

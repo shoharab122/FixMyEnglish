@@ -8,8 +8,7 @@ function authOptional(req: any, _res: any, next: any) {
   try {
     const header = req.headers.authorization || '';
     const bearer = header.startsWith('Bearer ') ? header.slice(7) : null;
-    const token = bearer || req.cookies?.ec_access_token;
-    if (token) req.user = verifyAccessToken(token);
+    if (bearer) req.user = verifyAccessToken(bearer);
   } catch { /* anonymous */ }
   next();
 }
@@ -19,7 +18,6 @@ router.get('/', authOptional, async (req: any, res, next) => {
     const items: any[] = [];
 
     if (req.user) {
-      // Badges earned but not seen
       try {
         const badges = await prisma.userAchievement.findMany({
           where: { userId: req.user.id },
@@ -41,7 +39,6 @@ router.get('/', authOptional, async (req: any, res, next) => {
       } catch { /* model may not exist */ }
     }
 
-    // Upcoming + live rooms
     try {
       const rooms = await prisma.liveRoom.findMany({
         where: { status: { in: ['scheduled', 'live'] } },
@@ -61,7 +58,6 @@ router.get('/', authOptional, async (req: any, res, next) => {
       }
     } catch { /* */ }
 
-    // Active announcements
     try {
       const anns = await prisma.announcement.findMany({
         where: { active: true },
