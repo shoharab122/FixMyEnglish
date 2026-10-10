@@ -1,10 +1,12 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { curriculumApi } from '../api/curriculum';
 import { Icon } from '../components/Icon';
 
 /* ============================================================
-   CURRICULUM — Langut-inspired, mobile-first
-   2000+ exercises · 35+ categories · Lessons + Practice
+   CURRICULUM — Langut-inspired, mobile-first (optimised)
+   1500+ exercises · 28 categories · Lessons + Practice
+   Papers: English 2nd Paper + General only.
+   (IELTS section removed.)
    ============================================================ */
 
 const CURRICULUM_CSS = `
@@ -17,21 +19,25 @@ const CURRICULUM_CSS = `
   --lang-ink:#17102E;--lang-ink-soft:#6B6488;--lang-line:#17102E;
   --lang-safe:env(safe-area-inset-bottom, 0px);
   --lang-nav-h:110px;
+  --tap:48px;
 
   width:100%;max-width:100%;overflow-x:hidden;position:relative;
   padding-bottom:calc(var(--lang-nav-h) + var(--lang-safe));
+  -webkit-text-size-adjust:100%;
 }
 .ec-cur,.ec-cur *{box-sizing:border-box;min-width:0;-webkit-tap-highlight-color:transparent}
-.ec-cur button,.ec-cur input,.ec-cur select,.ec-cur textarea{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.ec-cur button,.ec-cur input,.ec-cur select,.ec-cur textarea{
+  touch-action:manipulation;-webkit-tap-highlight-color:transparent;font-family:inherit;
+}
 .ec-cur input,.ec-cur select,.ec-cur textarea{font-size:16px}
+.ec-cur button{cursor:pointer}
 
 .ec-cur-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
 .ec-cur-eyebrow{margin:0 0 6px;font-size:11.5px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:var(--lang-purple);opacity:.95}
 
 /* HERO */
 .ec-cur-hero{
-  position:relative;overflow:hidden;
-  border-radius:28px;
+  position:relative;overflow:hidden;border-radius:28px;
   padding:clamp(22px,4vw,38px) clamp(20px,4vw,40px);
   color:#fff;
   background:linear-gradient(140deg,#2A1A6E 0%,#1E1252 55%,#3B2596 100%);
@@ -51,30 +57,23 @@ const CURRICULUM_CSS = `
 }
 .ec-cur-hero-copy{position:relative;z-index:1;max-width:580px;min-width:0;flex:1 1 auto}
 .ec-cur-hero-badge{
-  display:inline-flex;align-items:center;
-  font-size:10.5px;font-weight:900;
-  letter-spacing:.14em;text-transform:uppercase;
-  padding:7px 14px;border-radius:999px;
+  display:inline-flex;align-items:center;font-size:10.5px;font-weight:900;
+  letter-spacing:.14em;text-transform:uppercase;padding:7px 14px;border-radius:999px;
   background:var(--lang-lime);color:var(--lang-ink);
-  border:2px solid var(--lang-line);
-  box-shadow:0 3px 0 rgba(0,0,0,.4);
+  border:2px solid var(--lang-line);box-shadow:0 3px 0 rgba(0,0,0,.4);
   margin-bottom:14px;max-width:100%;
 }
 .ec-cur-hero h1{
-  margin:0 0 10px;
-  font-size:clamp(22px,2.4vw + 14px,36px);
-  font-weight:900;letter-spacing:-.035em;line-height:1.1;color:#fff;
-  word-break:break-word;
+  margin:0 0 10px;font-size:clamp(22px,2.4vw + 14px,36px);
+  font-weight:900;letter-spacing:-.035em;line-height:1.1;color:#fff;word-break:break-word;
 }
 .ec-cur-hero h1 em{font-style:normal;color:var(--lang-lime)}
 .ec-cur-hero p{margin:0 0 18px;font-size:14px;line-height:1.6;opacity:.92;font-weight:500;max-width:52ch}
 .ec-cur-hero-stats{display:flex;gap:10px;flex-wrap:wrap;position:relative;z-index:1}
 .ec-cur-hero-stat{
-  display:flex;flex-direction:column;gap:2px;
-  padding:9px 14px;border-radius:14px;
+  display:flex;flex-direction:column;gap:2px;padding:9px 14px;border-radius:14px;
   background:var(--lang-lime);border:2px solid var(--lang-line);
-  box-shadow:0 3px 0 var(--lang-line);
-  min-width:80px;
+  box-shadow:0 3px 0 var(--lang-line);min-width:80px;
 }
 .ec-cur-hero-stat strong{font-size:20px;font-weight:900;line-height:1;letter-spacing:-.04em;color:var(--lang-ink)}
 .ec-cur-hero-stat span{font-size:9.5px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--lang-ink);opacity:.75}
@@ -82,8 +81,7 @@ const CURRICULUM_CSS = `
 .ec-cur-hero-stat:nth-child(3){background:var(--lang-purple-2)}
 .ec-cur-hero-stat:nth-child(3) strong,.ec-cur-hero-stat:nth-child(3) span{color:#fff}
 .ec-cur-hero-mascot{
-  position:relative;z-index:1;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
+  position:relative;z-index:1;flex-shrink:0;display:flex;align-items:center;justify-content:center;
   filter:drop-shadow(0 14px 28px rgba(0,0,0,.28));
   animation:ec-cur-bob 4s ease-in-out infinite;
 }
@@ -91,26 +89,23 @@ const CURRICULUM_CSS = `
 
 /* MODE SWITCH */
 .ec-cur-modes{
-  display:flex;gap:8px;margin-bottom:14px;
-  background:#fff;padding:6px;
-  border:2px solid var(--lang-line);
-  border-radius:999px;
-  box-shadow:0 3px 0 var(--lang-line);
-  width:fit-content;max-width:100%;
-  overflow-x:auto;scrollbar-width:none;
+  display:flex;gap:8px;margin-bottom:14px;background:#fff;padding:6px;
+  border:2px solid var(--lang-line);border-radius:999px;
+  box-shadow:0 3px 0 var(--lang-line);width:100%;max-width:100%;
+  overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;
 }
 .ec-cur-modes::-webkit-scrollbar{display:none}
 .ec-cur-mode{
-  flex:0 0 auto;
-  display:inline-flex;align-items:center;gap:7px;
-  padding:9px 18px;border-radius:999px;
+  flex:1 1 0;min-width:120px;
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  padding:11px 18px;border-radius:999px;
   border:none;background:transparent;color:var(--lang-ink);
-  font-size:12.5px;font-weight:900;cursor:pointer;
-  font-family:inherit;transition:background .18s ease,color .18s ease;
-  white-space:nowrap;min-height:38px;
+  font-size:13px;font-weight:900;
+  transition:background .18s ease,color .18s ease;
+  white-space:nowrap;min-height:var(--tap);
 }
 .ec-cur-mode--active{background:var(--lang-ink);color:var(--lang-lime)}
-.ec-cur-mode svg{width:14px;height:14px}
+.ec-cur-mode svg{width:15px;height:15px}
 
 /* FILTER BAR */
 .ec-cur-filters{
@@ -120,58 +115,50 @@ const CURRICULUM_CSS = `
   border-radius:20px;box-shadow:0 5px 0 var(--lang-line);
   animation:ec-cur-fade .45s ease both;
 }
-.ec-cur-filter-group{display:flex;gap:6px;flex-wrap:wrap}
+.ec-cur-filter-group{display:flex;gap:6px;flex-wrap:wrap;flex:1 1 auto}
 .ec-cur-pill{
-  border:2px solid var(--lang-line);
-  background:#fff;color:var(--lang-ink);
-  padding:9px 15px;border-radius:999px;
-  font-size:12.5px;font-weight:900;
-  cursor:pointer;font-family:inherit;
+  border:2px solid var(--lang-line);background:#fff;color:var(--lang-ink);
+  padding:11px 16px;border-radius:999px;font-size:13px;font-weight:900;
   transition:transform .16s ease,box-shadow .16s ease,background .16s ease,color .16s ease;
   box-shadow:0 3px 0 var(--lang-line);
-  letter-spacing:.02em;min-height:42px;
+  letter-spacing:.02em;min-height:var(--tap);
+  display:inline-flex;align-items:center;justify-content:center;
 }
 .ec-cur-pill:hover{background:var(--lang-lime-soft);transform:translateY(-2px);box-shadow:0 5px 0 var(--lang-line)}
-.ec-cur-pill:active{transform:translateY(1px);box-shadow:0 1px 0 var(--lang-line)}
+.ec-cur-pill:active{transform:translateY(1px);box-shadow:0 1px 0 var(--lang-line);background:var(--lang-lime)}
 .ec-cur-pill--active{background:var(--lang-ink);color:var(--lang-lime);box-shadow:0 3px 0 var(--lang-ink)}
 .ec-cur-select{
-  border:2px solid var(--lang-line);
-  background:#fff;color:var(--lang-ink);
-  padding:9px 14px;border-radius:999px;
-  font-size:12.5px;font-weight:900;
-  font-family:inherit;cursor:pointer;outline:none;
-  box-shadow:0 3px 0 var(--lang-line);
-  min-height:42px;
+  border:2px solid var(--lang-line);background:#fff;color:var(--lang-ink);
+  padding:11px 14px;border-radius:999px;font-size:13px;font-weight:900;
+  outline:none;box-shadow:0 3px 0 var(--lang-line);min-height:var(--tap);min-width:140px;
 }
 .ec-cur-check{
   display:inline-flex;align-items:center;gap:8px;
-  font-size:12.5px;font-weight:900;
-  color:var(--lang-ink);cursor:pointer;
-  user-select:none;padding:9px 14px;
+  font-size:13px;font-weight:900;color:var(--lang-ink);cursor:pointer;
+  user-select:none;padding:11px 16px;
   border:2px solid var(--lang-line);border-radius:999px;
   background:#fff;box-shadow:0 3px 0 var(--lang-line);
-  min-height:42px;
+  min-height:var(--tap);
 }
-.ec-cur-check input{accent-color:var(--lang-ink);width:16px;height:16px}
+.ec-cur-check input{accent-color:var(--lang-ink);width:18px;height:18px}
 
 /* CATEGORY TABS */
 .ec-cur-cats{
   display:flex;gap:8px;overflow-x:auto;
   scrollbar-width:none;-webkit-overflow-scrolling:touch;
   padding:4px 2px 14px;margin-bottom:4px;max-width:100%;
+  scroll-snap-type:x proximity;
 }
 .ec-cur-cats::-webkit-scrollbar{display:none}
 .ec-cur-cat{
-  flex:0 0 auto;
+  flex:0 0 auto;scroll-snap-align:start;
   display:inline-flex;align-items:center;gap:7px;
-  padding:10px 15px;border-radius:999px;
-  border:2px solid var(--lang-line);
-  background:#fff;color:var(--lang-ink);
-  font-size:12.5px;font-weight:900;
-  cursor:pointer;white-space:nowrap;
+  padding:12px 16px;border-radius:999px;
+  border:2px solid var(--lang-line);background:#fff;color:var(--lang-ink);
+  font-size:13px;font-weight:900;
+  white-space:nowrap;min-height:var(--tap);
   transition:transform .16s ease,box-shadow .16s ease,background .16s ease,color .16s ease;
   box-shadow:0 3px 0 var(--lang-line);
-  min-height:44px;
 }
 .ec-cur-cat:hover{background:var(--lang-lime-soft);transform:translateY(-2px);box-shadow:0 5px 0 var(--lang-line)}
 .ec-cur-cat:active{transform:translateY(1px);box-shadow:0 1px 0 var(--lang-line)}
@@ -179,10 +166,8 @@ const CURRICULUM_CSS = `
 .ec-cur-cat--active:hover{background:var(--lang-ink);color:var(--lang-lime)}
 .ec-cur-cat svg{width:15px;height:15px;flex-shrink:0}
 .ec-cur-cat-count{
-  font-size:10px;font-weight:900;
-  padding:2px 7px;border-radius:999px;
-  background:var(--lang-lime);color:var(--lang-ink);
-  border:2px solid var(--lang-line);
+  font-size:10px;font-weight:900;padding:2px 7px;border-radius:999px;
+  background:var(--lang-lime);color:var(--lang-ink);border:2px solid var(--lang-line);
 }
 
 /* GRID */
@@ -193,28 +178,22 @@ const CURRICULUM_CSS = `
 .ec-cur-section{
   background:#fff;border:2px solid var(--lang-line);
   border-radius:24px;padding:20px;
-  box-shadow:0 5px 0 var(--lang-line);
-  margin-bottom:18px;
+  box-shadow:0 5px 0 var(--lang-line);margin-bottom:18px;
   background-image:radial-gradient(circle at 100% 0%,rgba(212,245,92,.10),transparent 55%);
   animation:ec-cur-fade .4s ease both;
 }
 .ec-cur-section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap}
 .ec-cur-section-title{margin:0;font-size:15.5px;font-weight:900;letter-spacing:-.01em;color:var(--lang-ink)}
 .ec-cur-chip{
-  font-size:10.5px;font-weight:900;
-  color:var(--lang-ink);background:var(--lang-lime);
-  border:2px solid var(--lang-line);
-  padding:4px 11px;border-radius:999px;
-  letter-spacing:.05em;text-transform:uppercase;
-  box-shadow:0 2px 0 var(--lang-line);
-  flex-shrink:0;
+  font-size:10.5px;font-weight:900;color:var(--lang-ink);background:var(--lang-lime);
+  border:2px solid var(--lang-line);padding:4px 11px;border-radius:999px;
+  letter-spacing:.05em;text-transform:uppercase;box-shadow:0 2px 0 var(--lang-line);flex-shrink:0;
 }
 
 /* LESSON VIEWER */
 .ec-lesson{
   background:#fff;border:2px solid var(--lang-line);
-  border-radius:24px;padding:22px;
-  box-shadow:0 5px 0 var(--lang-line);
+  border-radius:24px;padding:22px;box-shadow:0 5px 0 var(--lang-line);
   margin-bottom:18px;
   background-image:radial-gradient(circle at 100% 0%,rgba(212,245,92,.14),transparent 55%);
   animation:ec-cur-fade .4s ease both;
@@ -223,63 +202,40 @@ const CURRICULUM_CSS = `
 .ec-lesson-title{margin:0;font-size:18px;font-weight:900;color:var(--lang-ink);letter-spacing:-.02em}
 .ec-lesson-body{display:flex;flex-direction:column;gap:14px}
 .ec-lesson-block{
-  background:var(--lang-lime-soft);
-  border:2px solid var(--lang-line);
-  border-radius:14px;
-  padding:14px 16px;
-  box-shadow:0 2px 0 var(--lang-line);
+  background:var(--lang-lime-soft);border:2px solid var(--lang-line);
+  border-radius:14px;padding:14px 16px;box-shadow:0 2px 0 var(--lang-line);
 }
 .ec-lesson-block h4{
-  margin:0 0 8px;font-size:13px;font-weight:900;
-  color:var(--lang-ink);letter-spacing:.02em;
-  text-transform:uppercase;
+  margin:0 0 8px;font-size:13px;font-weight:900;color:var(--lang-ink);
+  letter-spacing:.02em;text-transform:uppercase;
   display:flex;align-items:center;gap:6px;
 }
 .ec-lesson-block ul{margin:0;padding-left:18px}
-.ec-lesson-block li{
-  font-size:13px;line-height:1.6;color:var(--lang-ink);
-  font-weight:700;margin-bottom:5px;
-}
+.ec-lesson-block li{font-size:13px;line-height:1.6;color:var(--lang-ink);font-weight:700;margin-bottom:5px}
 .ec-lesson-block li:last-child{margin-bottom:0}
-.ec-lesson-block code{
-  background:var(--lang-ink);color:var(--lang-lime);
-  padding:1px 6px;border-radius:5px;font-weight:900;font-size:12.5px;
-}
+.ec-lesson-block code{background:var(--lang-ink);color:var(--lang-lime);padding:1px 6px;border-radius:5px;font-weight:900;font-size:12.5px}
 .ec-lesson-example{
-  background:#fff;border:2px dashed var(--lang-line);
-  border-radius:12px;padding:10px 12px;
-  font-size:12.5px;font-weight:700;color:var(--lang-ink-soft);
-  line-height:1.55;
+  background:#fff;border:2px dashed var(--lang-line);border-radius:12px;padding:10px 12px;
+  font-size:12.5px;font-weight:700;color:var(--lang-ink-soft);line-height:1.55;
 }
 .ec-lesson-example strong{color:var(--lang-ink);font-weight:900}
 .ec-lesson-bn{
-  background:linear-gradient(160deg,#FFB3D1,#FF8FCB);
-  color:#fff;border:2px solid var(--lang-line);
-  border-radius:14px;padding:12px 14px;
-  font-size:12.5px;font-weight:800;line-height:1.6;
-  box-shadow:0 2px 0 var(--lang-line);
+  background:linear-gradient(160deg,#FFB3D1,#FF8FCB);color:#fff;
+  border:2px solid var(--lang-line);border-radius:14px;padding:12px 14px;
+  font-size:12.5px;font-weight:800;line-height:1.6;box-shadow:0 2px 0 var(--lang-line);
 }
 
 /* QUIZ */
 .ec-quiz-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
 .ec-quiz-badge{
-  display:inline-flex;align-items:center;
-  font-size:10.5px;font-weight:900;letter-spacing:.07em;
-  text-transform:uppercase;
-  padding:6px 12px;border-radius:999px;
-  background:var(--lang-lime);color:var(--lang-ink);
-  border:2px solid var(--lang-line);
-  box-shadow:0 2px 0 var(--lang-line);
-  max-width:100%;
+  display:inline-flex;align-items:center;font-size:10.5px;font-weight:900;letter-spacing:.07em;
+  text-transform:uppercase;padding:6px 12px;border-radius:999px;
+  background:var(--lang-lime);color:var(--lang-ink);border:2px solid var(--lang-line);
+  box-shadow:0 2px 0 var(--lang-line);max-width:100%;
 }
-.ec-quiz-counter{
-  font-size:11.5px;font-weight:900;
-  color:var(--lang-ink-soft);
-  letter-spacing:.05em;text-transform:uppercase;
-}
+.ec-quiz-counter{font-size:11.5px;font-weight:900;color:var(--lang-ink-soft);letter-spacing:.05em;text-transform:uppercase}
 .ec-quiz-progress{
-  height:10px;border-radius:999px;
-  background:#E8E5F2;overflow:hidden;
+  height:10px;border-radius:999px;background:#E8E5F2;overflow:hidden;
   margin-bottom:16px;border:2px solid var(--lang-line);
 }
 .ec-quiz-progress-fill{
@@ -288,28 +244,22 @@ const CURRICULUM_CSS = `
   transition:width .5s cubic-bezier(.22,1,.36,1);
 }
 .ec-quiz-question{
-  font-size:clamp(15px,1vw + 12px,18px);
-  font-weight:900;line-height:1.4;
-  margin:0 0 16px;color:var(--lang-ink);
-  letter-spacing:-.02em;word-break:break-word;overflow-wrap:anywhere;
+  font-size:clamp(15px,1vw + 12px,18px);font-weight:900;line-height:1.4;
+  margin:0 0 16px;color:var(--lang-ink);letter-spacing:-.02em;
+  word-break:break-word;overflow-wrap:anywhere;
 }
 .ec-quiz-options{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
 .ec-quiz-option{
   display:flex;align-items:center;
-  border:2px solid var(--lang-line);
-  background:#fff;color:var(--lang-ink);
-  font-size:14px;font-weight:800;
-  padding:14px 16px;border-radius:14px;
-  text-align:left;cursor:pointer;
+  border:2px solid var(--lang-line);background:#fff;color:var(--lang-ink);
+  font-size:14.5px;font-weight:800;
+  padding:15px 16px;border-radius:14px;text-align:left;
   transition:transform .16s ease,box-shadow .16s ease,background .16s ease;
-  font-family:inherit;
   box-shadow:0 3px 0 var(--lang-line);
-  min-height:48px;width:100%;
-  word-break:break-word;overflow-wrap:anywhere;
-  line-height:1.35;
+  min-height:52px;width:100%;word-break:break-word;overflow-wrap:anywhere;line-height:1.35;
 }
 .ec-quiz-option:hover:not(:disabled){background:var(--lang-lime-soft);transform:translateY(-2px);box-shadow:0 5px 0 var(--lang-line)}
-.ec-quiz-option:active:not(:disabled){transform:translateY(1px);box-shadow:0 1px 0 var(--lang-line)}
+.ec-quiz-option:active:not(:disabled){transform:translateY(1px);box-shadow:0 1px 0 var(--lang-line);background:var(--lang-lime)}
 .ec-quiz-option:disabled{cursor:default}
 .ec-quiz-option--correct{background:var(--lang-lime);color:var(--lang-ink);font-weight:900}
 .ec-quiz-option--incorrect{background:var(--lang-pink-2);color:#fff;font-weight:900}
@@ -317,68 +267,64 @@ const CURRICULUM_CSS = `
 .ec-quiz-feedback--good{color:#1F8A4C}
 .ec-quiz-feedback--bad{color:#C4325A}
 .ec-quiz-explain{
-  margin:10px 0 0;font-size:12.5px;line-height:1.6;
-  color:var(--lang-ink);background:var(--lang-lime-soft);
-  border:2px solid var(--lang-line);border-radius:12px;
-  padding:10px 12px;font-weight:700;
-  box-shadow:0 2px 0 var(--lang-line);
-  word-break:break-word;
+  margin:10px 0 0;font-size:12.5px;line-height:1.6;color:var(--lang-ink);
+  background:var(--lang-lime-soft);border:2px solid var(--lang-line);
+  border-radius:12px;padding:10px 12px;font-weight:700;
+  box-shadow:0 2px 0 var(--lang-line);word-break:break-word;
 }
 
 /* TOPIC LIST */
 .ec-cur-topic-list{display:flex;flex-direction:column;gap:8px;max-height:520px;overflow-y:auto;padding-right:4px}
 .ec-cur-topic-btn{
-  display:flex;align-items:center;gap:10px;
-  padding:11px 13px;border-radius:14px;
-  border:2px solid var(--lang-line);
-  background:#fff;color:var(--lang-ink);
-  font-size:12.5px;font-weight:800;
-  text-align:left;cursor:pointer;font-family:inherit;
-  width:100%;transition:transform .15s ease,box-shadow .15s ease,background .15s ease;
-  box-shadow:0 3px 0 var(--lang-line);
-  min-height:44px;
+  display:flex;align-items:center;gap:10px;padding:12px 13px;border-radius:14px;
+  border:2px solid var(--lang-line);background:#fff;color:var(--lang-ink);
+  font-size:13px;font-weight:800;text-align:left;width:100%;
+  transition:transform .15s ease,box-shadow .15s ease,background .15s ease;
+  box-shadow:0 3px 0 var(--lang-line);min-height:var(--tap);
 }
 .ec-cur-topic-btn:hover{background:var(--lang-lime-soft);transform:translateY(-1px);box-shadow:0 4px 0 var(--lang-line)}
+.ec-cur-topic-btn:active{transform:translateY(1px);box-shadow:0 1px 0 var(--lang-line)}
 .ec-cur-topic-btn--active{background:var(--lang-ink);color:var(--lang-lime)}
 .ec-cur-topic-btn--active:hover{background:var(--lang-ink);color:var(--lang-lime)}
 .ec-cur-topic-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ec-cur-topic-count{
-  font-size:10.5px;font-weight:900;
-  padding:3px 9px;border-radius:999px;
-  background:var(--lang-lime);color:var(--lang-ink);
-  border:2px solid var(--lang-line);flex-shrink:0;
+  font-size:10.5px;font-weight:900;padding:3px 9px;border-radius:999px;
+  background:var(--lang-lime);color:var(--lang-ink);border:2px solid var(--lang-line);flex-shrink:0;
 }
 
 /* WRITING BANK */
 .ec-cur-bank-item{
-  display:flex;align-items:center;justify-content:space-between;
-  gap:12px;padding:12px 14px;border-radius:14px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:13px 14px;border-radius:14px;
   background:var(--lang-pink);color:var(--lang-ink);
-  border:2px solid var(--lang-line);
-  font-size:13px;font-weight:800;
+  border:2px solid var(--lang-line);font-size:13px;font-weight:800;
   transition:transform .16s ease,box-shadow .16s ease,background .16s ease;
-  box-shadow:0 3px 0 var(--lang-line);
-  cursor:pointer;min-height:44px;word-break:break-word;
+  box-shadow:0 3px 0 var(--lang-line);min-height:var(--tap);
+  word-break:break-word;text-align:left;width:100%;
 }
 .ec-cur-bank-item:hover{background:var(--lang-pink-2);color:#fff;transform:translateY(-2px);box-shadow:0 5px 0 var(--lang-line)}
+.ec-cur-bank-item:active{transform:translateY(1px);box-shadow:0 1px 0 var(--lang-line)}
 
 /* TRANSLATION */
 .ec-cur-translation p.bn{font-size:17px;font-weight:900;margin:12px 0;color:var(--lang-ink);letter-spacing:-.015em}
 .ec-cur-translation textarea{
-  width:100%;border-radius:14px;
-  border:2px solid var(--lang-line);
-  padding:12px 14px;font-family:inherit;
-  font-size:16px;font-weight:700;
-  background:#fff;color:var(--lang-ink);
-  outline:none;resize:vertical;
-  box-shadow:0 3px 0 var(--lang-line);
+  width:100%;border-radius:14px;border:2px solid var(--lang-line);
+  padding:12px 14px;font-size:16px;font-weight:700;
+  background:#fff;color:var(--lang-ink);outline:none;resize:vertical;
+  box-shadow:0 3px 0 var(--lang-line);min-height:80px;
 }
 .ec-cur-translation textarea:focus{box-shadow:0 3px 0 var(--lang-line),0 0 0 3px rgba(212,245,92,.5)}
+.ec-cur-translation-feedback{
+  margin-top:10px;padding:10px 12px;border-radius:12px;
+  font-size:12.5px;font-weight:800;line-height:1.5;
+  border:2px solid var(--lang-line);box-shadow:0 2px 0 var(--lang-line);
+}
+.ec-cur-translation-feedback--good{background:var(--lang-lime-soft)}
+.ec-cur-translation-feedback--bad{background:#FFE0EE}
 
 /* SESSION */
 .ec-cur-session-label{
-  display:flex;justify-content:space-between;
-  font-size:12.5px;font-weight:900;
+  display:flex;justify-content:space-between;font-size:12.5px;font-weight:900;
   letter-spacing:.04em;text-transform:uppercase;margin-bottom:10px;
 }
 
@@ -386,12 +332,9 @@ const CURRICULUM_CSS = `
 .ec-cur-xp-toast{
   position:fixed;top:78px;right:20px;z-index:50;
   background:var(--lang-ink);color:var(--lang-lime);
-  padding:12px 22px;border-radius:999px;
-  font-weight:900;font-size:13.5px;
-  border:2px solid var(--lang-lime);
-  box-shadow:0 12px 28px rgba(23,16,46,.4);
-  animation:ec-toast-pop .9s ease both;
-  letter-spacing:.03em;pointer-events:none;
+  padding:12px 22px;border-radius:999px;font-weight:900;font-size:13.5px;
+  border:2px solid var(--lang-lime);box-shadow:0 12px 28px rgba(23,16,46,.4);
+  animation:ec-toast-pop .9s ease both;letter-spacing:.03em;pointer-events:none;
   max-width:calc(100vw - 24px);
 }
 @keyframes ec-toast-pop{
@@ -407,40 +350,6 @@ const CURRICULUM_CSS = `
 @keyframes ec-shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
 .ec-shake{animation:ec-shake .4s ease}
 
-/* UTILITIES (replace former inline styles) */
-.ec-cur-center{text-align:center;padding:40px 20px}
-.ec-cur-loading{font-size:14px;color:var(--lang-ink-soft);font-weight:700}
-.ec-cur-hint{margin:0;font-size:12.5px;color:var(--lang-ink-soft);font-weight:700}
-.ec-cur-stack{display:flex;flex-direction:column;gap:10px}
-.ec-cur-filter-group--spaced{margin-bottom:12px}
-.ec-cur-pill--sm{padding:8px 14px;font-size:11.5px;flex-shrink:0}
-.ec-cur-pill--md{padding:10px 18px;font-size:12.5px;margin-top:12px}
-.ec-cur-pill--start{padding:11px 20px;font-size:13px;align-self:flex-start}
-.ec-cur-pill--cap{text-transform:capitalize}
-.ec-lesson-list{display:flex;flex-direction:column;gap:8px}
-.ec-cur-board-item{
-  display:flex;align-items:center;justify-content:space-between;gap:12px;
-  padding:12px 14px;border-radius:14px;
-  background:var(--lang-lime-soft);border:2px solid var(--lang-line);
-  box-shadow:0 2px 0 var(--lang-line);
-}
-.ec-cur-board-title{margin:0 0 4px;font-weight:900;font-size:13px;color:var(--lang-ink)}
-.ec-cur-board-tag{
-  font-size:10px;font-weight:900;color:var(--lang-ink);
-  background:var(--lang-pink);padding:3px 9px;border-radius:999px;
-  border:2px solid var(--lang-line);text-transform:uppercase;letter-spacing:.05em;
-}
-.ec-cur-session-col{display:flex;flex-direction:column;gap:12px}
-.ec-cur-session-dim{color:var(--lang-ink-soft)}
-.ec-cur-session-val{color:var(--lang-ink)}
-.ec-cur-meter{height:14px;border-radius:999px;background:#E8E5F2;overflow:hidden;border:2px solid var(--lang-line)}
-.ec-cur-meter-fill{height:100%;background:linear-gradient(90deg,#D4F55C,#B8E62E);border-radius:999px;transition:width .8s ease}
-.ec-cur-score-chip{
-  font-size:12px;font-weight:900;color:var(--lang-ink);background:var(--lang-lime);
-  border:2px solid var(--lang-line);padding:6px 12px;border-radius:999px;
-  align-self:flex-end;box-shadow:0 2px 0 var(--lang-line);letter-spacing:.04em;
-}
-
 /* RESPONSIVE */
 @media (max-width:1080px){.ec-cur-grid{grid-template-columns:minmax(0,1fr) 280px;gap:18px}}
 @media (max-width:900px){
@@ -448,6 +357,7 @@ const CURRICULUM_CSS = `
   .ec-cur-grid > section,.ec-cur-grid > aside{width:100%}
   .ec-cur-hero{flex-direction:column;align-items:flex-start;min-height:0}
   .ec-cur-hero-mascot{position:absolute;right:12px;bottom:12px;transform:scale(.7);transform-origin:bottom right;animation:none;opacity:.92}
+  .ec-cur-topic-list{max-height:none;overflow:visible}
 }
 @media (max-width:720px){
   .ec-cur{padding-bottom:calc(var(--lang-nav-h) + var(--lang-safe) + 12px)}
@@ -463,12 +373,12 @@ const CURRICULUM_CSS = `
   .ec-cur-hero-stat span{font-size:9px}
   .ec-cur-hero-mascot{display:none}
   .ec-cur-modes{margin-bottom:12px;padding:5px}
-  .ec-cur-mode{padding:8px 14px;font-size:12px}
+  .ec-cur-mode{padding:10px 12px;font-size:12.5px;min-height:44px}
   .ec-cur-filters{padding:12px;gap:8px;border-radius:18px;margin-bottom:14px}
-  .ec-cur-pill{padding:8px 13px;font-size:12px;min-height:40px}
-  .ec-cur-select{padding:8px 13px;font-size:12px;min-height:40px}
-  .ec-cur-check{padding:8px 12px;font-size:12px;min-height:40px}
-  .ec-cur-cat{padding:9px 13px;font-size:12px;min-height:42px}
+  .ec-cur-pill{padding:10px 14px;font-size:12.5px;min-height:44px}
+  .ec-cur-select{padding:10px 13px;font-size:12.5px;min-height:44px;width:100%}
+  .ec-cur-check{padding:10px 13px;font-size:12.5px;min-height:44px}
+  .ec-cur-cat{padding:11px 14px;font-size:12.5px;min-height:46px}
   .ec-cur-cat svg{width:14px;height:14px}
   .ec-cur-section{padding:16px;border-radius:20px;box-shadow:0 4px 0 var(--lang-line);margin-bottom:14px}
   .ec-cur-section-title{font-size:14.5px}
@@ -477,17 +387,16 @@ const CURRICULUM_CSS = `
   .ec-lesson-block{padding:12px 14px}
   .ec-lesson-block li{font-size:12.5px}
   .ec-quiz-question{font-size:15px;margin-bottom:12px}
-  .ec-quiz-option{padding:12px 14px;font-size:13.5px;border-radius:12px;min-height:46px}
+  .ec-quiz-option{padding:14px 14px;font-size:14px;border-radius:12px;min-height:52px}
   .ec-quiz-explain{font-size:12px;padding:9px 11px}
-  .ec-cur-topic-list{max-height:none}
-  .ec-cur-topic-btn{padding:10px 12px;font-size:12px}
-  .ec-cur-bank-item{padding:11px 13px;font-size:12.5px}
+  .ec-cur-topic-btn{padding:12px;font-size:12.5px;min-height:46px}
+  .ec-cur-bank-item{padding:12px 13px;font-size:12.5px;min-height:46px}
   .ec-cur-translation p.bn{font-size:15.5px}
   .ec-cur-xp-toast{
     top:auto;bottom:calc(var(--lang-nav-h) + var(--lang-safe) - 80px);
-    right:12px;left:12px;text-align:center;
-    padding:11px 18px;font-size:13px;
+    right:12px;left:12px;text-align:center;padding:11px 18px;font-size:13px;
   }
+  .ec-cur-filter-group{flex:1 1 100%}
 }
 @media (max-width:480px){
   .ec-cur-hero h1{font-size:20px}
@@ -495,14 +404,15 @@ const CURRICULUM_CSS = `
   .ec-cur-hero-stat strong{font-size:15px}
   .ec-cur-hero-stat span{font-size:8.5px}
   .ec-quiz-question{font-size:14.5px}
-  .ec-quiz-option{font-size:13px;padding:11px 13px}
+  .ec-quiz-option{font-size:13.5px;padding:13px 13px}
   .ec-lesson-title{font-size:15px}
+  .ec-cur-mode{font-size:12px;padding:9px 10px;min-height:42px}
 }
 @media (max-width:380px){
-  .ec-cur-pill{padding:7px 11px;font-size:11.5px}
-  .ec-cur-cat{padding:8px 11px;font-size:11.5px}
+  .ec-cur-pill{padding:9px 12px;font-size:12px}
+  .ec-cur-cat{padding:10px 12px;font-size:12px}
   .ec-cur-hero h1{font-size:18px}
-  .ec-quiz-option{font-size:12.5px;padding:10px 12px}
+  .ec-quiz-option{font-size:13px;padding:12px}
 }
 @media (prefers-reduced-motion: reduce){
   .ec-cur *,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}
@@ -510,11 +420,10 @@ const CURRICULUM_CSS = `
 `;
 
 /* ============================================================
-   QUESTION BANK
-   Each category: name, icon, class ('all'), lesson, questions
+   QUESTION BANK — core categories only (IELTS removed)
+   Each category: name, icon, class, lesson, questions
    ============================================================ */
 const QUESTION_BANK = {
-  /* ================= CORE GENERAL ================= */
   verbs: {
     name: 'Right Form of Verbs', icon: 'target', class: 'all',
     lesson: {
@@ -848,7 +757,6 @@ const QUESTION_BANK = {
       bangla: 'গণনাযোগ্য plural → many/few; uncountable → much/little। "Very" সরাসরি adjective এর আগে, "such a" noun সহ।',
     },
     questions: [
-      { p:'___ students should study regularly.', o:['A','An','The','—'], a:'The', e:'Definite group.', b:'নির্দিষ্ট গোষ্ঠী।' },
       { p:'It is a ___ interesting book.', o:['very','much','so','such'], a:'very', e:'Very + adj.', b:'Very + adj।' },
       { p:'He runs ___ fast.', o:['very','much','so','such'], a:'very', e:'Very + adverb.', b:'Very + adverb।' },
       { p:'She is ___ a nice girl.', o:['such','so','very','much'], a:'such', e:'Such a + adj + noun.', b:'Such a + adj + noun।' },
@@ -898,6 +806,7 @@ const QUESTION_BANK = {
       { p:'He is ___ honest than his brother.', o:['very','more','much','most'], a:'more', e:'More + adj.', b:'More + adj।' },
       { p:'The film was ___ interesting.', o:['very','much','such','so much'], a:'very', e:'Very + adj.', b:'Very + adj।' },
       { p:'He drives ___ than his brother.', o:['careful','carefully','more carefully','most carefully'], a:'more carefully', e:'Comparative adverb.', b:'Comparative adverb।' },
+      { p:'___ students should study regularly.', o:['A','An','The','—'], a:'The', e:'Definite group.', b:'নির্দিষ্ট গোষ্ঠী।' },
     ],
   },
 
@@ -2192,22 +2101,359 @@ const QUESTION_BANK = {
       { p:'Both my parents ___ teachers.', o:['is','are','was','be'], a:'are', e:'Plural subject.', b:'Plural subject।' },
     ],
   },
+
+  /* ================= EXTRA CORE CATEGORIES ================= */
+
+  determiners: {
+    name: 'Determiners', icon: 'flag', class: 'all',
+    lesson: {
+      rules: [
+        '<code>This/That</code> + singular; <code>These/Those</code> + plural.',
+        '<code>Some</code> in positive; <code>any</code> in negative/questions.',
+        '<code>Each/Every</code> + singular noun + singular verb.',
+        '<code>Both</code> + plural; <code>Neither/Either</code> + singular.',
+        '<code>All/None/Most</code> + plural or uncountable.',
+      ],
+      examples: [
+        '<strong>This</strong> book is mine.',
+        'I have <strong>some</strong> money.',
+        '<strong>Each</strong> student has a book.',
+        '<strong>Both</strong> boys are present.',
+      ],
+      bangla: 'This/That একবচনে, These/Those বহুবচনে। Some ধনাত্মকে, any ঋণাত্মক/প্রশ্নে।',
+    },
+    questions: [
+      { p:'___ book is mine.', o:['This','These','Those','Many'], a:'This', e:'Singular.', b:'একবচন।' },
+      { p:'___ books are mine.', o:['This','That','These','Much'], a:'These', e:'Plural.', b:'বহুবচন।' },
+      { p:'I have ___ money.', o:['many','some','few','a few'], a:'some', e:'Positive uncountable.', b:'Uncountable positive।' },
+      { p:'Do you have ___ questions?', o:['some','any','much','little'], a:'any', e:'Question.', b:'প্রশ্ন।' },
+      { p:'___ student must attend.', o:['All','Each','Every','Both'], a:'Each', e:'Each + singular.', b:'Each + একবচন।' },
+      { p:'___ of them are present.', o:['Each','Every','Both','Much'], a:'Both', e:'Both + plural.', b:'Both + plural।' },
+      { p:'___ of the two is correct.', o:['Both','Neither','All','Some'], a:'Neither', e:'Neither of two.', b:'দুইয়ের কেউ নয়।' },
+      { p:'I have ___ friends in Dhaka.', o:['much','a little','a few','little'], a:'a few', e:'Countable positive.', b:'Countable positive।' },
+      { p:'She has ___ patience.', o:['many','few','little','a few'], a:'little', e:'Uncountable negative.', b:'Uncountable negative।' },
+      { p:'___ people were present.', o:['Much','Many','A little','Little'], a:'Many', e:'Countable.', b:'Countable।' },
+      { p:'I have ___ time.', o:['many','few','a little','a few'], a:'a little', e:'Uncountable positive.', b:'Uncountable positive।' },
+      { p:'___ of the boys came.', o:['Each','Every','All','Much'], a:'All', e:'All + plural.', b:'All + plural।' },
+      { p:'___ of the students passed.', o:['Much','Most','Little','A little'], a:'Most', e:'Most + plural.', b:'Most + plural।' },
+      { p:'There isn\'t ___ milk left.', o:['some','any','many','few'], a:'any', e:'Negative.', b:'Negative।' },
+      { p:'Would you like ___ tea?', o:['any','some','many','few'], a:'some', e:'Offer.', b:'Offer।' },
+      { p:'___ boy in the class passed.', o:['All','Every','Both','Some'], a:'Every', e:'Every + singular.', b:'Every + একবচন।' },
+      { p:'___ of my friends came.', o:['Much','Some','Little','A little'], a:'Some', e:'Some + plural.', b:'Some + plural।' },
+      { p:'I have ___ idea about it.', o:['no','not','none','nothing'], a:'no', e:'No + noun.', b:'No + noun।' },
+      { p:'___ of them knew the answer.', o:['None','No','Not','Nothing'], a:'None', e:'None of.', b:'None of।' },
+      { p:'___ of the two roads leads home.', o:['Either','Both','All','Some'], a:'Either', e:'Either of two.', b:'Either of two।' },
+      { p:'I have ___ books than you.', o:['less','fewer','little','few'], a:'fewer', e:'Countable.', b:'Countable।' },
+      { p:'She has ___ money than I.', o:['less','fewer','little','few'], a:'less', e:'Uncountable.', b:'Uncountable।' },
+      { p:'He spent ___ money on books.', o:['many','a lot of','few','a few'], a:'a lot of', e:'Both types.', b:'উভয় ধরন।' },
+      { p:'I have ___ homework tonight.', o:['many','few','much','a few'], a:'much', e:'Uncountable question/negative.', b:'Uncountable।' },
+      { p:'___ of the cake was eaten.', o:['All','Every','Each','Many'], a:'All', e:'Uncountable.', b:'Uncountable।' },
+      { p:'___ of the girls was absent.', o:['Each','Every','Many','Several'], a:'Each', e:'Each of + singular.', b:'Each of + একবচন।' },
+      { p:'He has ___ friends in the city.', o:['much','few','little','a little'], a:'few', e:'Countable negative.', b:'Countable negative।' },
+      { p:'There are ___ chairs in the room.', o:['much','several','a little','little'], a:'several', e:'Several + plural.', b:'Several + plural।' },
+      { p:'___ people prefer tea to coffee.', o:['Much','Most','A little','Little'], a:'Most', e:'Most + plural.', b:'Most + plural।' },
+      { p:'She didn\'t bring ___ food.', o:['some','any','many','few'], a:'any', e:'Negative.', b:'Negative।' },
+      { p:'Let me give you ___ advice.', o:['an','a','some','many'], a:'some', e:'Uncountable positive.', b:'Uncountable positive।' },
+      { p:'___ of the answers is right.', o:['Both','Neither','All','Some'], a:'Neither', e:'Neither + singular.', b:'Neither + একবচন।' },
+      { p:'___ of us wants to go.', o:['None','No','Not','Nothing'], a:'None', e:'None + of.', b:'None + of।' },
+      { p:'I bought ___ apples from the market.', o:['much','some','a little','little'], a:'some', e:'Countable positive.', b:'Countable positive।' },
+      { p:'Take ___ of these two books.', o:['both','either','all','some'], a:'either', e:'Either of two.', b:'দুইয়ের একটি।' },
+      { p:'He has ___ wealth than his brother.', o:['fewer','less','few','little'], a:'less', e:'Uncountable comparative.', b:'Uncountable comparative।' },
+      { p:'There is ___ water in the glass.', o:['many','few','a little','a few'], a:'a little', e:'Uncountable positive.', b:'Uncountable positive।' },
+      { p:'I have ___ patience with him.', o:['many','few','little','a few'], a:'little', e:'Uncountable negative.', b:'Uncountable negative।' },
+      { p:'She spent ___ hours reading.', o:['much','several','a little','little'], a:'several', e:'Several + plural.', b:'Several + plural।' },
+      { p:'___ of the students were absent.', o:['Much','Many','A little','Little'], a:'Many', e:'Many + plural.', b:'Many + plural।' },
+      { p:'Do you have ___ pens I can borrow?', o:['some','any','much','little'], a:'any', e:'Question.', b:'প্রশ্ন।' },
+      { p:'___ of the two boys won the race.', o:['Both','Either','All','Some'], a:'Either', e:'Either of two.', b:'দুইয়ের একজন।' },
+      { p:'He has ___ interest in politics.', o:['many','few','little','a few'], a:'little', e:'Uncountable negative.', b:'Uncountable negative।' },
+      { p:'___ people attended the meeting.', o:['Much','Few','A little','Little'], a:'Few', e:'Countable negative.', b:'Countable negative।' },
+      { p:'Would you like ___ sugar in your tea?', o:['any','some','many','few'], a:'some', e:'Offer.', b:'Offer।' },
+      { p:'I need ___ help with this problem.', o:['any','some','many','few'], a:'some', e:'Positive.', b:'Positive।' },
+      { p:'___ of the milk was wasted.', o:['Many','Some','Few','Several'], a:'Some', e:'Uncountable.', b:'Uncountable।' },
+      { p:'___ of the questions were easy.', o:['Much','Most','A little','Little'], a:'Most', e:'Most + plural.', b:'Most + plural।' },
+      { p:'I have ___ information about this.', o:['many','few','little','a few'], a:'little', e:'Uncountable negative.', b:'Uncountable negative।' },
+      { p:'___ of the two roads is safe.', o:['Both','Neither','All','Many'], a:'Neither', e:'Neither of two.', b:'দুইয়ের কেউ নয়।' },
+    ],
+  },
+
+  gerundsInfinitives: {
+    name: 'Gerunds & Infinitives', icon: 'book', class: 'all',
+    lesson: {
+      rules: [
+        'Verbs + gerund: enjoy, mind, suggest, avoid, finish, practice.',
+        'Verbs + infinitive: want, decide, hope, promise, agree, plan.',
+        'Verbs + both (same): like, love, hate, prefer, begin, start.',
+        'Verbs + both (diff meaning): stop, remember, forget, try.',
+        'After preposition → gerund (good at swimming).',
+      ],
+      examples: [
+        'She enjoys <strong>swimming</strong>.',
+        'I want <strong>to go</strong> home.',
+        'He stopped <strong>smoking</strong> (= quit).',
+        'He stopped <strong>to smoke</strong> (= paused to smoke).',
+      ],
+      bangla: 'Enjoy/mind/suggest → gerund। Want/decide/hope → infinitive। Preposition এর পরে gerund।',
+    },
+    questions: [
+      { p:'She enjoys ___ books.', o:['read','reads','reading','to read'], a:'reading', e:'Enjoy + gerund.', b:'Enjoy + gerund।' },
+      { p:'I want ___ home.', o:['go','going','to go','went'], a:'to go', e:'Want + infinitive.', b:'Want + infinitive।' },
+      { p:'He decided ___ medicine.', o:['study','studying','to study','studied'], a:'to study', e:'Decide + infinitive.', b:'Decide + infinitive।' },
+      { p:'She suggested ___ the meeting.', o:['postpone','to postpone','postponing','postponed'], a:'postponing', e:'Suggest + gerund.', b:'Suggest + gerund।' },
+      { p:'I hope ___ you soon.', o:['see','seeing','to see','saw'], a:'to see', e:'Hope + infinitive.', b:'Hope + infinitive।' },
+      { p:'He avoided ___ the question.', o:['answer','to answer','answering','answered'], a:'answering', e:'Avoid + gerund.', b:'Avoid + gerund।' },
+      { p:'They promised ___ on time.', o:['come','coming','to come','came'], a:'to come', e:'Promise + infinitive.', b:'Promise + infinitive।' },
+      { p:'She finished ___ her homework.', o:['do','doing','to do','did'], a:'doing', e:'Finish + gerund.', b:'Finish + gerund।' },
+      { p:'I plan ___ abroad.', o:['go','going','to go','went'], a:'to go', e:'Plan + infinitive.', b:'Plan + infinitive।' },
+      { p:'He practices ___ every day.', o:['swim','swimming','to swim','swam'], a:'swimming', e:'Practice + gerund.', b:'Practice + gerund।' },
+      { p:'She agreed ___ us.', o:['help','helping','to help','helped'], a:'to help', e:'Agree + infinitive.', b:'Agree + infinitive।' },
+      { p:'I don\'t mind ___ late.', o:['work','working','to work','worked'], a:'working', e:'Mind + gerund.', b:'Mind + gerund।' },
+      { p:'He wants ___ a doctor.', o:['become','becoming','to become','became'], a:'to become', e:'Want + infinitive.', b:'Want + infinitive।' },
+      { p:'She likes ___ novels.', o:['read','reading','to read','Both A and B are correct'], a:'Both A and B are correct', e:'Like + both.', b:'Like + উভয়ই।' },
+      { p:'He stopped ___ when he was 40.', o:['smoke','smoking','to smoke','smoked'], a:'smoking', e:'Stop + gerund = quit.', b:'Stop + gerund = ছাড়া।' },
+      { p:'He stopped ___ a cigarette.', o:['smoke','smoking','to smoke','smoked'], a:'to smoke', e:'Stop + inf = pause to.', b:'Stop + inf = থামা।' },
+      { p:'I remember ___ the door.', o:['lock','locking','to lock','locked'], a:'locking', e:'Remember + gerund = past.', b:'Remember + gerund = অতীত।' },
+      { p:'Remember ___ the door!', o:['lock','locking','to lock','locked'], a:'to lock', e:'Remember + inf = future.', b:'Remember + inf = ভবিষ্যৎ।' },
+      { p:'He is good at ___ English.', o:['speak','speaking','to speak','spoke'], a:'speaking', e:'Preposition + gerund.', b:'Preposition + gerund।' },
+      { p:'I look forward to ___ from you.', o:['hear','hearing','to hear','heard'], a:'hearing', e:'To = preposition.', b:'To = preposition।' },
+      { p:'She is afraid of ___ alone.', o:['travel','traveling','to travel','traveled'], a:'traveling', e:'Preposition + gerund.', b:'Preposition + gerund।' },
+      { p:'Thank you for ___ me.', o:['help','helping','to help','helped'], a:'helping', e:'For + gerund.', b:'For + gerund।' },
+      { p:'I am interested in ___ music.', o:['learn','learning','to learn','learned'], a:'learning', e:'In + gerund.', b:'In + gerund।' },
+      { p:'He insisted on ___ the bill.', o:['pay','paying','to pay','paid'], a:'paying', e:'On + gerund.', b:'On + gerund।' },
+      { p:'She is used to ___ up early.', o:['get','getting','to get','got'], a:'getting', e:'Used to + gerund.', b:'Used to + gerund।' },
+      { p:'I want to ___ a doctor.', o:['become','becoming','became','becomes'], a:'become', e:'To + base.', b:'To + base।' },
+      { p:'Let me ___ you.', o:['help','helping','to help','helped'], a:'help', e:'Let + base.', b:'Let + base।' },
+      { p:'He made me ___ the truth.', o:['tell','telling','to tell','told'], a:'tell', e:'Make + base.', b:'Make + base।' },
+      { p:'I heard him ___ the song.', o:['sing','singing','to sing','sang'], a:'sing', e:'Hear + base/gerund.', b:'Hear + base/gerund।' },
+      { p:'She saw me ___ the road.', o:['cross','crossing','to cross','crossed'], a:'cross', e:'See + base.', b:'See + base।' },
+      { p:'I would rather ___ at home.', o:['stay','staying','to stay','stayed'], a:'stay', e:'Would rather + base.', b:'Would rather + base।' },
+      { p:'You had better ___ a doctor.', o:['see','seeing','to see','saw'], a:'see', e:'Had better + base.', b:'Had better + base।' },
+      { p:'He cannot help ___ about her.', o:['think','thinking','to think','thought'], a:'thinking', e:'Cannot help + gerund.', b:'Cannot help + gerund।' },
+      { p:'I am looking forward to ___ you.', o:['see','seeing','to see','saw'], a:'seeing', e:'To = preposition.', b:'To = preposition।' },
+      { p:'She apologized for ___ late.', o:['be','being','to be','was'], a:'being', e:'For + gerund.', b:'For + gerund।' },
+      { p:'He is capable of ___ the work.', o:['do','doing','to do','did'], a:'doing', e:'Of + gerund.', b:'Of + gerund।' },
+      { p:'I am tired of ___ the same thing.', o:['do','doing','to do','did'], a:'doing', e:'Of + gerund.', b:'Of + gerund।' },
+      { p:'She dreamt of ___ a singer.', o:['become','becoming','to become','became'], a:'becoming', e:'Of + gerund.', b:'Of + gerund।' },
+      { p:'He objected to ___ the plan.', o:['change','changing','to change','changed'], a:'changing', e:'To = preposition.', b:'To = preposition।' },
+      { p:'I don\'t feel like ___ today.', o:['work','working','to work','worked'], a:'working', e:'Feel like + gerund.', b:'Feel like + gerund।' },
+      { p:'She kept ___ despite the noise.', o:['study','studying','to study','studied'], a:'studying', e:'Keep + gerund.', b:'Keep + gerund।' },
+      { p:'He gave up ___ years ago.', o:['smoke','smoking','to smoke','smoked'], a:'smoking', e:'Give up + gerund.', b:'Give up + gerund।' },
+      { p:'They put off ___ the meeting.', o:['hold','holding','to hold','held'], a:'holding', e:'Put off + gerund.', b:'Put off + gerund।' },
+      { p:'I can\'t stand ___ in queues.', o:['wait','waiting','to wait','waited'], a:'waiting', e:'Can\'t stand + gerund.', b:'Can\'t stand + gerund।' },
+      { p:'She admitted ___ the mistake.', o:['make','making','to make','made'], a:'making', e:'Admit + gerund.', b:'Admit + gerund।' },
+      { p:'He denied ___ the money.', o:['steal','stealing','to steal','stole'], a:'stealing', e:'Deny + gerund.', b:'Deny + gerund।' },
+      { p:'I appreciate your ___ me.', o:['help','helping','to help','helped'], a:'helping', e:'Appreciate + gerund.', b:'Appreciate + gerund।' },
+      { p:'She considered ___ a new job.', o:['take','taking','to take','took'], a:'taking', e:'Consider + gerund.', b:'Consider + gerund।' },
+      { p:'He mentioned ___ you yesterday.', o:['see','seeing','to see','saw'], a:'seeing', e:'Mention + gerund.', b:'Mention + gerund।' },
+      { p:'I recommend ___ this book.', o:['read','reading','to read','read'], a:'reading', e:'Recommend + gerund.', b:'Recommend + gerund।' },
+      { p:'She avoided ___ him.', o:['meet','meeting','to meet','met'], a:'meeting', e:'Avoid + gerund.', b:'Avoid + gerund।' },
+      { p:'He risked ___ his job.', o:['lose','losing','to lose','lost'], a:'losing', e:'Risk + gerund.', b:'Risk + gerund।' },
+      { p:'I don\'t recall ___ him before.', o:['see','seeing','to see','saw'], a:'seeing', e:'Recall + gerund.', b:'Recall + gerund।' },
+      { p:'She imagines ___ rich.', o:['be','being','to be','was'], a:'being', e:'Imagine + gerund.', b:'Imagine + gerund।' },
+      { p:'He postponed ___ the decision.', o:['make','making','to make','made'], a:'making', e:'Postpone + gerund.', b:'Postpone + gerund।' },
+      { p:'I don\'t mind ___ for you.', o:['wait','waiting','to wait','waited'], a:'waiting', e:'Mind + gerund.', b:'Mind + gerund।' },
+      { p:'She succeeded in ___ the exam.', o:['pass','passing','to pass','passed'], a:'passing', e:'In + gerund.', b:'In + gerund।' },
+      { p:'He is thinking of ___ a car.', o:['buy','buying','to buy','bought'], a:'buying', e:'Of + gerund.', b:'Of + gerund।' },
+      { p:'I am used to ___ up early.', o:['get','getting','to get','got'], a:'getting', e:'Used to + gerund.', b:'Used to + gerund।' },
+      { p:'Let\'s ___ a movie.', o:['watch','watching','to watch','watched'], a:'watch', e:'Let\'s + base.', b:'Let\'s + base।' },
+      { p:'Why not ___ a break?', o:['take','taking','to take','took'], a:'take', e:'Why not + base.', b:'Why not + base।' },
+      { p:'You should ___ harder.', o:['try','trying','to try','tried'], a:'try', e:'Should + base.', b:'Should + base।' },
+      { p:'He made me ___ for hours.', o:['wait','waiting','to wait','waited'], a:'wait', e:'Make + base.', b:'Make + base।' },
+      { p:'I had better ___ now.', o:['go','going','to go','went'], a:'go', e:'Had better + base.', b:'Had better + base।' },
+      { p:'She can ___ three languages.', o:['speak','speaking','to speak','spoke'], a:'speak', e:'Can + base.', b:'Can + base।' },
+      { p:'I want ___ a new phone.', o:['buy','buying','to buy','bought'], a:'to buy', e:'Want + infinitive.', b:'Want + infinitive।' },
+      { p:'He hopes ___ the prize.', o:['win','winning','to win','won'], a:'to win', e:'Hope + infinitive.', b:'Hope + infinitive।' },
+    ],
+  },
+
+  clauses: {
+    name: 'Clauses & Phrases', icon: 'grid', class: 'all',
+    lesson: {
+      rules: [
+        'Main clause = independent sentence; Subordinate = dependent.',
+        'Noun clause: acts as subject/object (what he said).',
+        'Adjective clause: modifies noun (the man who came).',
+        'Adverb clause: modifies verb (when he arrived).',
+        'Phrase = group of words without subject+verb.',
+      ],
+      examples: [
+        '<strong>What he said</strong> was true. (Noun clause)',
+        'The man <strong>who came</strong> is my uncle. (Adjective)',
+        'He left <strong>when the bell rang</strong>. (Adverb)',
+      ],
+      bangla: 'Noun clause subject/object হিসেবে, Adjective clause noun modify করে, Adverb clause verb modify করে।',
+    },
+    questions: [
+      { p:'___ he said was true.', o:['What','That','Which','Who'], a:'What', e:'Noun clause subject.', b:'Noun clause subject।' },
+      { p:'I know ___ he will come.', o:['that','what','which','who'], a:'that', e:'Noun clause object.', b:'Noun clause object।' },
+      { p:'The man ___ came is my uncle.', o:['who','which','whom','whose'], a:'who', e:'Adjective clause person.', b:'Adjective clause ব্যক্তি।' },
+      { p:'The book ___ I read is good.', o:['who','which','whose','whom'], a:'which', e:'Adjective clause thing.', b:'Adjective clause বস্তু।' },
+      { p:'He left ___ the bell rang.', o:['when','which','who','what'], a:'when', e:'Adverb clause time.', b:'Adverb clause সময়।' },
+      { p:'I stayed home ___ it rained.', o:['because','which','who','that'], a:'because', e:'Adverb clause cause.', b:'Adverb clause কারণ।' },
+      { p:'___ he is poor, he is honest.', o:['Although','Because','So','And'], a:'Although', e:'Adverb clause concession.', b:'Adverb clause ছাড়।' },
+      { p:'She will come ___ she can.', o:['if','which','who','what'], a:'if', e:'Adverb clause condition.', b:'Adverb clause শর্ত।' },
+      { p:'I don\'t know ___ he lives.', o:['where','which','who','that'], a:'where', e:'Noun clause place.', b:'Noun clause স্থান।' },
+      { p:'Tell me ___ you want.', o:['what','which','who','whose'], a:'what', e:'Noun clause object.', b:'Noun clause object।' },
+      { p:'The girl ___ hair is long is my sister.', o:['whose','who','which','whom'], a:'whose', e:'Possessive relative.', b:'Possessive relative।' },
+      { p:'This is the house ___ I was born.', o:['where','which','who','that'], a:'where', e:'Adjective clause place.', b:'Adjective clause স্থান।' },
+      { p:'I know the reason ___ he left.', o:['why','which','who','that'], a:'why', e:'Adjective clause reason.', b:'Adjective clause কারণ।' },
+      { p:'___ I arrived, they had left.', o:['When','Which','Who','That'], a:'When', e:'Adverb clause time.', b:'Adverb clause সময়।' },
+      { p:'He works hard ___ he may succeed.', o:['so that','because','although','but'], a:'so that', e:'Adverb clause purpose.', b:'Adverb clause উদ্দেশ্য।' },
+      { p:'She was so tired ___ she fell asleep.', o:['that','which','who','what'], a:'that', e:'So...that.', b:'So...that।' },
+      { p:'It is a fact ___ the earth is round.', o:['that','which','who','what'], a:'that', e:'Noun clause.', b:'Noun clause।' },
+      { p:'I wonder ___ he will agree.', o:['whether','that','which','who'], a:'whether', e:'Noun clause.', b:'Noun clause।' },
+      { p:'He is the boy ___ won the prize.', o:['who','which','whom','whose'], a:'who', e:'Relative pronoun.', b:'Relative pronoun।' },
+      { p:'The car ___ is red is mine.', o:['which','who','whom','whose'], a:'which', e:'Relative pronoun thing.', b:'Relative pronoun বস্তু।' },
+      { p:'I met the man ___ you told me about.', o:['whom','which','who','whose'], a:'whom', e:'Object relative.', b:'Object relative।' },
+      { p:'She lives in a city ___ is very old.', o:['which','who','whom','whose'], a:'which', e:'Relative pronoun.', b:'Relative pronoun।' },
+      { p:'___ you work hard, you will fail.', o:['Unless','If','Because','Although'], a:'Unless', e:'Adverb clause.', b:'Adverb clause।' },
+      { p:'He came ___ I was out.', o:['when','which','who','that'], a:'when', e:'Adverb clause.', b:'Adverb clause।' },
+      { p:'She cried ___ she was sad.', o:['because','which','who','what'], a:'because', e:'Adverb clause cause.', b:'Adverb clause কারণ।' },
+      { p:'___ I was walking, I saw a bird.', o:['While','Because','Although','So'], a:'While', e:'Adverb clause time.', b:'Adverb clause সময়।' },
+      { p:'He is the man ___ I saw yesterday.', o:['whom','who','which','whose'], a:'whom', e:'Object relative.', b:'Object relative।' },
+      { p:'The place ___ we met is beautiful.', o:['where','which','who','that'], a:'where', e:'Relative adverb.', b:'Relative adverb।' },
+      { p:'I don\'t know ___ to do.', o:['what','which','who','whose'], a:'what', e:'Infinitive clause.', b:'Infinitive clause।' },
+      { p:'Tell me ___ to go.', o:['where','which','who','whose'], a:'where', e:'Infinitive clause.', b:'Infinitive clause।' },
+      { p:'___ I had known, I would have come.', o:['If','Unless','Although','Because'], a:'If', e:'Adverb clause condition.', b:'Adverb clause শর্ত।' },
+      { p:'He failed ___ he did not study.', o:['because','which','who','what'], a:'because', e:'Adverb clause.', b:'Adverb clause।' },
+      { p:'She is the girl ___ sings well.', o:['who','which','whom','whose'], a:'who', e:'Subject relative.', b:'Subject relative।' },
+      { p:'This is the book ___ changed my life.', o:['that','who','whom','whose'], a:'that', e:'Relative pronoun.', b:'Relative pronoun।' },
+      { p:'I have a friend ___ father is a doctor.', o:['whose','who','which','whom'], a:'whose', e:'Possessive relative.', b:'Possessive relative।' },
+      { p:'___ he tried, he could not win.', o:['However','Because','So','And'], a:'However', e:'Adverb clause.', b:'Adverb clause।' },
+      { p:'I left ___ the meeting ended.', o:['after','which','who','what'], a:'after', e:'Adverb clause time.', b:'Adverb clause সময়।' },
+      { p:'He is stronger ___ I thought.', o:['than','which','who','that'], a:'than', e:'Comparative clause.', b:'Comparative clause।' },
+      { p:'She works ___ she can support her family.', o:['so that','because','although','but'], a:'so that', e:'Purpose clause.', b:'Purpose clause।' },
+      { p:'I know the man ___ is standing there.', o:['who','which','whom','whose'], a:'who', e:'Subject relative.', b:'Subject relative।' },
+      { p:'The reason ___ he came is unknown.', o:['why','which','who','what'], a:'why', e:'Relative adverb.', b:'Relative adverb।' },
+      { p:'___ you say, I will not go.', o:['Whatever','However','Whenever','Wherever'], a:'Whatever', e:'Concessive clause.', b:'Concessive clause।' },
+      { p:'___ he arrived, the party started.', o:['As soon as','Because','Although','If'], a:'As soon as', e:'Time clause.', b:'Time clause।' },
+      { p:'I will wait ___ you return.', o:['until','because','although','so'], a:'until', e:'Time clause.', b:'Time clause।' },
+      { p:'He ran fast ___ he could catch the bus.', o:['so that','because','although','if'], a:'so that', e:'Purpose clause.', b:'Purpose clause।' },
+      { p:'___ she was tired, she kept working.', o:['Although','Because','So','And'], a:'Although', e:'Concessive clause.', b:'Concessive clause।' },
+      { p:'I know ___ she is honest.', o:['that','which','who','what'], a:'that', e:'Noun clause.', b:'Noun clause।' },
+      { p:'This is the village ___ my father was born.', o:['where','which','who','that'], a:'where', e:'Relative adverb.', b:'Relative adverb।' },
+      { p:'The boy ___ I met is my cousin.', o:['whom','which','who','whose'], a:'whom', e:'Object relative.', b:'Object relative।' },
+      { p:'I can\'t tell ___ he will come or not.', o:['whether','if','that','which'], a:'whether', e:'Whether...or.', b:'Whether...or।' },
+      { p:'She is the one ___ helped me.', o:['who','which','whom','whose'], a:'who', e:'Subject relative.', b:'Subject relative।' },
+      { p:'The dog ___ barks loudly is mine.', o:['that','who','whom','whose'], a:'that', e:'Relative pronoun.', b:'Relative pronoun।' },
+      { p:'I wonder ___ he is coming.', o:['if','that','which','who'], a:'if', e:'Noun clause.', b:'Noun clause।' },
+      { p:'___ I was a child, I loved sweets.', o:['When','Which','Who','That'], a:'When', e:'Adverb clause.', b:'Adverb clause।' },
+      { p:'He is the man ___ car was stolen.', o:['whose','who','which','whom'], a:'whose', e:'Possessive.', b:'Possessive।' },
+      { p:'I came ___ I wanted to see you.', o:['because','which','who','that'], a:'because', e:'Adverb clause.', b:'Adverb clause।' },
+      { p:'She sings better ___ I do.', o:['than','which','who','that'], a:'than', e:'Comparative.', b:'Comparative।' },
+      { p:'I will go ___ it rains.', o:['unless','if','because','although'], a:'unless', e:'Condition.', b:'Condition।' },
+      { p:'Give me the book ___ is on the table.', o:['which','who','whom','whose'], a:'which', e:'Relative pronoun.', b:'Relative pronoun।' },
+      { p:'He asked me ___ I was going.', o:['where','which','who','that'], a:'where', e:'Noun clause.', b:'Noun clause।' },
+      { p:'The fact ___ he lied hurt me.', o:['that','which','who','what'], a:'that', e:'Noun clause appositive.', b:'Noun clause appositive।' },
+      { p:'She spoke ___ she knew everything.', o:['as if','because','although','so'], a:'as if', e:'Adverb clause manner.', b:'Adverb clause manner।' },
+      { p:'I don\'t know ___ the meeting will start.', o:['when','which','who','what'], a:'when', e:'Noun clause time.', b:'Noun clause সময়।' },
+      { p:'This is ___ I wanted to show you.', o:['what','which','who','whose'], a:'what', e:'Noun clause.', b:'Noun clause।' },
+      { p:'He ran ___ he could.', o:['as fast as','because','although','if'], a:'as fast as', e:'Comparison clause.', b:'Comparison clause।' },
+    ],
+  },
+
+  advancedGrammar: {
+    name: 'Advanced Grammar', icon: 'target', class: 'all',
+    lesson: {
+      rules: [
+        'Inversion after negative adverbs (Never have I…).',
+        'Cleft sentences for emphasis (It was John who…).',
+        'Subjunctive mood (I suggest that he go).',
+        'Ellipsis and substitution in conversation.',
+        'Emphatic "do" (I do like it).',
+        'Fronting for emphasis (Beautiful was the scenery).',
+      ],
+      examples: [
+        '<strong>Never have I</strong> seen such a thing. (Inversion)',
+        '<strong>It was John who</strong> broke the window. (Cleft)',
+        'I suggest that he <strong>go</strong> now. (Subjunctive)',
+        'I <strong>do</strong> like coffee. (Emphatic do)',
+      ],
+      bangla: 'Inversion → negative adverb শুরুতে। Cleft → It was X who...। Subjunctive → suggest/insist + base verb।',
+    },
+    questions: [
+      { p:'___ have I seen such beauty.', o:['Never','Ever','Always','Often'], a:'Never', e:'Inversion.', b:'Inversion।' },
+      { p:'Rarely ___ he speak in public.', o:['do','does','did','doing'], a:'does', e:'Inversion.', b:'Inversion।' },
+      { p:'It was John ___ broke the window.', o:['who','which','whom','whose'], a:'who', e:'Cleft.', b:'Cleft।' },
+      { p:'I suggest that he ___ now.', o:['go','goes','going','went'], a:'go', e:'Subjunctive.', b:'Subjunctive।' },
+      { p:'She insisted that he ___ present.', o:['be','is','was','being'], a:'be', e:'Subjunctive.', b:'Subjunctive।' },
+      { p:'I ___ like coffee.', o:['do','does','did','doing'], a:'do', e:'Emphatic.', b:'Emphatic।' },
+      { p:'Hardly ___ I entered when the phone rang.', o:['had','have','did','do'], a:'had', e:'Inversion.', b:'Inversion।' },
+      { p:'No sooner ___ he arrived than it rained.', o:['had','has','did','does'], a:'had', e:'Inversion.', b:'Inversion।' },
+      { p:'Never ___ I forget you.', o:['will','would','shall','Both A and B'], a:'shall', e:'Inversion.', b:'Inversion।' },
+      { p:'Little ___ he know the truth.', o:['did','does','do','done'], a:'did', e:'Inversion.', b:'Inversion।' },
+      { p:'Only then ___ I understand.', o:['did','do','does','done'], a:'did', e:'Inversion.', b:'Inversion।' },
+      { p:'Not only ___ she sing, but also dance.', o:['can','could','does','did'], a:'can', e:'Inversion.', b:'Inversion।' },
+      { p:'Under no circumstances ___ you leave.', o:['should','would','did','do'], a:'should', e:'Inversion.', b:'Inversion।' },
+      { p:'It is education ___ changes lives.', o:['that','which','who','what'], a:'that', e:'Cleft.', b:'Cleft।' },
+      { p:'It was in 1990 ___ he was born.', o:['that','which','who','when'], a:'that', e:'Cleft.', b:'Cleft।' },
+      { p:'I demand that she ___ the truth.', o:['tell','tells','told','telling'], a:'tell', e:'Subjunctive.', b:'Subjunctive।' },
+      { p:'It is essential that he ___ on time.', o:['be','is','was','being'], a:'be', e:'Subjunctive.', b:'Subjunctive।' },
+      { p:'If I ___ you, I would tell the truth.', o:['am','was','were','be'], a:'were', e:'Subjunctive.', b:'Subjunctive।' },
+      { p:'I wish I ___ there.', o:['am','was','were','be'], a:'were', e:'Subjunctive.', b:'Subjunctive।' },
+      { p:'He acts as if he ___ the boss.', o:['is','was','were','be'], a:'were', e:'Subjunctive.', b:'Subjunctive।' },
+      { p:'She said she ___ come tomorrow.', o:['will','would','shall','should'], a:'would', e:'Reported speech.', b:'Reported speech।' },
+      { p:'Beautiful ___ the scenery.', o:['was','were','is','are'], a:'was', e:'Fronting.', b:'Fronting।' },
+      { p:'___ do I need your help.', o:['Nor','Or','So','And'], a:'Nor', e:'Inversion.', b:'Inversion।' },
+      { p:'Here ___ the bus.', o:['comes','come','came','coming'], a:'comes', e:'Inversion.', b:'Inversion।' },
+      { p:'There ___ the bell.', o:['goes','go','went','going'], a:'goes', e:'Inversion.', b:'Inversion।' },
+      { p:'Nowhere ___ I find it.', o:['could','can','did','do'], a:'could', e:'Inversion.', b:'Inversion।' },
+      { p:'In no way ___ she responsible.', o:['is','are','was','were'], a:'is', e:'Inversion.', b:'Inversion।' },
+      { p:'On no account ___ you touch it.', o:['must','should','would','did'], a:'must', e:'Inversion.', b:'Inversion।' },
+      { p:'So beautiful ___ the sunset that we stopped.', o:['was','were','is','are'], a:'was', e:'Inversion.', b:'Inversion।' },
+      { p:'Such ___ his anger that he left.', o:['was','were','is','are'], a:'was', e:'Inversion.', b:'Inversion।' },
+      { p:'I ___ hope you succeed.', o:['do','does','did','doing'], a:'do', e:'Emphatic.', b:'Emphatic।' },
+      { p:'She ___ come to the party.', o:['did','does','done','doing'], a:'did', e:'Emphatic.', b:'Emphatic।' },
+      { p:'It ___ his attitude that annoyed me.', o:['was','were','is','are'], a:'was', e:'Cleft.', b:'Cleft।' },
+      { p:'What I want ___ peace.', o:['is','are','was','were'], a:'is', e:'Wh-cleft.', b:'Wh-cleft।' },
+      { p:'What she said ___ true.', o:['was','were','is','Both A and C'], a:'is', e:'Wh-cleft.', b:'Wh-cleft।' },
+      { p:'The reason ___ I left was personal.', o:['why','which','who','that'], a:'why', e:'Relative adverb.', b:'Relative adverb।' },
+      { p:'The time ___ we met was summer.', o:['when','which','who','that'], a:'when', e:'Relative adverb.', b:'Relative adverb।' },
+      { p:'The way ___ he talks annoys me.', o:['that','which','who','when'], a:'that', e:'Relative.', b:'Relative।' },
+      { p:'He is the same man ___ I saw yesterday.', o:['that','which','who','whom'], a:'that', e:'Same + that.', b:'Same + that।' },
+      { p:'It is high time we ___ action.', o:['take','took','will take','taking'], a:'took', e:'Subjunctive.', b:'Subjunctive।' },
+      { p:'I would rather you ___ silent.', o:['keep','kept','keeping','keeps'], a:'kept', e:'Subjunctive.', b:'Subjunctive।' },
+      { p:'Suppose he ___ late, what would you do?', o:['is','was','were','be'], a:'were', e:'Subjunctive.', b:'Subjunctive।' },
+      { p:'Were I ___ rich, I would travel.', o:['to be','being','been','be'], a:'to be', e:'Inverted.', b:'Inverted।' },
+      { p:'Had I ___ earlier, I would have met him.', o:['come','came','coming','comes'], a:'come', e:'Inverted.', b:'Inverted।' },
+      { p:'Should it ___ tomorrow, we will cancel.', o:['rain','rains','rained','raining'], a:'rain', e:'Inverted.', b:'Inverted।' },
+      { p:'Not until midnight ___ he arrive.', o:['did','does','do','done'], a:'did', e:'Inversion.', b:'Inversion।' },
+      { p:'Hardly had I left ___ it started raining.', o:['when','than','that','then'], a:'when', e:'Hardly...when.', b:'Hardly...when।' },
+      { p:'Scarcely had I sat down ___ the bell rang.', o:['when','than','that','then'], a:'when', e:'Scarcely...when.', b:'Scarcely...when।' },
+      { p:'No sooner had she left ___ he came.', o:['than','when','that','then'], a:'than', e:'No sooner...than.', b:'No sooner...than।' },
+      { p:'I have never ___ such a beautiful place.', o:['seen','saw','see','seeing'], a:'seen', e:'V3.', b:'V3।' },
+      { p:'Rarely ___ such talent.', o:['have I seen','I have seen','I saw','did I saw'], a:'have I seen', e:'Inversion.', b:'Inversion।' },
+      { p:'Little ___ that he would win.', o:['did I know','I knew','I know','do I know'], a:'did I know', e:'Inversion.', b:'Inversion।' },
+      { p:'He ___ rather stay home than go out.', o:['would','should','could','might'], a:'would', e:'Preference.', b:'Preference।' },
+      { p:'The earlier you come, ___ it is.', o:['the better','better','the best','best'], a:'the better', e:'Correlative.', b:'Correlative।' },
+      { p:'No matter ___ hard he tries, he fails.', o:['how','what','which','who'], a:'how', e:'Concessive.', b:'Concessive।' },
+      { p:'Whatever ___ , stay calm.', o:['happens','happen','happened','happening'], a:'happens', e:'Concessive.', b:'Concessive।' },
+      { p:'It is I who ___ responsible.', o:['am','is','are','be'], a:'am', e:'Agreement.', b:'Agreement।' },
+      { p:'It is you who ___ right.', o:['are','is','am','be'], a:'are', e:'Agreement.', b:'Agreement।' },
+      { p:'It was they who ___ won.', o:['have','has','had','having'], a:'have', e:'Agreement.', b:'Agreement।' },
+      { p:'He is said ___ very rich.', o:['to be','being','been','be'], a:'to be', e:'Passive reporting.', b:'Passive reporting।' },
+      { p:'She is believed ___ the money.', o:['to steal','to have stolen','steal','stealing'], a:'to have stolen', e:'Perfect infinitive.', b:'Perfect infinitive।' },
+      { p:'He seems ___ tired.', o:['to be','being','been','be'], a:'to be', e:'Seem + inf.', b:'Seem + inf।' },
+      { p:'She appears ___ left.', o:['to have','having','have','has'], a:'to have', e:'Perfect infinitive.', b:'Perfect infinitive।' },
+      { p:'He happened ___ there.', o:['to be','being','been','be'], a:'to be', e:'Happen + inf.', b:'Happen + inf।' },
+    ],
+  },
 };
 
 /* ============================================================
-   Static data derived once at module load
+   Build TABS
    ============================================================ */
-const TABS = Object.entries(QUESTION_BANK).map(([id, cat]) => ({
+const ALL_TABS = Object.entries(QUESTION_BANK).map(([id, cat]) => ({
   id,
   label: cat.name,
   icon: cat.icon,
   count: cat.questions.length,
+  class: cat.class || 'all',
 }));
 
 const CLASSES = ['SSC', 'HSC', 'General'];
-const PAPERS = ['1st Paper', '2nd Paper', 'General'];
+/* Only English 2nd Paper + General (1st Paper removed) */
+const PAPERS = ['2nd Paper', 'General'];
 const BOARDS = ['Dhaka', 'Rajshahi', 'Chattogram', 'Sylhet', 'Barishal', 'Cumilla', 'Jashore', 'Dinajpur', 'Mymensingh'];
-const WRITING_TYPES = ['paragraph', 'composition', 'letter'];
 
 const FALLBACK_TOPICS = [
   { id: 't1', title: 'Seen Comprehension', tag: 'Reading' },
@@ -2220,21 +2466,12 @@ const FALLBACK_WRITING = [
   { id: 'w2', title: 'A Letter to a Friend about SSC Results' },
 ];
 
-const TOTAL_QUESTIONS = TABS.reduce((sum, t) => sum + t.count, 0);
-const ANSWER_DELAY_MS = 900;
-const XP_PER_CORRECT = 10;
-const DEFAULT_CAT = 'verbs';
-
-const isWeak = (stat) => !!stat && stat.total >= 3 && stat.correct / stat.total < 0.6;
+const TOTAL_QUESTIONS = Object.values(QUESTION_BANK).reduce((s, c) => s + c.questions.length, 0);
 
 /* ============================================================
-   Presentational pieces (memoised so quiz ticks don't re-render them)
+   Mascot
    ============================================================ */
-const Styles = memo(function Styles() {
-  return <style>{CURRICULUM_CSS}</style>;
-});
-
-const LangutMascot = memo(function LangutMascot({ size = 160 }) {
+function LangutMascot({ size = 160 }) {
   return (
     <svg viewBox="0 0 170 170" width={size} height={size} fill="none" aria-hidden="true">
       <ellipse cx="85" cy="158" rx="46" ry="7" fill="#000" opacity="0.22" />
@@ -2263,307 +2500,15 @@ const LangutMascot = memo(function LangutMascot({ size = 160 }) {
       <path d="M148 46l2.5-6 2.5 6-6 2.5 6 2.5-2.5 6-2.5-6-6-2.5z" fill="#FF8FCB" />
     </svg>
   );
-});
-
-const PageHead = memo(function PageHead() {
-  return (
-    <div className="ec-cur-head">
-      <div>
-        <p className="ec-cur-eyebrow">Curriculum</p>
-        <h1 className="ec-page-title">English Grammar Mastery</h1>
-        <p className="ec-page-sub">SSC, HSC &amp; General — {TOTAL_QUESTIONS}+ exercises.</p>
-      </div>
-    </div>
-  );
-});
-
-const Hero = memo(function Hero() {
-  return (
-    <div className="ec-cur-hero">
-      <div className="ec-cur-hero-copy">
-        <span className="ec-cur-hero-badge">Bangladesh Boards</span>
-        <h1>Grammar practice, <em>board-style</em></h1>
-        <p>Every grammar rule, gap-filling type, translation pattern and writing form — lessons + practice for school and board exams.</p>
-        <div className="ec-cur-hero-stats">
-          <div className="ec-cur-hero-stat"><strong>{TOTAL_QUESTIONS}</strong><span>Exercises</span></div>
-          <div className="ec-cur-hero-stat"><strong>{TABS.length}</strong><span>Topics</span></div>
-          <div className="ec-cur-hero-stat"><strong>{BOARDS.length}</strong><span>Boards</span></div>
-        </div>
-      </div>
-      <div className="ec-cur-hero-mascot">
-        <LangutMascot size={150} />
-      </div>
-    </div>
-  );
-});
-
-const ModeSwitch = memo(function ModeSwitch({ mode, onChange }) {
-  return (
-    <div className="ec-cur-modes">
-      <button
-        className={`ec-cur-mode${mode === 'practice' ? ' ec-cur-mode--active' : ''}`}
-        onClick={() => onChange('practice')}
-      >
-        <Icon name="target" /> Practice
-      </button>
-      <button
-        className={`ec-cur-mode${mode === 'lesson' ? ' ec-cur-mode--active' : ''}`}
-        onClick={() => onChange('lesson')}
-      >
-        <Icon name="book" /> Lessons
-      </button>
-    </div>
-  );
-});
-
-const Filters = memo(function Filters({ cls, paper, board, banglaHelp, onCls, onPaper, onBoard, onBangla }) {
-  return (
-    <div className="ec-cur-filters">
-      <div className="ec-cur-filter-group">
-        {CLASSES.map((c) => (
-          <button key={c} className={`ec-cur-pill${cls === c ? ' ec-cur-pill--active' : ''}`} onClick={() => onCls(c)}>{c}</button>
-        ))}
-      </div>
-      <div className="ec-cur-filter-group">
-        {PAPERS.map((p) => (
-          <button key={p} className={`ec-cur-pill${paper === p ? ' ec-cur-pill--active' : ''}`} onClick={() => onPaper(p)}>{p}</button>
-        ))}
-      </div>
-      <select className="ec-cur-select" value={board} onChange={(e) => onBoard(e.target.value)}>
-        {BOARDS.map((b) => <option key={b} value={b}>{b} Board</option>)}
-      </select>
-      <label className="ec-cur-check">
-        <input type="checkbox" checked={banglaHelp} onChange={(e) => onBangla(e.target.checked)} />
-        🇧🇩 বাংলা
-      </label>
-    </div>
-  );
-});
-
-const CategoryTabs = memo(function CategoryTabs({ catId, onSelect }) {
-  return (
-    <div className="ec-cur-cats">
-      {TABS.map((t) => (
-        <button
-          key={t.id}
-          className={`ec-cur-cat${catId === t.id ? ' ec-cur-cat--active' : ''}`}
-          onClick={() => onSelect(t.id)}
-        >
-          <Icon name={t.icon} />
-          {t.label}
-          <span className="ec-cur-cat-count">{t.count}</span>
-        </button>
-      ))}
-    </div>
-  );
-});
-
-const Lesson = memo(function Lesson({ cat, onStart }) {
-  const { lesson } = cat;
-  return (
-    <div className="ec-lesson">
-      <div className="ec-lesson-head">
-        <h2 className="ec-lesson-title">{cat.name} — Lesson</h2>
-        <span className="ec-cur-chip">{cat.questions.length} exercises</span>
-      </div>
-      <div className="ec-lesson-body">
-        <div className="ec-lesson-block">
-          <h4>📘 Key Rules</h4>
-          <ul>
-            {lesson.rules.map((r, i) => (
-              <li key={i} dangerouslySetInnerHTML={{ __html: r }} />
-            ))}
-          </ul>
-        </div>
-        <div className="ec-lesson-block">
-          <h4>✨ Examples</h4>
-          <div className="ec-lesson-list">
-            {lesson.examples.map((ex, i) => (
-              <div key={i} className="ec-lesson-example" dangerouslySetInnerHTML={{ __html: ex }} />
-            ))}
-          </div>
-        </div>
-        <div className="ec-lesson-bn">🇧🇩 {lesson.bangla}</div>
-        <button className="ec-cur-pill ec-cur-pill--active ec-cur-pill--start" onClick={onStart}>
-          ▶ Start practice →
-        </button>
-      </div>
-    </div>
-  );
-});
-
-const Quiz = memo(function Quiz({ cat, question, qIndex, selected, banglaHelp, onAnswer }) {
-  const total = cat.questions.length;
-  const answered = selected !== null;
-  const isGood = answered && selected === question.a;
-
-  return (
-    <div className="ec-cur-section">
-      <div className="ec-quiz-top">
-        <span className="ec-quiz-badge">{cat.name}</span>
-        <span className="ec-quiz-counter">Question {qIndex + 1} / {total}</span>
-      </div>
-      <div className="ec-quiz-progress">
-        <div className="ec-quiz-progress-fill" style={{ width: `${((qIndex + 1) / total) * 100}%` }} />
-      </div>
-      <p className="ec-quiz-question">{question.p}</p>
-      <div className="ec-quiz-options">
-        {question.o.map((opt, i) => {
-          const isSelected = selected === opt;
-          const isCorrect = opt === question.a;
-          const state = isSelected
-            ? isCorrect ? ' ec-quiz-option--correct ec-pop' : ' ec-quiz-option--incorrect'
-            : '';
-          return (
-            <button
-              key={`${opt}-${i}`}
-              className={`ec-quiz-option${state}`}
-              onClick={() => onAnswer(opt)}
-              disabled={answered && !isSelected && !isCorrect}
-            >
-              {opt}
-            </button>
-          );
-        })}
-      </div>
-      <div className={`ec-quiz-feedback${isGood ? ' ec-quiz-feedback--good' : answered ? ' ec-quiz-feedback--bad' : ''}`}>
-        {answered && (isGood ? '✨ Correct!' : `Correct answer: ${question.a}`)}
-      </div>
-      {answered && (
-        <p className="ec-quiz-explain">💡 {banglaHelp ? question.b : question.e}</p>
-      )}
-    </div>
-  );
-});
-
-const BoardSets = memo(function BoardSets({ topics, cls, paper }) {
-  const list = topics.length ? topics : FALLBACK_TOPICS;
-  return (
-    <div className="ec-cur-section">
-      <div className="ec-cur-section-head">
-        <h2 className="ec-cur-section-title">Board-style question sets</h2>
-        <span className="ec-cur-chip">{cls} · {paper}</span>
-      </div>
-      <div className="ec-cur-stack">
-        {list.map((t) => (
-          <div key={t.id} className="ec-cur-board-item">
-            <div>
-              <p className="ec-cur-board-title">{t.title}</p>
-              <span className="ec-cur-board-tag">{t.tag}</span>
-            </div>
-            <button className="ec-cur-pill ec-cur-pill--active ec-cur-pill--sm">Practice</button>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-});
-
-const Translation = memo(function Translation() {
-  return (
-    <div className="ec-cur-section ec-cur-translation">
-      <div className="ec-cur-section-head">
-        <h2 className="ec-cur-section-title">Translation practice</h2>
-        <span className="ec-cur-chip">Bangla ↔ English</span>
-      </div>
-      <p className="ec-cur-hint">Translate the sentence below:</p>
-      <p className="bn">সে প্রতিদিন সকালে হাঁটে।</p>
-      <textarea rows={2} placeholder="Type the English translation…" />
-      <button className="ec-cur-pill ec-cur-pill--active ec-cur-pill--md">Check</button>
-    </div>
-  );
-});
-
-const TopicList = memo(function TopicList({ catId, catStats, onSelect }) {
-  return (
-    <div className="ec-cur-section">
-      <div className="ec-cur-section-head">
-        <h2 className="ec-cur-section-title">All topics</h2>
-        <span className="ec-cur-chip">{TABS.length}</span>
-      </div>
-      <div className="ec-cur-topic-list">
-        {TABS.map((t) => {
-          const stat = catStats[t.id];
-          const pct = stat && stat.total ? Math.round((stat.correct / stat.total) * 100) : null;
-          return (
-            <button
-              key={t.id}
-              className={`ec-cur-topic-btn${catId === t.id ? ' ec-cur-topic-btn--active' : ''}`}
-              onClick={() => onSelect(t.id)}
-            >
-              <span className="ec-cur-topic-name">{t.label}</span>
-              {pct !== null && (
-                <span
-                  className="ec-cur-topic-count"
-                  style={isWeak(stat) ? { background: 'var(--lang-pink-2)', color: '#fff' } : undefined}
-                >
-                  {pct}%
-                </span>
-              )}
-              <span className="ec-cur-topic-count">{t.count}</span>
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-});
-
-const WritingBank = memo(function WritingBank({ writingType, items, onType }) {
-  const list = items.length ? items : FALLBACK_WRITING;
-  return (
-    <div className="ec-cur-section">
-      <div className="ec-cur-section-head">
-        <h2 className="ec-cur-section-title">Writing bank</h2>
-      </div>
-      <div className="ec-cur-filter-group ec-cur-filter-group--spaced">
-        {WRITING_TYPES.map((t) => (
-          <button
-            key={t}
-            className={`ec-cur-pill ec-cur-pill--cap${writingType === t ? ' ec-cur-pill--active' : ''}`}
-            onClick={() => onType(t)}
-          >
-            {t}
-          </button>
-        ))}
-      </div>
-      <div className="ec-cur-stack">
-        {list.map((w) => (
-          <div key={w.id} className="ec-cur-bank-item">{w.title}</div>
-        ))}
-      </div>
-    </div>
-  );
-});
-
-const SessionCard = memo(function SessionCard({ score }) {
-  const pct = score.total ? Math.round((score.correct / score.total) * 100) : 0;
-  return (
-    <div className="ec-cur-section">
-      <div className="ec-cur-section-head">
-        <h2 className="ec-cur-section-title">Your session</h2>
-      </div>
-      <div className="ec-cur-session-col">
-        <div className="ec-cur-session-label">
-          <span className="ec-cur-session-dim">Correct</span>
-          <span className="ec-cur-session-val">{score.correct} / {score.total}</span>
-        </div>
-        <div className="ec-cur-meter">
-          <div className="ec-cur-meter-fill" style={{ width: `${pct}%` }} />
-        </div>
-        <span className="ec-cur-score-chip">{pct}% accuracy</span>
-      </div>
-    </div>
-  );
-});
+}
 
 /* ============================================================
    MAIN COMPONENT
    ============================================================ */
 export function Curriculum() {
-  const [mode, setMode] = useState('practice'); // 'practice' | 'lesson'
+  const [mode, setMode] = useState('practice');
   const [cls, setCls] = useState('SSC');
-  const [paper, setPaper] = useState('1st Paper');
+  const [paper, setPaper] = useState('2nd Paper');
   const [board, setBoard] = useState('Dhaka');
   const [banglaHelp, setBanglaHelp] = useState(false);
 
@@ -2571,94 +2516,111 @@ export function Curriculum() {
   const [writingType, setWritingType] = useState('paragraph');
   const [writingBank, setWritingBank] = useState([]);
 
-  /* Quiz state — one object so each answer/advance is a single render */
-  const [quiz, setQuiz] = useState({ catId: DEFAULT_CAT, qIndex: 0, selected: null });
-  const [catStats, setCatStats] = useState({});
+  const [catId, setCatId] = useState('verbs');
+  const [qIndex, setQIndex] = useState(0);
+  const [selected, setSelected] = useState(null);
+  const [feel, setFeel] = useState(null);
+  const [score, setScore] = useState({ correct: 0, total: 0 });
   const [xpToast, setXpToast] = useState(null);
+  const [catStats, setCatStats] = useState({});
+  const [translationInput, setTranslationInput] = useState('');
+  const [translationFeedback, setTranslationFeedback] = useState(null);
 
-  const advanceTimer = useRef(null);
-  const toastTimer = useRef(null);
-
-  /* Clear pending timers on unmount */
-  useEffect(() => () => {
-    clearTimeout(advanceTimer.current);
-    clearTimeout(toastTimer.current);
-  }, []);
-
-  /* Fetch topics (ignore stale responses) */
   useEffect(() => {
-    let cancelled = false;
     curriculumApi.topics({ class: cls, paper, board })
-      .then((t) => { if (!cancelled) setTopics(t || []); })
-      .catch(() => { if (!cancelled) setTopics([]); });
-    return () => { cancelled = true; };
+      .then((t) => setTopics(t || []))
+      .catch(() => setTopics([]));
   }, [cls, paper, board]);
 
-  /* Fetch writing bank (ignore stale responses) */
   useEffect(() => {
-    let cancelled = false;
     curriculumApi.writingBank(writingType)
-      .then((w) => { if (!cancelled) setWritingBank(w || []); })
-      .catch(() => { if (!cancelled) setWritingBank([]); });
-    return () => { cancelled = true; };
+      .then((w) => setWritingBank(w || []))
+      .catch(() => setWritingBank([]));
   }, [writingType]);
 
-  const { catId, qIndex, selected } = quiz;
-  const cat = QUESTION_BANK[catId] || QUESTION_BANK[DEFAULT_CAT];
+  const tabs = useMemo(() => ALL_TABS, []);
+
+  useEffect(() => {
+    if (!tabs.some((t) => t.id === catId) && tabs.length) {
+      setCatId(tabs[0].id);
+      setQIndex(0);
+      setSelected(null);
+      setFeel(null);
+    }
+  }, [tabs, catId]);
+
+  const cat = QUESTION_BANK[catId] || (tabs[0] && QUESTION_BANK[tabs[0].id]);
   const question = cat ? cat.questions[qIndex] : null;
   const totalForCat = cat ? cat.questions.length : 0;
 
-  /* Session score is derived from per-category stats — no duplicate state */
-  const score = useMemo(() => {
-    let correct = 0;
-    let total = 0;
-    for (const id in catStats) {
-      correct += catStats[id].correct;
-      total += catStats[id].total;
-    }
-    return { correct, total };
-  }, [catStats]);
-
-  const showXp = useCallback((amount) => {
-    clearTimeout(toastTimer.current);
+  const showXp = (amount) => {
     setXpToast(amount);
-    toastTimer.current = setTimeout(() => setXpToast(null), ANSWER_DELAY_MS);
-  }, []);
+    setTimeout(() => setXpToast(null), 900);
+  };
 
-  const answer = useCallback((opt) => {
-    if (!question || selected !== null) return;
+  const answer = (opt) => {
+    if (!question || selected) return;
+    setSelected(opt);
     const correct = opt === question.a;
-
-    setQuiz((q) => ({ ...q, selected: opt }));
+    setFeel(correct ? 'good' : 'bad');
+    setScore((s) => ({ correct: s.correct + (correct ? 1 : 0), total: s.total + 1 }));
     setCatStats((st) => {
       const prev = st[catId] || { correct: 0, total: 0 };
       return { ...st, [catId]: { correct: prev.correct + (correct ? 1 : 0), total: prev.total + 1 } };
     });
-    if (correct) showXp(XP_PER_CORRECT);
+    if (correct) showXp(10);
+    setTimeout(() => {
+      setSelected(null);
+      setFeel(null);
+      setQIndex((i) => (i + 1 < totalForCat ? i + 1 : 0));
+    }, 900);
+  };
 
-    clearTimeout(advanceTimer.current);
-    advanceTimer.current = setTimeout(() => {
-      setQuiz((q) => ({
-        ...q,
-        selected: null,
-        qIndex: q.qIndex + 1 < totalForCat ? q.qIndex + 1 : 0,
-      }));
-    }, ANSWER_DELAY_MS);
-  }, [question, selected, catId, totalForCat, showXp]);
+  const switchCat = (id) => {
+    setCatId(id);
+    setQIndex(0);
+    setSelected(null);
+    setFeel(null);
+  };
 
-  const switchCat = useCallback((id) => {
-    clearTimeout(advanceTimer.current); // don't let a pending advance hit the new category
-    setQuiz({ catId: id, qIndex: 0, selected: null });
-  }, []);
+  const startPracticeFromTopic = () => {
+    setMode('practice');
+  };
 
-  const startPractice = useCallback(() => setMode('practice'), []);
+  const checkTranslation = () => {
+    const expected = 'He walks in the morning every day.';
+    const val = translationInput.trim();
+    if (!val) {
+      setTranslationFeedback({ type: 'bad', msg: 'Please type a translation first.' });
+      return;
+    }
+    setTranslationFeedback({
+      type: 'good',
+      msg: `Good attempt! A model answer: "${expected}"`,
+    });
+  };
+
+  const openWritingBank = (title) => {
+    showXp(0);
+    setXpToast(`📖 ${title}`);
+    setTimeout(() => setXpToast(null), 1400);
+  };
+
+  const isWeakCat = (id) => {
+    const s = catStats[id];
+    return !!s && s.total >= 3 && s.correct / s.total < 0.6;
+  };
+
+  const overallPct = score.total ? Math.round((score.correct / score.total) * 100) : 0;
 
   if (!cat || !question) {
     return (
       <div className="ec-cur">
-        <Styles />
-        <div className="ec-cur-section ec-cur-center">
-          <p className="ec-cur-loading">Loading curriculum…</p>
+        <style>{CURRICULUM_CSS}</style>
+        <div className="ec-cur-section" style={{ textAlign: 'center', padding: '40px 20px' }}>
+          <p style={{ fontSize: 14, color: 'var(--lang-ink-soft)', fontWeight: 700 }}>
+            Loading curriculum…
+          </p>
         </div>
       </div>
     );
@@ -2666,54 +2628,374 @@ export function Curriculum() {
 
   return (
     <div className="ec-cur">
-      <Styles />
+      <style>{CURRICULUM_CSS}</style>
 
-      <PageHead />
-      <Hero />
-      <ModeSwitch mode={mode} onChange={setMode} />
-      <Filters
-        cls={cls}
-        paper={paper}
-        board={board}
-        banglaHelp={banglaHelp}
-        onCls={setCls}
-        onPaper={setPaper}
-        onBoard={setBoard}
-        onBangla={setBanglaHelp}
-      />
-      <CategoryTabs catId={catId} onSelect={switchCat} />
+      <div className="ec-cur-head">
+        <div>
+          <p className="ec-cur-eyebrow">Curriculum</p>
+          <h1 className="ec-page-title">English Grammar Mastery</h1>
+          <p className="ec-page-sub">
+            SSC, HSC & General — {TOTAL_QUESTIONS}+ exercises across {tabs.length} categories.
+          </p>
+        </div>
+      </div>
+
+      <div className="ec-cur-hero">
+        <div className="ec-cur-hero-copy">
+          <span className="ec-cur-hero-badge">Bangladesh Board</span>
+          <h1>Grammar practice, <em>board-style</em></h1>
+          <p>Every grammar rule, gap-filling type, translation pattern and writing form — lessons + practice for school and board exams.</p>
+          <div className="ec-cur-hero-stats">
+            <div className="ec-cur-hero-stat"><strong>{TOTAL_QUESTIONS}</strong><span>Exercises</span></div>
+            <div className="ec-cur-hero-stat"><strong>{tabs.length}</strong><span>Topics</span></div>
+            <div className="ec-cur-hero-stat"><strong>{BOARDS.length}</strong><span>Boards</span></div>
+          </div>
+        </div>
+        <div className="ec-cur-hero-mascot">
+          <LangutMascot size={150} />
+        </div>
+      </div>
+
+      <div className="ec-cur-modes">
+        <button
+          type="button"
+          className={`ec-cur-mode${mode === 'practice' ? ' ec-cur-mode--active' : ''}`}
+          onClick={() => setMode('practice')}
+          aria-pressed={mode === 'practice'}
+        >
+          <Icon name="target" /> Practice
+        </button>
+        <button
+          type="button"
+          className={`ec-cur-mode${mode === 'lesson' ? ' ec-cur-mode--active' : ''}`}
+          onClick={() => setMode('lesson')}
+          aria-pressed={mode === 'lesson'}
+        >
+          <Icon name="book" /> Lessons
+        </button>
+      </div>
+
+      <div className="ec-cur-filters">
+        <div className="ec-cur-filter-group">
+          {CLASSES.map((c) => (
+            <button
+              type="button"
+              key={c}
+              className={`ec-cur-pill${cls === c ? ' ec-cur-pill--active' : ''}`}
+              onClick={() => setCls(c)}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
+        <div className="ec-cur-filter-group">
+          {PAPERS.map((p) => (
+            <button
+              type="button"
+              key={p}
+              className={`ec-cur-pill${paper === p ? ' ec-cur-pill--active' : ''}`}
+              onClick={() => setPaper(p)}
+            >
+              {p}
+            </button>
+          ))}
+        </div>
+        <select
+          className="ec-cur-select"
+          value={board}
+          onChange={(e) => setBoard(e.target.value)}
+          aria-label="Select board"
+        >
+          {BOARDS.map((b) => <option key={b} value={b}>{b} Board</option>)}
+        </select>
+        <label className="ec-cur-check">
+          <input type="checkbox" checked={banglaHelp} onChange={(e) => setBanglaHelp(e.target.checked)} />
+          🇧🇩 বাংলা
+        </label>
+      </div>
+
+      <div className="ec-cur-cats">
+        {tabs.map((t) => (
+          <button
+            type="button"
+            key={t.id}
+            className={`ec-cur-cat${catId === t.id ? ' ec-cur-cat--active' : ''}`}
+            onClick={() => switchCat(t.id)}
+          >
+            <Icon name={t.icon} />
+            {t.label}
+            <span className="ec-cur-cat-count">{t.count}</span>
+          </button>
+        ))}
+      </div>
 
       {xpToast && <div className="ec-cur-xp-toast">+{xpToast} XP ✨</div>}
 
       <div className="ec-cur-grid">
         <section>
-          {mode === 'lesson' && cat.lesson && <Lesson cat={cat} onStart={startPractice} />}
-
-          {mode === 'lesson' && !cat.lesson && (
-            <div className="ec-cur-section ec-cur-center">
-              <p className="ec-cur-loading">Lesson coming soon for {cat.name}.</p>
+          {mode === 'lesson' && cat.lesson && (
+            <div className="ec-lesson">
+              <div className="ec-lesson-head">
+                <h2 className="ec-lesson-title">{cat.name} — Lesson</h2>
+                <span className="ec-cur-chip">{cat.questions.length} exercises</span>
+              </div>
+              <div className="ec-lesson-body">
+                <div className="ec-lesson-block">
+                  <h4>📘 Key Rules</h4>
+                  <ul>
+                    {cat.lesson.rules.map((r, i) => (
+                      <li key={i} dangerouslySetInnerHTML={{ __html: r }} />
+                    ))}
+                  </ul>
+                </div>
+                <div className="ec-lesson-block">
+                  <h4>✨ Examples</h4>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {cat.lesson.examples.map((ex, i) => (
+                      <div key={i} className="ec-lesson-example" dangerouslySetInnerHTML={{ __html: ex }} />
+                    ))}
+                  </div>
+                </div>
+                <div className="ec-lesson-bn">
+                  🇧🇩 {cat.lesson.bangla}
+                </div>
+                <button
+                  type="button"
+                  className="ec-cur-pill ec-cur-pill--active"
+                  style={{ padding: '11px 20px', fontSize: 13, alignSelf: 'flex-start' }}
+                  onClick={() => setMode('practice')}
+                >
+                  ▶ Start practice →
+                </button>
+              </div>
             </div>
           )}
 
           {mode === 'practice' && (
-            <Quiz
-              cat={cat}
-              question={question}
-              qIndex={qIndex}
-              selected={selected}
-              banglaHelp={banglaHelp}
-              onAnswer={answer}
-            />
+            <div className="ec-cur-section">
+              <div className="ec-quiz-top">
+                <span className="ec-quiz-badge">{cat.name}</span>
+                <span className="ec-quiz-counter">Question {qIndex + 1} / {totalForCat}</span>
+              </div>
+              <div className="ec-quiz-progress">
+                <div className="ec-quiz-progress-fill" style={{ width: `${((qIndex + 1) / totalForCat) * 100}%` }} />
+              </div>
+              <p className="ec-quiz-question">{question.p}</p>
+              <div className="ec-quiz-options">
+                {question.o.map((opt, i) => {
+                  const isSelected = selected === opt;
+                  const isCorrect = opt === question.a;
+                  const c = `ec-quiz-option${isSelected ? (isCorrect ? ' ec-quiz-option--correct ec-pop' : ' ec-quiz-option--incorrect') : ''}`;
+                  return (
+                    <button
+                      type="button"
+                      key={`${opt}-${i}`}
+                      className={c}
+                      onClick={() => answer(opt)}
+                      disabled={!!selected && !isSelected && !isCorrect}
+                    >
+                      {opt}
+                    </button>
+                  );
+                })}
+              </div>
+              <div className={`ec-quiz-feedback${feel === 'good' ? ' ec-quiz-feedback--good' : feel === 'bad' ? ' ec-quiz-feedback--bad' : ''}`}>
+                {feel === 'good' && '✨ Correct!'}
+                {feel === 'bad' && `Correct answer: ${question.a}`}
+              </div>
+              {feel && (
+                <p className="ec-quiz-explain">
+                  💡 {banglaHelp ? question.b : question.e}
+                </p>
+              )}
+            </div>
           )}
 
-          <BoardSets topics={topics} cls={cls} paper={paper} />
-          <Translation />
+          {mode === 'lesson' && !cat.lesson && (
+            <div className="ec-cur-section" style={{ textAlign: 'center', padding: '40px 20px' }}>
+              <p style={{ fontSize: 14, color: 'var(--lang-ink-soft)', fontWeight: 700 }}>
+                Lesson coming soon for {cat.name}.
+              </p>
+            </div>
+          )}
+
+          <div className="ec-cur-section">
+            <div className="ec-cur-section-head">
+              <h2 className="ec-cur-section-title">Board-style question sets</h2>
+              <span className="ec-cur-chip">{cls} · {paper}</span>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {(topics.length ? topics : FALLBACK_TOPICS).map((t) => (
+                <div
+                  key={t.id}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 12,
+                    padding: '12px 14px',
+                    borderRadius: 14,
+                    background: 'var(--lang-lime-soft)',
+                    border: '2px solid var(--lang-line)',
+                    boxShadow: '0 2px 0 var(--lang-line)',
+                  }}
+                >
+                  <div style={{ minWidth: 0 }}>
+                    <p style={{ margin: '0 0 4px', fontWeight: 900, fontSize: 13, color: 'var(--lang-ink)' }}>{t.title}</p>
+                    <span style={{
+                      fontSize: 10, fontWeight: 900,
+                      color: 'var(--lang-ink)', background: 'var(--lang-pink)',
+                      padding: '3px 9px', borderRadius: 999,
+                      border: '2px solid var(--lang-line)',
+                      textTransform: 'uppercase', letterSpacing: '.05em',
+                    }}>{t.tag}</span>
+                  </div>
+                  <button
+                    type="button"
+                    className="ec-cur-pill ec-cur-pill--active"
+                    style={{ padding: '10px 16px', fontSize: 12, flexShrink: 0, minHeight: 44 }}
+                    onClick={startPracticeFromTopic}
+                    aria-label={`Practice ${t.title}`}
+                  >
+                    Practice
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="ec-cur-section ec-cur-translation">
+            <div className="ec-cur-section-head">
+              <h2 className="ec-cur-section-title">Translation practice</h2>
+              <span className="ec-cur-chip">Bangla → English</span>
+            </div>
+            <p style={{ margin: 0, fontSize: 12.5, color: 'var(--lang-ink-soft)', fontWeight: 700 }}>
+              Translate the sentence below:
+            </p>
+            <p className="bn">সে প্রতিদিন সকালে হাঁটে।</p>
+            <textarea
+              rows={2}
+              placeholder="Type the English translation…"
+              value={translationInput}
+              onChange={(e) => { setTranslationInput(e.target.value); setTranslationFeedback(null); }}
+            />
+            <button
+              type="button"
+              className="ec-cur-pill ec-cur-pill--active"
+              style={{ marginTop: 12, padding: '11px 20px', fontSize: 13, minHeight: 46 }}
+              onClick={checkTranslation}
+            >
+              Check
+            </button>
+            {translationFeedback && (
+              <div className={`ec-cur-translation-feedback ec-cur-translation-feedback--${translationFeedback.type}`}>
+                {translationFeedback.type === 'good' ? '✅ ' : '⚠️ '}
+                {translationFeedback.msg}
+              </div>
+            )}
+          </div>
         </section>
 
         <aside>
-          <TopicList catId={catId} catStats={catStats} onSelect={switchCat} />
-          <WritingBank writingType={writingType} items={writingBank} onType={setWritingType} />
-          <SessionCard score={score} />
+          <div className="ec-cur-section">
+            <div className="ec-cur-section-head">
+              <h2 className="ec-cur-section-title">All topics</h2>
+              <span className="ec-cur-chip">{tabs.length}</span>
+            </div>
+            <div className="ec-cur-topic-list">
+              {tabs.map((t) => {
+                const stat = catStats[t.id];
+                const pct = stat && stat.total ? Math.round((stat.correct / stat.total) * 100) : null;
+                const weak = isWeakCat(t.id);
+                return (
+                  <button
+                    type="button"
+                    key={t.id}
+                    className={`ec-cur-topic-btn${catId === t.id ? ' ec-cur-topic-btn--active' : ''}`}
+                    onClick={() => switchCat(t.id)}
+                  >
+                    <span className="ec-cur-topic-name">{t.label}</span>
+                    {pct !== null && (
+                      <span
+                        className="ec-cur-topic-count"
+                        style={weak ? { background: 'var(--lang-pink-2)', color: '#fff' } : undefined}
+                      >
+                        {pct}%
+                      </span>
+                    )}
+                    <span className="ec-cur-topic-count">{t.count}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="ec-cur-section">
+            <div className="ec-cur-section-head">
+              <h2 className="ec-cur-section-title">Writing bank</h2>
+            </div>
+            <div className="ec-cur-filter-group" style={{ marginBottom: 12 }}>
+              {['paragraph', 'composition', 'letter'].map((t) => (
+                <button
+                  type="button"
+                  key={t}
+                  className={`ec-cur-pill${writingType === t ? ' ec-cur-pill--active' : ''}`}
+                  onClick={() => setWritingType(t)}
+                  style={{ textTransform: 'capitalize' }}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {(writingBank.length ? writingBank : FALLBACK_WRITING).map((w) => (
+                <button
+                  type="button"
+                  key={w.id}
+                  className="ec-cur-bank-item"
+                  onClick={() => openWritingBank(w.title)}
+                >
+                  {w.title}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="ec-cur-section">
+            <div className="ec-cur-section-head">
+              <h2 className="ec-cur-section-title">Your session</h2>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div className="ec-cur-session-label">
+                <span style={{ color: 'var(--lang-ink-soft)' }}>Correct</span>
+                <span style={{ color: 'var(--lang-ink)' }}>{score.correct} / {score.total}</span>
+              </div>
+              <div style={{
+                height: 14, borderRadius: 999,
+                background: '#E8E5F2', overflow: 'hidden',
+                border: '2px solid var(--lang-line)',
+              }}>
+                <div style={{
+                  height: '100%',
+                  width: `${overallPct}%`,
+                  background: 'linear-gradient(90deg, #D4F55C, #B8E62E)',
+                  borderRadius: 999,
+                  transition: 'width .8s ease',
+                }} />
+              </div>
+              <span style={{
+                fontSize: 12, fontWeight: 900,
+                color: 'var(--lang-ink)', background: 'var(--lang-lime)',
+                border: '2px solid var(--lang-line)',
+                padding: '6px 12px', borderRadius: 999,
+                alignSelf: 'flex-end',
+                boxShadow: '0 2px 0 var(--lang-line)',
+                letterSpacing: '.04em',
+              }}>
+                {overallPct}% accuracy
+              </span>
+            </div>
+          </div>
         </aside>
       </div>
     </div>
