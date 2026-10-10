@@ -286,7 +286,17 @@ export async function awardXp(userId: string, amount: number, opts: AwardOpts): 
   }
 
   // ---- realtime pushes ----
-  emitToUser(userId, 'gamification:update', { ...summary, gained: xp, source });
+  const dayRow = await prisma.userStatsDaily
+    .findUnique({ where: { userId_date: { userId, date: today } } })
+    .catch(() => null);
+  const pad2 = (n: number) => String(n).padStart(2, '0');
+  const day = {
+    date: `${today.getUTCFullYear()}-${pad2(today.getUTCMonth() + 1)}-${pad2(today.getUTCDate())}`,
+    xp: dayRow?.xpEarned ?? 0,
+    questions: dayRow?.questionsAnswered ?? 0,
+    minutes: dayRow?.minutesActive ?? 0,
+  };
+  emitToUser(userId, 'gamification:update', { ...summary, gained: xp, source, day });
   if (unlocked.length) emitToUser(userId, 'gamification:badge_unlocked', unlocked);
   if (summary.xpToday >= DAILY_GOAL && summary.xpToday - xp < DAILY_GOAL) {
     emitToUser(userId, 'gamification:goal_reached', { xpToday: summary.xpToday, xpGoal: DAILY_GOAL });
