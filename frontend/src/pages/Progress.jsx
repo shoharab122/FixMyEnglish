@@ -1,6 +1,7 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { gamificationApi } from '../api/gamification';
+import { getSocket } from '../api/socket';
 import { useAuth } from '../context/AuthContext';
 import { Icon } from '../components/Icon';
 
@@ -667,48 +668,71 @@ const PROGRESS_CSS = `
   .ec-prog-plan-item:hover,.ec-prog-card-link:hover,
   .ec-prog-weak-btn:hover,.ec-prog-retry:hover{transform:none}
 }
+
+/* ---------- additions: live chip, empty state, link-style buttons ---------- */
+.ec-prog-live{display:inline-flex;align-items:center;gap:6px}
+.ec-prog-live-dot{width:8px;height:8px;border-radius:50%;background:var(--lang-mint-2);box-shadow:0 0 0 3px rgba(127,217,169,.35)}
+.ec-prog-live--off .ec-prog-live-dot{background:var(--lang-ink-soft);box-shadow:none}
+.ec-prog-empty{margin:6px 0 2px;font-size:13px;font-weight:700;color:var(--lang-ink-soft)}
+a.ec-prog-weak-btn{display:inline-block;text-decoration:none}
+.ec-prog-plan-item:focus-visible,.ec-prog-weak-btn:focus-visible,.ec-prog-retry:focus-visible{outline:3px solid var(--lang-purple);outline-offset:2px}
 `;
 
-/* ---------- Fallback data ---------- */
-const HISTORY = [
-  { id: 'h1', label: 'Grammar quiz', score: 82, date: 'Mar 20', icon: 'target' },
-  { id: 'h2', label: 'Vocabulary blitz', score: 65, date: 'Mar 19', icon: 'book' },
-  { id: 'h3', label: 'IELTS Reading mock', score: 71, date: 'Mar 17', icon: 'flag' },
-  { id: 'h4', label: 'Speaking practice', score: 74, date: 'Mar 16', icon: 'mic' },
-];
-
-const WEEK = [
-  { day: 'Mon', xp: 80 },
-  { day: 'Tue', xp: 120 },
-  { day: 'Wed', xp: 60 },
-  { day: 'Thu', xp: 140 },
-  { day: 'Fri', xp: 90 },
-  { day: 'Sat', xp: 160 },
-  { day: 'Sun', xp: 45, today: true },
-];
-
-const WEAK_AREAS = [
-  { id: 'w1', skill: 'Prepositions', score: 54, note: 'Boost this skill — a little practice goes a long way.' },
-  { id: 'w2', skill: 'Listening for detail', score: 58, note: 'Boost this skill with short daily clips.' },
-  { id: 'w3', skill: 'Articles', score: 62, note: 'Quick wins available — 10 questions a day.' },
-];
-
+/* ---------- Static content ---------- */
+// Badge fallback if the API is down. Everything is locked so nobody is shown badges they have not earned.
 const DEFAULT_BADGES = [
-  { id: 'b1', name: '50 Words Mastered', icon: '📚', unlocked: true, hint: 'Learn 50 new words' },
-  { id: 'b2', name: '7-Day Streak', icon: '🔥', unlocked: true, hint: 'Practise 7 days in a row' },
-  { id: 'b3', name: 'Grammar Guru', icon: '✓', unlocked: false, hint: 'Score 90% on 20 exercises' },
-  { id: 'b4', name: 'First Mock Exam', icon: '🎯', unlocked: true, hint: 'Complete any full mock' },
-  { id: 'b5', name: 'Speaking Star', icon: '✦', unlocked: false, hint: 'Get a Band 7 on speaking' },
-  { id: 'b6', name: '30-Day Streak', icon: '⚡', unlocked: false, hint: 'Practise 30 days in a row' },
+  { id: 'b1', name: 'First Steps', icon: '🌱', unlocked: false, hint: 'Earn your first XP' },
+  { id: 'b2', name: '50 Words Mastered', icon: '📚', unlocked: false, hint: 'Learn 50 new words' },
+  { id: 'b3', name: '7-Day Streak', icon: '🔥', unlocked: false, hint: 'Practise 7 days in a row' },
+  { id: 'b4', name: 'Grammar Guru', icon: '✓', unlocked: false, hint: 'Score 90% on 20 exercises' },
+  { id: 'b5', name: 'First Mock Exam', icon: '🎯', unlocked: false, hint: 'Complete any full mock' },
+  { id: 'b6', name: 'Speaking Star', icon: '✦', unlocked: false, hint: 'Get a Band 7 on speaking' },
+  { id: 'b7', name: '30-Day Streak', icon: '⚡', unlocked: false, hint: 'Practise 30 days in a row' },
+];
+
+// Suggestions (not yet computed from the user's results).
+const WEAK_AREAS = [
+  { id: 'w1', skill: 'Prepositions', score: 54, to: '/grammar', note: 'Boost this skill — a little practice goes a long way.' },
+  { id: 'w2', skill: 'Listening for detail', score: 58, to: '/exams', note: 'Boost this skill with short daily clips.' },
+  { id: 'w3', skill: 'Articles', score: 62, to: '/grammar', note: 'Quick wins available — 10 questions a day.' },
 ];
 
 const STUDY_PLAN = [
-  { id: 'p1', text: '10 vocabulary flashcards', meta: 'Spaced repetition · 5 min', done: true },
+  { id: 'p1', text: '10 vocabulary flashcards', meta: 'Spaced repetition · 5 min', done: false },
   { id: 'p2', text: '1 prepositions exercise', meta: 'Grammar drill · 8 min', done: false },
   { id: 'p3', text: '5-minute listening clip', meta: 'Listening for detail · 5 min', done: false },
   { id: 'p4', text: 'Speaking prompt (optional)', meta: 'AI scoring · 10 min', done: false },
 ];
 
+/* ---------- Helpers ---------- */
+const pad2 = (n) => String(n).padStart(2, '0');
+const ymd = (d) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+
+function emptyWeek() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(today);
+    d.setDate(today.getDate() - (6 - i));
+    return {
+      date: ymd(d),
+      label: d.toLocaleDateString('en-US', { weekday: 'short' }),
+      xp: 0, questions: 0, minutes: 0, active: false,
+    };
+  });
+}
+
+/** Apply a live "today" record to the week; falls back to the last (today) slot if dates differ by timezone. */
+function mergeDay(week, day) {
+  if (!day) return week;
+  let idx = week.findIndex((d) => d.date === day.date);
+  if (idx < 0) idx = week.length - 1;
+  return week.map((d, i) => (i === idx
+    ? { ...d, xp: day.xp, questions: day.questions, minutes: day.minutes, active: true }
+    : d));
+}
+
+/* ---------- Mascot — Langut-style yellow blob ---------- */
 /* ---------- Mascot — Langut-style yellow blob ---------- */
 function LangutMascot({ size = 170 }) {
   return (
@@ -742,60 +766,157 @@ function LangutMascot({ size = 170 }) {
 }
 
 /* ---------- Component ---------- */
-export function Progress() {
-  const { user } = useAuth();
+export function Progress({ socket: socketProp } = {}) {
+  const auth = useAuth() || {};
+  const user = auth.user;
+  // AuthContext creates the socket after login and it can be replaced on reconnect,
+  // so follow getSocket() instead of capturing it once at mount.
+  const [liveSocket, setLiveSocket] = useState(() => getSocket());
+  useEffect(() => {
+    const t = setInterval(() => {
+      const s = getSocket();
+      setLiveSocket((prev) => (prev === s ? prev : s));
+    }, 1000);
+    return () => clearInterval(t);
+  }, []);
+  const socket = socketProp || liveSocket || null;
+
   const [xp, setXp] = useState(null);
-  const [xpLoading, setXpLoading] = useState(true);
-  const [xpError, setXpError] = useState(false);
-
+  const [week, setWeek] = useState(emptyWeek);
+  const [recent, setRecent] = useState([]);
   const [badges, setBadges] = useState(null);
-  const [badgesLoading, setBadgesLoading] = useState(true);
-
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [live, setLive] = useState(false);
   const [animate, setAnimate] = useState(false);
-  const [planDone, setPlanDone] = useState(() => {
+
+  const alive = useRef(true);
+  useEffect(() => {
+    alive.current = true;
+    return () => { alive.current = false; };
+  }, []);
+
+  /* ----- study plan: remembered per user per day ----- */
+  const planKey = `ec-plan:${user?.id ?? 'guest'}:${ymd(new Date())}`;
+  const planDefaults = () => {
     const initial = {};
     STUDY_PLAN.forEach((p) => { initial[p.id] = p.done; });
     return initial;
-  });
+  };
+  const [planDone, setPlanDone] = useState(planDefaults);
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(planKey) || 'null');
+      setPlanDone(saved ? { ...planDefaults(), ...saved } : planDefaults());
+    } catch {
+      setPlanDone(planDefaults());
+    }
+  }, [planKey]);
 
-  const loadXp = useCallback(() => {
-    setXpLoading(true);
-    setXpError(false);
-    gamificationApi
-      .summary()
-      .then(setXp)
-      .catch(() => setXpError(true))
-      .finally(() => setXpLoading(false));
-  }, []);
+  const togglePlan = (id) => {
+    setPlanDone((prev) => {
+      const next = { ...prev, [id]: !prev[id] };
+      try { localStorage.setItem(planKey, JSON.stringify(next)); } catch { /* storage unavailable */ }
+      return next;
+    });
+  };
 
-  const loadBadges = useCallback(() => {
-    setBadgesLoading(true);
-    gamificationApi
-      .badges()
-      .then((b) => setBadges(Array.isArray(b) && b.length ? b : DEFAULT_BADGES))
-      .catch(() => setBadges(DEFAULT_BADGES))
-      .finally(() => setBadgesLoading(false));
+  /* ----- data loading (silent refreshes never flash the skeletons) ----- */
+  const load = useCallback(async ({ silent = false } = {}) => {
+    if (!silent) { setLoading(true); setError(false); }
+    try {
+      if (typeof gamificationApi.progress === 'function') {
+        // One call: summary + last 7 days + badges + recent scores.
+        const p = await gamificationApi.progress();
+        if (!alive.current) return;
+        setXp(p.summary || null);
+        setWeek(Array.isArray(p.week) && p.week.length ? p.week : emptyWeek());
+        setBadges(Array.isArray(p.badges) && p.badges.length ? p.badges : DEFAULT_BADGES);
+        setRecent(Array.isArray(p.recent) ? p.recent : []);
+      } else {
+        // Older API client: same two calls the page always made.
+        const [s, b] = await Promise.allSettled([gamificationApi.summary(), gamificationApi.badges()]);
+        if (!alive.current) return;
+        if (s.status !== 'fulfilled') throw s.reason;
+        setXp(s.value);
+        setBadges(b.status === 'fulfilled' && Array.isArray(b.value) && b.value.length ? b.value : DEFAULT_BADGES);
+      }
+      setError(false);
+    } catch {
+      if (!alive.current) return;
+      if (!silent) setError(true);
+      setBadges((prev) => prev || DEFAULT_BADGES);
+    } finally {
+      if (alive.current) setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
-    loadXp();
-    loadBadges();
+    load();
     const t = requestAnimationFrame(() => setAnimate(true));
     return () => cancelAnimationFrame(t);
-  }, [loadXp, loadBadges]);
+  }, [load]);
 
+  /* ----- real time: socket events update the page in place ----- */
+  useEffect(() => {
+    if (!socket || typeof socket.on !== 'function') { setLive(false); return undefined; }
+
+    const onUpdate = (p) => {
+      const { gained, source, day, ...summary } = p || {};
+      setXp((prev) => ({ ...(prev || {}), ...summary }));
+      if (day) setWeek((prev) => mergeDay(prev, day));
+      // Recent scores (and older servers without `day`) need a quiet refetch.
+      if (!day || source === 'exam' || source === 'speaking') load({ silent: true });
+    };
+
+    const onBadges = (list) => {
+      const arr = Array.isArray(list) ? list : [];
+      const ids = new Set(arr.map((b) => b.id));
+      const names = new Set(arr.map((b) => b.name));
+      setBadges((prev) => (prev || DEFAULT_BADGES).map((b) =>
+        ids.has(b.id) || names.has(b.name) ? { ...b, unlocked: true } : b));
+    };
+
+    const onConnect = () => { setLive(true); load({ silent: true }); };
+    const onDisconnect = () => setLive(false);
+
+    socket.on('gamification:update', onUpdate);
+    socket.on('gamification:badge_unlocked', onBadges);
+    socket.on('connect', onConnect);
+    socket.on('disconnect', onDisconnect);
+    setLive(!!socket.connected);
+
+    return () => {
+      socket.off?.('gamification:update', onUpdate);
+      socket.off?.('gamification:badge_unlocked', onBadges);
+      socket.off?.('connect', onConnect);
+      socket.off?.('disconnect', onDisconnect);
+    };
+  }, [socket, load]);
+
+  /* ----- fallback: poll while the socket is not live; refresh when the tab returns ----- */
+  useEffect(() => {
+    const timer = live ? null : setInterval(() => load({ silent: true }), 30000);
+    const onVisible = () => { if (document.visibilityState === 'visible') load({ silent: true }); };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      if (timer) clearInterval(timer);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, [live, load]);
+
+  /* ----- derived values ----- */
   const shownBadges = badges || DEFAULT_BADGES;
-  const unlockedCount = shownBadges.filter((b) => b.unlocked !== false).length;
+  const unlockedCount = shownBadges.filter((b) => b.unlocked === true).length;
 
   const xpToday = xp?.xpToday ?? 0;
   const xpGoal = xp?.xpGoal ?? 100;
   const xpPct = Math.max(0, Math.min(100, Math.round((xpToday / Math.max(xpGoal, 1)) * 100)));
 
-  const weekMax = Math.max(...WEEK.map((d) => d.xp), 100);
-
-  const togglePlan = (id) => {
-    setPlanDone((prev) => ({ ...prev, [id]: !prev[id] }));
-  };
+  const weekTotal = week.reduce((s, d) => s + d.xp, 0);
+  const weekMax = Math.max(...week.map((d) => d.xp), 100);
+  const activeDays = week.filter((d) => d.active || d.xp > 0).length;
+  const showSkeleton = loading && !xp;
 
   return (
     <div className="ec-prog">
@@ -810,6 +931,10 @@ export function Progress() {
             Score history, streaks, badges, and a study plan built from how you’re actually doing.
           </p>
         </div>
+        <span className={`ec-prog-card-chip ec-prog-live${live ? '' : ' ec-prog-live--off'}`} aria-live="polite">
+          <span className="ec-prog-live-dot" aria-hidden="true" />
+          {live ? 'Live' : 'Updates every 30s'}
+        </span>
       </div>
 
       {/* Hero */}
@@ -825,7 +950,7 @@ export function Progress() {
               <span>Day streak</span>
             </div>
             <div className="ec-prog-hero-stat">
-              <strong>{HISTORY.length}</strong>
+              <strong>{recent.length}</strong>
               <span>Recent sessions</span>
             </div>
             <div className="ec-prog-hero-stat">
@@ -840,10 +965,10 @@ export function Progress() {
       </div>
 
       {/* Error */}
-      {xpError && (
+      {error && (
         <div className="ec-prog-error">
           <span>Couldn’t load your stats right now.</span>
-          <button className="ec-prog-retry" onClick={loadXp}>Retry</button>
+          <button className="ec-prog-retry" onClick={() => load()}>Retry</button>
         </div>
       )}
 
@@ -851,7 +976,7 @@ export function Progress() {
       <div className="ec-prog-stats">
         <div className="ec-prog-stat ec-prog-anim" style={{ animationDelay: '0.05s' }}>
           <span className="ec-prog-stat-icon ec-prog-stat-icon--yellow"><Icon name="zap" /></span>
-          {xpLoading ? (
+          {showSkeleton ? (
             <span className="ec-prog-skel" style={{ width: 60, height: 22, display: 'block' }} />
           ) : (
             <span className="ec-prog-stat-value">{xp?.streak ?? '—'}<small>days</small></span>
@@ -861,7 +986,7 @@ export function Progress() {
 
         <div className="ec-prog-stat ec-prog-anim" style={{ animationDelay: '0.1s' }}>
           <span className="ec-prog-stat-icon ec-prog-stat-icon--lime"><Icon name="target" /></span>
-          {xpLoading ? (
+          {showSkeleton ? (
             <span className="ec-prog-skel" style={{ width: 80, height: 22, display: 'block' }} />
           ) : (
             <span className="ec-prog-stat-value">{xpToday}<small>/ {xpGoal} XP</small></span>
@@ -871,7 +996,7 @@ export function Progress() {
 
         <div className="ec-prog-stat ec-prog-anim" style={{ animationDelay: '0.15s' }}>
           <span className="ec-prog-stat-icon ec-prog-stat-icon--pink"><Icon name="trophy" /></span>
-          {xpLoading ? (
+          {showSkeleton ? (
             <span className="ec-prog-skel" style={{ width: 60, height: 22, display: 'block' }} />
           ) : (
             <span className="ec-prog-stat-value">Rank {xp?.rank ?? '—'}</span>
@@ -881,8 +1006,8 @@ export function Progress() {
 
         <div className="ec-prog-stat ec-prog-anim" style={{ animationDelay: '0.2s' }}>
           <span className="ec-prog-stat-icon ec-prog-stat-icon--purple"><Icon name="users" /></span>
-          <span className="ec-prog-stat-value">{HISTORY.length}<small>sessions</small></span>
-          <span className="ec-prog-stat-label">This week</span>
+          <span className="ec-prog-stat-value">{activeDays}<small>/ 7 days</small></span>
+          <span className="ec-prog-stat-label">Active this week</span>
         </div>
       </div>
 
@@ -910,7 +1035,10 @@ export function Progress() {
               <h2>Recent scores</h2>
               <Link to="/exams" className="ec-prog-card-link">View all →</Link>
             </div>
-            {HISTORY.map((h) => (
+            {recent.length === 0 && (
+              <p className="ec-prog-empty">No scores yet — finish a speaking practice or exam and it will show up here.</p>
+            )}
+            {recent.map((h) => (
               <div key={h.id} className="ec-prog-history-row">
                 <span className="ec-prog-history-icon"><Icon name={h.icon || 'target'} /></span>
                 <div className="ec-prog-history-info">
@@ -929,22 +1057,23 @@ export function Progress() {
           <div className="ec-prog-card ec-prog-anim">
             <div className="ec-prog-card-head">
               <h2>This week’s XP</h2>
-              <span className="ec-prog-card-chip">{WEEK.reduce((s, d) => s + d.xp, 0)} XP</span>
+              <span className="ec-prog-card-chip">{weekTotal} XP</span>
             </div>
             <div className="ec-prog-chart">
-              {WEEK.map((d) => {
+              {week.map((d, i) => {
                 const pct = Math.max(8, Math.round((d.xp / weekMax) * 100));
+                const isToday = i === week.length - 1;
                 return (
                   <div
-                    key={d.day}
-                    className={`ec-prog-chart-bar${d.today ? ' ec-prog-chart-bar--today' : ''}${d.xp === 0 ? ' ec-prog-chart-bar--empty' : ''}`}
+                    key={d.date}
+                    className={`ec-prog-chart-bar${isToday ? ' ec-prog-chart-bar--today' : ''}${d.xp === 0 ? ' ec-prog-chart-bar--empty' : ''}`}
                   >
                     <span className="ec-prog-chart-val">{d.xp}</span>
                     <div
                       className="ec-prog-chart-col"
                       style={{ height: animate ? `${pct}%` : '0%' }}
                     />
-                    <span className="ec-prog-chart-label">{d.day}</span>
+                    <span className="ec-prog-chart-label">{d.label}</span>
                   </div>
                 );
               })}
@@ -958,7 +1087,7 @@ export function Progress() {
               <span className="ec-prog-card-chip">{unlockedCount}/{shownBadges.length}</span>
             </div>
 
-            {badgesLoading ? (
+            {loading && !badges ? (
               <div className="ec-prog-badges">
                 {[0, 1, 2, 3].map((i) => (
                   <div className="ec-prog-badge" key={i}>
@@ -970,7 +1099,8 @@ export function Progress() {
             ) : (
               <div className="ec-prog-badges">
                 {shownBadges.map((b) => {
-                  const locked = b.unlocked === false;
+                  const locked = b.unlocked !== true;
+                  const hint = b.hint || b.description;
                   return (
                     <div
                       key={b.id}
@@ -982,7 +1112,7 @@ export function Progress() {
                       </div>
                       <div className="ec-prog-badge-body">
                         <p className="ec-prog-badge-name">{b.name}</p>
-                        {b.hint && <span className="ec-prog-badge-hint">{b.hint}</span>}
+                        {hint && <span className="ec-prog-badge-hint">{hint}</span>}
                       </div>
                     </div>
                   );
@@ -1008,7 +1138,7 @@ export function Progress() {
                     <span className="ec-prog-weak-score">{w.score}%</span>
                   </p>
                   <p className="ec-prog-weak-note">{w.note}</p>
-                  <button className="ec-prog-weak-btn">Practice now →</button>
+                  <Link to={w.to} className="ec-prog-weak-btn">Practice now →</Link>
                 </div>
               ))}
             </div>
@@ -1024,12 +1154,18 @@ export function Progress() {
             </div>
             <ul className="ec-prog-plan-list">
               {STUDY_PLAN.map((p) => {
-                const done = planDone[p.id];
+                const done = !!planDone[p.id];
                 return (
                   <li
                     key={p.id}
                     className={`ec-prog-plan-item${done ? ' ec-prog-plan-item--done' : ''}`}
+                    role="checkbox"
+                    aria-checked={done}
+                    tabIndex={0}
                     onClick={() => togglePlan(p.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); togglePlan(p.id); }
+                    }}
                   >
                     <span className="ec-prog-plan-check" aria-hidden="true">✓</span>
                     <span className="ec-prog-plan-text">
