@@ -6,7 +6,8 @@ services:
     region: singapore
     rootDir: backend
     buildCommand: npm install --include=dev && npx prisma generate && npm run build
-    startCommand: npx prisma db push && npx tsx prisma/seed.ts && node dist/server.js
+    preDeployCommand: npx prisma db push && npx tsx prisma/seed.ts
+    startCommand: node dist/server.js
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV

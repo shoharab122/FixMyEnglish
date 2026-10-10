@@ -59,11 +59,11 @@ export async function refresh(refreshToken: string, deviceInfo?: string) {
   try { decoded = verifyRefreshToken(refreshToken); }
   catch { throw Unauthorized('Invalid refresh token'); }
   const hash = hashToken(refreshToken);
-  const stored = await prisma.refreshToken.findFirst({
+  // Atomic: only one concurrent refresh can consume this token
+  const { count } = await prisma.refreshToken.deleteMany({
     where: { userId: decoded.id, tokenHash: hash, expiresAt: { gt: new Date() } },
   });
-  if (!stored) throw Unauthorized('Refresh token revoked');
-  await prisma.refreshToken.delete({ where: { id: stored.id } });
+  if (count === 0) throw Unauthorized('Refresh token revoked');
   const user = await prisma.user.findUnique({ where: { id: decoded.id } });
   if (!user) throw Unauthorized('User no longer exists');
   const tokens = await issueTokens(user, deviceInfo);

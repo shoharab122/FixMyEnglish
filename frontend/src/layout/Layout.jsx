@@ -6,7 +6,7 @@ import { GiMi } from '../components/GiMi/GiMi';
 import './Layout.css';
 
 /* ============================================================
-   Layout v10 — Mobile drawer matches the Langut theme.
+   Layout v11 — Polished rail, glass topbar, floating mobile nav, Langut drawer.
    ============================================================ */
 
 const NAV = [
@@ -35,15 +35,17 @@ const RAIL_CSS = `
   width: 84px !important;
   flex-shrink: 0 !important;
   background-color: #0F1222 !important;
-  background-image: none !important;
-  border: 1px solid rgba(255,255,255,0.06) !important;
+  background-image:
+    radial-gradient(120% 60% at 0% 0%, rgba(108,76,241,0.28) 0%, transparent 60%),
+    radial-gradient(100% 50% at 100% 100%, rgba(241,76,160,0.18) 0%, transparent 60%) !important;
+  border: 1px solid rgba(255,255,255,0.07) !important;
   margin: 16px 0 16px 16px !important;
-  border-radius: 24px !important;
+  border-radius: 28px !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
   padding: 22px 0 !important;
-  box-shadow: 0 16px 40px rgba(15,18,34,0.22), inset 0 1px 0 rgba(255,255,255,0.04) !important;
+  box-shadow: 0 20px 48px rgba(15,18,34,0.28), inset 0 1px 0 rgba(255,255,255,0.06) !important;
   position: sticky !important;
   top: 16px !important;
   height: calc(100vh - 32px) !important;
@@ -53,7 +55,7 @@ const RAIL_CSS = `
   transition: width 0.32s cubic-bezier(0.22,1,0.36,1), padding 0.32s cubic-bezier(0.22,1,0.36,1) !important;
 }
 #root .ec-rail--expanded {
-  width: 220px !important;
+  width: 224px !important;
   padding: 22px 12px !important;
   align-items: stretch !important;
 }
@@ -64,28 +66,31 @@ const RAIL_CSS = `
   gap: 12px !important;
   text-decoration: none !important;
   flex-shrink: 0 !important;
-  height: 34px !important;
+  height: 38px !important;
   padding: 0 4px !important;
   min-width: 0 !important;
 }
 #root .ec-rail-logo-mark {
-  width: 34px !important;
-  height: 34px !important;
-  border-radius: 10px !important;
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 12px !important;
   background-color: #6C4CF1 !important;
   background-image: linear-gradient(135deg, #F14CA0 0%, #6C4CF1 100%) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   color: #ffffff !important;
-  font-size: 16px !important;
+  font-size: 17px !important;
   font-weight: 900 !important;
   flex-shrink: 0 !important;
-  box-shadow: 0 4px 14px rgba(241,76,160,0.42), inset 0 1px 0 rgba(255,255,255,0.25) !important;
+  box-shadow: 0 6px 18px rgba(241,76,160,0.45), inset 0 1px 0 rgba(255,255,255,0.3) !important;
+  transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1) !important;
 }
+#root .ec-rail-logo:hover .ec-rail-logo-mark { transform: rotate(-6deg) scale(1.06) !important; }
 #root .ec-rail-logo-text {
-  font-size: 14px !important;
+  font-size: 15px !important;
   font-weight: 800 !important;
+  letter-spacing: -0.01em !important;
   color: #ffffff !important;
   white-space: nowrap !important;
   overflow: hidden !important;
@@ -94,7 +99,7 @@ const RAIL_CSS = `
 }
 
 #root .ec-rail-nav {
-  margin-top: 36px !important;
+  margin-top: 32px !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
@@ -115,16 +120,16 @@ const RAIL_CSS = `
   align-items: center !important;
   justify-content: center !important;
   gap: 12px !important;
-  width: 46px !important;
-  height: 46px !important;
-  min-width: 46px !important;
-  min-height: 46px !important;
-  max-width: 46px !important;
-  max-height: 46px !important;
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 48px !important;
+  min-height: 48px !important;
+  max-width: 48px !important;
+  max-height: 48px !important;
   padding: 0 !important;
   margin: 0 !important;
   border: none !important;
-  border-radius: 14px !important;
+  border-radius: 16px !important;
   background-color: transparent !important;
   background-image: none !important;
   color: rgba(255,255,255,0.55) !important;
@@ -147,22 +152,22 @@ const RAIL_CSS = `
   width: 100% !important;
   max-width: none !important;
   justify-content: flex-start !important;
-  padding: 0 12px !important;
+  padding: 0 14px !important;
   text-indent: 0 !important;
 }
 
 #root .ec-rail-btn > svg {
   display: block !important;
-  width: 20px !important;
-  height: 20px !important;
-  max-width: 20px !important;
-  max-height: 20px !important;
+  width: 21px !important;
+  height: 21px !important;
+  max-width: 21px !important;
+  max-height: 21px !important;
   flex-shrink: 0 !important;
   color: currentColor !important;
   pointer-events: none !important;
   text-indent: 0 !important;
-  font-size: 20px !important;
-  line-height: 20px !important;
+  font-size: 21px !important;
+  line-height: 21px !important;
 }
 
 #root .ec-rail-btn > span {
@@ -172,7 +177,7 @@ const RAIL_CSS = `
 #root .ec-rail--expanded .ec-rail-btn > span.ec-rail-label {
   display: inline-block !important;
   visibility: visible !important;
-  font-size: 13px !important;
+  font-size: 13.5px !important;
   line-height: 1 !important;
   font-weight: 700 !important;
   color: currentColor !important;
@@ -187,19 +192,20 @@ const RAIL_CSS = `
 }
 
 #root .ec-rail-btn:hover {
-  background-color: rgba(255,255,255,0.08) !important;
+  background-color: rgba(255,255,255,0.09) !important;
   color: #ffffff !important;
   transform: translateY(-1px) !important;
 }
-#root .ec-rail-btn:active { transform: translateY(0) scale(0.96) !important; }
+#root .ec-rail-btn:active { transform: translateY(0) scale(0.95) !important; }
 #root .ec-rail-btn:focus-visible {
-  outline: 2px solid #6C4CF1 !important;
+  outline: 2px solid #9b7bff !important;
   outline-offset: 2px !important;
 }
 #root .ec-rail-btn--active {
   background-color: #6C4CF1 !important;
+  background-image: linear-gradient(135deg, #8466ff 0%, #6C4CF1 100%) !important;
   color: #ffffff !important;
-  box-shadow: 0 6px 18px rgba(108,76,241,0.45), inset 0 1px 0 rgba(255,255,255,0.18) !important;
+  box-shadow: 0 8px 22px rgba(108,76,241,0.5), inset 0 1px 0 rgba(255,255,255,0.22) !important;
 }
 #root .ec-rail-btn--active:hover { background-color: #7d5eff !important; }
 
@@ -210,8 +216,8 @@ const RAIL_CSS = `
   flex-shrink: 0 !important;
 }
 #root .ec-rail-btn--logout:hover {
-  background-color: rgba(241,76,160,0.18) !important;
-  color: #f47bb6 !important;
+  background-color: rgba(241,76,160,0.2) !important;
+  color: #f68ac0 !important;
 }
 
 #root .ec-rail-toggle {
