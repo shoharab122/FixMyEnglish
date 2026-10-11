@@ -259,13 +259,44 @@ router.post('/exams/tracks', async (req, res, next) => {
     res.json(created);
   } catch (e) { next(e); }
 });
+
+/* ─────────────────────────────────────────────────────────
+   DELETE TRACK (fixed):
+   Deletes dependent ExamSession → ExamQuestion → ExamSet
+   inside a single transaction before removing the track,
+   so Postgres foreign-key constraints are respected.
+   ───────────────────────────────────────────────────────── */
 router.delete('/exams/tracks/:id', requireSuperAdmin, async (req, res, next) => {
   try {
-    await prisma.examTrack.delete({ where: { id: req.params.id } });
-    await log(req.user, 'exam.track.delete', 'ExamTrack', req.params.id);
+    const trackId = req.params.id;
+
+    const track = await prisma.examTrack.findUnique({
+      where: { id: trackId },
+      select: { id: true, name: true, sets: { select: { id: true } } },
+    });
+    if (!track) throw NotFound('Exam track not found');
+
+    const setIds = track.sets.map((s) => s.id);
+
+    await prisma.$transaction([
+      // 1. learner attempts that point at any set in this track
+      prisma.examSession.deleteMany({ where: { examSetId: { in: setIds } } }),
+      // 2. questions belonging to those sets
+      prisma.examQuestion.deleteMany({ where: { examSetId: { in: setIds } } }),
+      // 3. the sets themselves
+      prisma.examSet.deleteMany({ where: { trackId } }),
+      // 4. finally the track
+      prisma.examTrack.delete({ where: { id: trackId } }),
+    ]);
+
+    await log(req.user, 'exam.track.delete', 'ExamTrack', trackId, {
+      name: track.name,
+      setsRemoved: setIds.length,
+    });
     res.json({ ok: true });
   } catch (e) { next(e); }
 });
+
 router.get('/exams/sets/:id/questions', async (req, res, next) => {
   try {
     res.json(await prisma.examQuestion.findMany({ where: { examSetId: req.params.id }, orderBy: { orderIndex: 'asc' } }));
@@ -280,13 +311,29 @@ router.post('/exams/sets', async (req, res, next) => {
     res.json(created);
   } catch (e) { next(e); }
 });
+
+/* ─────────────────────────────────────────────────────────
+   DELETE SET (fixed):
+   Same idea — wipe sessions + questions before the set.
+   ───────────────────────────────────────────────────────── */
 router.delete('/exams/sets/:id', async (req, res, next) => {
   try {
-    await prisma.examSet.delete({ where: { id: req.params.id } });
-    await log(req.user, 'exam.set.delete', 'ExamSet', req.params.id);
+    const setId = req.params.id;
+
+    const exists = await prisma.examSet.findUnique({ where: { id: setId }, select: { id: true } });
+    if (!exists) throw NotFound('Exam set not found');
+
+    await prisma.$transaction([
+      prisma.examSession.deleteMany({ where: { examSetId: setId } }),
+      prisma.examQuestion.deleteMany({ where: { examSetId: setId } }),
+      prisma.examSet.delete({ where: { id: setId } }),
+    ]);
+
+    await log(req.user, 'exam.set.delete', 'ExamSet', setId);
     res.json({ ok: true });
   } catch (e) { next(e); }
 });
+
 router.post('/exams/questions', async (req, res, next) => {
   try {
     const { examSetId, orderIndex, prompt, options, correctAnswer, points } = req.body ?? {};
