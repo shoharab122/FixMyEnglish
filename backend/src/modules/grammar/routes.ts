@@ -8,6 +8,15 @@ const router = Router();
 
 const XP_FIRST_CORRECT = 10;
 
+// The current Grammar.jsx still uses local ids t1..t17. Map them to the DB slugs so
+// old clients keep working. Remove once the frontend uses the slugs from /topics.
+const LEGACY_TOPIC: Record<string, string> = {
+  t1: 'present-simple', t2: 'present-continuous', t3: 'present-perfect', t4: 'past-simple',
+  t5: 'past-continuous', t6: 'future-tenses', t7: 'articles', t8: 'prepositions',
+  t9: 'sva', t10: 'conditionals', t11: 'modals', t12: 'voice', t13: 'narration',
+  t14: 'nouns-pronouns', t15: 'adjectives-adverbs', t16: 'clauses', t17: 'punctuation',
+};
+
 function shuffle<T>(input: T[]): T[] {
   const a = [...input];
   for (let i = a.length - 1; i > 0; i--) {
@@ -33,7 +42,8 @@ router.get('/topics', optionalAuth, async (_req, res, next) => {
 
 router.get('/:topicId/questions', optionalAuth, async (req, res, next) => {
   try {
-    const topic = await prisma.grammarTopic.findUnique({ where: { slug: req.params.topicId } });
+    const slug = LEGACY_TOPIC[req.params.topicId] ?? req.params.topicId;
+    const topic = await prisma.grammarTopic.findUnique({ where: { slug } });
     if (!topic) return res.json([]);
 
     const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 50));
@@ -68,22 +78,23 @@ router.post('/questions/:questionId/attempt', requireAuth, async (req, res, next
 
     const isCorrect = answer === String(q.correctAnswer).trim();
 
-    const attempt = await prisma.grammarAttempt.create({
-      data: { userId, questionId: q.id, isCorrect, answer },
-    });
-
-    // XP only for the FIRST correct answer to a question. Checked after the insert
-    // by asking "is my attempt the earliest correct one?", so two simultaneous
-    // requests cannot both be paid.
-    let firstCorrect = false;
-    if (isCorrect) {
-      const first = await prisma.grammarAttempt.findFirst({
-        where: { userId, questionId: q.id, isCorrect: true },
-        orderBy: [{ attemptedAt: 'asc' }, { id: 'asc' }],
-        select: { id: true },
+    // Insert + "was there already a correct attempt?" run under a per-(user,question)
+    // advisory lock, so two simultaneous requests can never both be paid.
+    const { firstCorrect } = await prisma.$transaction(async (tx) => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`${userId}:${q.id}`}))`;
+      const attempt = await tx.grammarAttempt.create({
+        data: { userId, questionId: q.id, isCorrect, answer },
       });
-      firstCorrect = first?.id === attempt.id;
-    }
+      let first = false;
+      if (isCorrect) {
+        const prior = await tx.grammarAttempt.findFirst({
+          where: { userId, questionId: q.id, isCorrect: true, id: { not: attempt.id } },
+          select: { id: true },
+        });
+        first = !prior;
+      }
+      return { firstCorrect: first };
+    });
 
     let xpGained = 0;
     let summary: unknown = null;
@@ -103,6 +114,7 @@ router.post('/questions/:questionId/attempt', requireAuth, async (req, res, next
 
     res.json({
       isCorrect,
+      firstCorrect,
       correctAnswer: q.correctAnswer,
       explanation: q.explanation,
       banglaExplain: q.banglaExplain,
