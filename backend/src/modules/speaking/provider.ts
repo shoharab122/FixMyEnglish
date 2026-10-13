@@ -46,3 +46,8 @@ export function getSpeechProvider(): ISpeechProvider {
     default:      return new MockProvider();
   }
 }
+
+/** Used as a fallback when the configured provider fails. */
+export function getMockProvider(): ISpeechProvider {
+  return new MockProvider();
+}
