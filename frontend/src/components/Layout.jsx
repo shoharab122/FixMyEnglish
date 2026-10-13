@@ -1,26 +1,25 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { NavLink, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Icon } from '../components/Icon';
+import { GiMi } from '../components/GiMi/GiMi';
 import './Layout.css';
 
 /* ============================================================
-   Layout v9 — RAIL CSS is rendered inline via <style>.
-   Rendered inside <body> at first paint, so it beats every
-   <head> stylesheet (including index.css) on source order.
+   Layout v11 — Polished rail, glass topbar, floating mobile nav, Langut drawer.
    ============================================================ */
 
 const NAV = [
-  { to: '/',            icon: 'grid',     label: 'Overview',   end: true },
-  { to: '/vocabulary',  icon: 'book',     label: 'Vocabulary' },
-  { to: '/grammar',     icon: 'target',   label: 'Grammar' },
-  { to: '/curriculum',  icon: 'calendar', label: 'Curriculum' },
-  { to: '/exams',       icon: 'flag',     label: 'Exams' },
-  { to: '/speaking',    icon: 'mic',      label: 'Speaking' },
-  { to: '/progress',    icon: 'trophy',   label: 'Progress' },
-  { to: '/community',   icon: 'chat',     label: 'Community' },
-  { to: '/live-rooms',  icon: 'zap',      label: 'Live Rooms' },
-  { to: '/pricing',     icon: 'wallet',   label: 'Pricing' },
+  { to: '/',            icon: 'grid',     label: 'Overview',   end: true, tint: 'purple'  },
+  { to: '/vocabulary',  icon: 'book',     label: 'Vocabulary',            tint: 'lime'    },
+  { to: '/grammar',     icon: 'target',   label: 'Grammar',               tint: 'pink'    },
+  { to: '/curriculum',  icon: 'calendar', label: 'Curriculum',            tint: 'yellow'  },
+  { to: '/exams',       icon: 'flag',     label: 'Exams',                 tint: 'purple2' },
+  { to: '/speaking',    icon: 'mic',      label: 'Speaking',              tint: 'pink2'   },
+  { to: '/progress',    icon: 'trophy',   label: 'Progress',              tint: 'lime'    },
+  { to: '/community',   icon: 'chat',     label: 'Community',             tint: 'purple'  },
+  { to: '/live-rooms',  icon: 'zap',      label: 'Live Rooms',            tint: 'yellow'  },
+  { to: '/pricing',     icon: 'wallet',   label: 'Pricing',               tint: 'pink'    },
 ];
 
 const MOBILE_NAV = [
@@ -31,24 +30,22 @@ const MOBILE_NAV = [
   { to: '/profile',    icon: 'users',  label: 'Profile' },
 ];
 
-/* ============================================================
-   RAIL CSS — every selector uses #root prefix (1,1,0 specificity)
-   + !important, so nothing can override.
-   ============================================================ */
 const RAIL_CSS = `
 #root .ec-rail {
   width: 84px !important;
   flex-shrink: 0 !important;
   background-color: #0F1222 !important;
-  background-image: none !important;
-  border: 1px solid rgba(255,255,255,0.06) !important;
+  background-image:
+    radial-gradient(120% 60% at 0% 0%, rgba(108,76,241,0.28) 0%, transparent 60%),
+    radial-gradient(100% 50% at 100% 100%, rgba(241,76,160,0.18) 0%, transparent 60%) !important;
+  border: 1px solid rgba(255,255,255,0.07) !important;
   margin: 16px 0 16px 16px !important;
-  border-radius: 24px !important;
+  border-radius: 28px !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
   padding: 22px 0 !important;
-  box-shadow: 0 16px 40px rgba(15,18,34,0.22), inset 0 1px 0 rgba(255,255,255,0.04) !important;
+  box-shadow: 0 20px 48px rgba(15,18,34,0.28), inset 0 1px 0 rgba(255,255,255,0.06) !important;
   position: sticky !important;
   top: 16px !important;
   height: calc(100vh - 32px) !important;
@@ -58,7 +55,7 @@ const RAIL_CSS = `
   transition: width 0.32s cubic-bezier(0.22,1,0.36,1), padding 0.32s cubic-bezier(0.22,1,0.36,1) !important;
 }
 #root .ec-rail--expanded {
-  width: 220px !important;
+  width: 224px !important;
   padding: 22px 12px !important;
   align-items: stretch !important;
 }
@@ -69,28 +66,31 @@ const RAIL_CSS = `
   gap: 12px !important;
   text-decoration: none !important;
   flex-shrink: 0 !important;
-  height: 34px !important;
+  height: 38px !important;
   padding: 0 4px !important;
   min-width: 0 !important;
 }
 #root .ec-rail-logo-mark {
-  width: 34px !important;
-  height: 34px !important;
-  border-radius: 10px !important;
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 12px !important;
   background-color: #6C4CF1 !important;
   background-image: linear-gradient(135deg, #F14CA0 0%, #6C4CF1 100%) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   color: #ffffff !important;
-  font-size: 16px !important;
+  font-size: 17px !important;
   font-weight: 900 !important;
   flex-shrink: 0 !important;
-  box-shadow: 0 4px 14px rgba(241,76,160,0.42), inset 0 1px 0 rgba(255,255,255,0.25) !important;
+  box-shadow: 0 6px 18px rgba(241,76,160,0.45), inset 0 1px 0 rgba(255,255,255,0.3) !important;
+  transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1) !important;
 }
+#root .ec-rail-logo:hover .ec-rail-logo-mark { transform: rotate(-6deg) scale(1.06) !important; }
 #root .ec-rail-logo-text {
-  font-size: 14px !important;
+  font-size: 15px !important;
   font-weight: 800 !important;
+  letter-spacing: -0.01em !important;
   color: #ffffff !important;
   white-space: nowrap !important;
   overflow: hidden !important;
@@ -99,7 +99,7 @@ const RAIL_CSS = `
 }
 
 #root .ec-rail-nav {
-  margin-top: 36px !important;
+  margin-top: 32px !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
@@ -120,16 +120,16 @@ const RAIL_CSS = `
   align-items: center !important;
   justify-content: center !important;
   gap: 12px !important;
-  width: 46px !important;
-  height: 46px !important;
-  min-width: 46px !important;
-  min-height: 46px !important;
-  max-width: 46px !important;
-  max-height: 46px !important;
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 48px !important;
+  min-height: 48px !important;
+  max-width: 48px !important;
+  max-height: 48px !important;
   padding: 0 !important;
   margin: 0 !important;
   border: none !important;
-  border-radius: 14px !important;
+  border-radius: 16px !important;
   background-color: transparent !important;
   background-image: none !important;
   color: rgba(255,255,255,0.55) !important;
@@ -152,22 +152,22 @@ const RAIL_CSS = `
   width: 100% !important;
   max-width: none !important;
   justify-content: flex-start !important;
-  padding: 0 12px !important;
+  padding: 0 14px !important;
   text-indent: 0 !important;
 }
 
 #root .ec-rail-btn > svg {
   display: block !important;
-  width: 20px !important;
-  height: 20px !important;
-  max-width: 20px !important;
-  max-height: 20px !important;
+  width: 21px !important;
+  height: 21px !important;
+  max-width: 21px !important;
+  max-height: 21px !important;
   flex-shrink: 0 !important;
   color: currentColor !important;
   pointer-events: none !important;
   text-indent: 0 !important;
-  font-size: 20px !important;
-  line-height: 20px !important;
+  font-size: 21px !important;
+  line-height: 21px !important;
 }
 
 #root .ec-rail-btn > span {
@@ -177,7 +177,7 @@ const RAIL_CSS = `
 #root .ec-rail--expanded .ec-rail-btn > span.ec-rail-label {
   display: inline-block !important;
   visibility: visible !important;
-  font-size: 13px !important;
+  font-size: 13.5px !important;
   line-height: 1 !important;
   font-weight: 700 !important;
   color: currentColor !important;
@@ -192,19 +192,20 @@ const RAIL_CSS = `
 }
 
 #root .ec-rail-btn:hover {
-  background-color: rgba(255,255,255,0.08) !important;
+  background-color: rgba(255,255,255,0.09) !important;
   color: #ffffff !important;
   transform: translateY(-1px) !important;
 }
-#root .ec-rail-btn:active { transform: translateY(0) scale(0.96) !important; }
+#root .ec-rail-btn:active { transform: translateY(0) scale(0.95) !important; }
 #root .ec-rail-btn:focus-visible {
-  outline: 2px solid #6C4CF1 !important;
+  outline: 2px solid #9b7bff !important;
   outline-offset: 2px !important;
 }
 #root .ec-rail-btn--active {
   background-color: #6C4CF1 !important;
+  background-image: linear-gradient(135deg, #8466ff 0%, #6C4CF1 100%) !important;
   color: #ffffff !important;
-  box-shadow: 0 6px 18px rgba(108,76,241,0.45), inset 0 1px 0 rgba(255,255,255,0.18) !important;
+  box-shadow: 0 8px 22px rgba(108,76,241,0.5), inset 0 1px 0 rgba(255,255,255,0.22) !important;
 }
 #root .ec-rail-btn--active:hover { background-color: #7d5eff !important; }
 
@@ -215,8 +216,8 @@ const RAIL_CSS = `
   flex-shrink: 0 !important;
 }
 #root .ec-rail-btn--logout:hover {
-  background-color: rgba(241,76,160,0.18) !important;
-  color: #f47bb6 !important;
+  background-color: rgba(241,76,160,0.2) !important;
+  color: #f68ac0 !important;
 }
 
 #root .ec-rail-toggle {
@@ -262,9 +263,6 @@ const RAIL_CSS = `
 }
 `;
 
-/* ============================================================
-   Inline SVGs
-   ============================================================ */
 const MenuIcon = () => (
   <svg viewBox="0 0 24 24" width="20" height="20" fill="none"
        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -274,7 +272,7 @@ const MenuIcon = () => (
 
 const CloseIcon = () => (
   <svg viewBox="0 0 24 24" width="18" height="18" fill="none"
-       stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+       stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
     <path d="M6 6l12 12M18 6 6 18" />
   </svg>
 );
@@ -293,6 +291,32 @@ const ChevronRight = () => (
   </svg>
 );
 
+
+/* ---------- Global search ---------- */
+const API_BASE = (import.meta.env && import.meta.env.VITE_API_URL) || '';
+const SEARCH_ENDPOINT = `${API_BASE}/api/search`;
+
+const KIND_LABEL = {
+  vocabulary: 'Vocabulary',
+  grammar: 'Grammar',
+  curriculum: 'Curriculum',
+  exam: 'Exam',
+  live: 'Live',
+  page: 'Page',
+};
+
+/* Fallback when the API is down: match the sidebar pages locally. */
+function localSearch(q) {
+  const needle = q.toLowerCase();
+  return NAV.filter((n) => n.label.toLowerCase().includes(needle)).map((n) => ({
+    kind: 'page',
+    id: n.to,
+    title: n.label,
+    subtitle: 'Go to page',
+    to: n.to,
+  }));
+}
+
 export function Layout({ children }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -300,6 +324,15 @@ export function Layout({ children }) {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [railExpanded, setRailExpanded] = useState(false);
+
+  const [searchQ, setSearchQ] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [searchOffline, setSearchOffline] = useState(false);
+  const [activeIdx, setActiveIdx] = useState(-1);
+  const searchRef = useRef(null);
+  const searchInputRef = useRef(null);
 
   const firstName = user?.name?.split(' ')[0] || 'Guest';
   const initial   = firstName.charAt(0).toUpperCase();
@@ -327,6 +360,90 @@ export function Layout({ children }) {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
+  /* Debounced search against the API, with local fallback */
+  useEffect(() => {
+    const q = searchQ.trim();
+    if (q.length < 2) {
+      setSearchResults([]);
+      setSearchLoading(false);
+      setSearchOffline(false);
+      setActiveIdx(-1);
+      return;
+    }
+    const ctrl = new AbortController();
+    setSearchLoading(true);
+    const t = setTimeout(async () => {
+      try {
+        const res = await fetch(`${SEARCH_ENDPOINT}?q=${encodeURIComponent(q)}`, {
+          signal: ctrl.signal,
+          credentials: 'include',
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        setSearchResults(Array.isArray(data.results) ? data.results : []);
+        setSearchOffline(false);
+      } catch (err) {
+        if (err.name === 'AbortError') return;
+        setSearchResults(localSearch(q));
+        setSearchOffline(true);
+      } finally {
+        if (!ctrl.signal.aborted) {
+          setSearchLoading(false);
+          setActiveIdx(-1);
+        }
+      }
+    }, 250);
+    return () => { clearTimeout(t); ctrl.abort(); };
+  }, [searchQ]);
+
+  /* Close on outside click */
+  useEffect(() => {
+    if (!searchOpen) return;
+    const onDown = (e) => {
+      if (searchRef.current && !searchRef.current.contains(e.target)) setSearchOpen(false);
+    };
+    document.addEventListener('mousedown', onDown);
+    return () => document.removeEventListener('mousedown', onDown);
+  }, [searchOpen]);
+
+  /* Cmd/Ctrl+K focuses search */
+  useEffect(() => {
+    const onKey = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+        setSearchOpen(true);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  useEffect(() => { setSearchOpen(false); }, [location.pathname]);
+
+  const goToResult = (r) => {
+    setSearchOpen(false);
+    setSearchQ('');
+    setSearchResults([]);
+    searchInputRef.current?.blur();
+    navigate(r.to);
+  };
+
+  const onSearchKeyDown = (e) => {
+    if (e.key === 'Escape') { setSearchOpen(false); e.currentTarget.blur(); return; }
+    if (!searchResults.length) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveIdx((i) => (i + 1) % searchResults.length);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveIdx((i) => (i <= 0 ? searchResults.length - 1 : i - 1));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      goToResult(searchResults[activeIdx >= 0 ? activeIdx : 0]);
+    }
+  };
+
   const handleLogout = async () => {
     setMenuOpen(false);
     try { await logout(); } catch { /* ignore */ }
@@ -335,11 +452,9 @@ export function Layout({ children }) {
 
   return (
     <>
-      {/* Rail CSS — rendered into <body> at first paint, wins source order */}
       <style dangerouslySetInnerHTML={{ __html: RAIL_CSS }} />
 
       <div className="ec-shell">
-        {/* ============ Desktop rail ============ */}
         <aside
           className={`ec-rail${railExpanded ? ' ec-rail--expanded' : ''}`}
           aria-label="Primary"
@@ -395,7 +510,6 @@ export function Layout({ children }) {
           </button>
         </aside>
 
-        {/* ============ Main column ============ */}
         <main className="ec-main">
           <header className="ec-topbar">
             <button
@@ -409,14 +523,57 @@ export function Layout({ children }) {
               <MenuIcon />
             </button>
 
-            <label className="ec-search">
-              <Icon name="search" />
-              <input
-                placeholder="Search lessons, words, exams…"
-                aria-label="Search"
-              />
-              <span className="ec-search-kbd" aria-hidden="true">⌘K</span>
-            </label>
+            <div className="ec-search-wrap" ref={searchRef}>
+              <label className="ec-search">
+                <Icon name="search" />
+                <input
+                  ref={searchInputRef}
+                  value={searchQ}
+                  onChange={(e) => { setSearchQ(e.target.value); setSearchOpen(true); }}
+                  onFocus={() => setSearchOpen(true)}
+                  onKeyDown={onSearchKeyDown}
+                  placeholder="Search lessons, words, exams…"
+                  aria-label="Search"
+                  aria-expanded={searchOpen}
+                  aria-controls="ec-search-results"
+                  autoComplete="off"
+                  type="search"
+                />
+                <span className="ec-search-kbd" aria-hidden="true">⌘K</span>
+              </label>
+
+              {searchOpen && searchQ.trim().length >= 2 && (
+                <div className="ec-search-panel" id="ec-search-results" role="listbox">
+                  {searchLoading && <div className="ec-search-status">Searching…</div>}
+                  {!searchLoading && searchResults.length === 0 && (
+                    <div className="ec-search-status">No results for “{searchQ.trim()}”</div>
+                  )}
+                  {!searchLoading && searchResults.map((r, i) => (
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected={i === activeIdx}
+                      key={`${r.kind}-${r.id}`}
+                      className={`ec-search-item${i === activeIdx ? ' is-active' : ''}`}
+                      onMouseDown={(e) => e.preventDefault()}
+                      onMouseEnter={() => setActiveIdx(i)}
+                      onClick={() => goToResult(r)}
+                    >
+                      <span className="ec-search-kind" data-kind={r.kind}>{KIND_LABEL[r.kind] || r.kind}</span>
+                      <span className="ec-search-text">
+                        <span className="ec-search-title">{r.title}</span>
+                        {r.subtitle && <span className="ec-search-sub">{r.subtitle}</span>}
+                      </span>
+                    </button>
+                  ))}
+                  {searchOffline && (
+                    <div className="ec-search-status ec-search-status--warn">
+                      Search server unreachable — showing pages only
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
 
             <div className="ec-topbar-right">
               <span className="ec-tier-pill" data-tier={tier}>
@@ -465,7 +622,6 @@ export function Layout({ children }) {
           <div className="ec-main-content">{children}</div>
         </main>
 
-        {/* ============ Mobile bottom dock ============ */}
         <nav className="ec-bottom-nav" aria-label="Primary mobile">
           {MOBILE_NAV.map((item) => (
             <NavLink
@@ -484,14 +640,12 @@ export function Layout({ children }) {
           ))}
         </nav>
 
-        {/* ============ Drawer backdrop ============ */}
         <div
           className={`ec-drawer-backdrop${menuOpen ? ' ec-drawer-backdrop--open' : ''}`}
           onClick={() => setMenuOpen(false)}
           aria-hidden="true"
         />
 
-        {/* ============ Mobile drawer ============ */}
         <aside
           id="ec-drawer"
           className={`ec-drawer${menuOpen ? ' ec-drawer--open' : ''}`}
@@ -547,7 +701,11 @@ export function Layout({ children }) {
                 style={{ animationDelay: menuOpen ? `${0.05 + i * 0.025}s` : '0s' }}
                 onClick={() => setMenuOpen(false)}
               >
-                <span className="ec-drawer-link-icon" aria-hidden="true">
+                <span
+                  className="ec-drawer-link-icon"
+                  data-tint={item.tint || 'lime'}
+                  aria-hidden="true"
+                >
                   <Icon name={item.icon} />
                 </span>
                 <span className="ec-drawer-link-label">{item.label}</span>
@@ -579,6 +737,11 @@ export function Layout({ children }) {
           </footer>
         </aside>
       </div>
+
+      {/* ============================================================
+          GiMi — floating AI assistant (mounted once for the whole app)
+         ============================================================ */}
+      <GiMi />
     </>
   );
 }
