@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
-import { Layout } from './components/Layout';
+import { Layout } from './layout/Layout';
 
 import { Overview } from './pages/Overview';
 import { Vocabulary } from './pages/Vocabulary';

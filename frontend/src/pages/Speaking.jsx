@@ -3,7 +3,7 @@ import { speakingApi } from '../api/speaking';
 import { Icon } from '../components/Icon';
 
 /* ============================================================
-   STYLES — Langut-inspired
+   SECTION 1 — STYLES
    ============================================================ */
 const SPEAK_CSS = `
 .ec-spk{
@@ -15,17 +15,19 @@ const SPEAK_CSS = `
   --lang-ink:#17102E;--lang-ink-soft:#6B6488;--lang-line:#17102E;
 }
 .ec-spk,.ec-spk *{box-sizing:border-box}
+.ec-spk{-webkit-tap-highlight-color:transparent}
 
-.ec-spk-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.ec-spk-head{margin-bottom:16px}
 .ec-spk-eyebrow{margin:0 0 6px;font-size:11.5px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:var(--lang-purple);opacity:.95}
 
+/* HERO */
 .ec-spk-hero{
   position:relative;overflow:hidden;border-radius:32px;
-  padding:clamp(26px,4vw,40px) clamp(24px,4vw,42px);
+  padding:clamp(24px,4vw,40px) clamp(20px,4vw,42px);
   color:#fff;
   background:linear-gradient(140deg,#2A1A6E 0%,#1E1252 55%,#3B2596 100%);
   box-shadow:0 20px 52px rgba(30,18,82,.34);
-  border:2px solid var(--lang-line);margin-bottom:22px;min-height:240px;
+  border:2px solid var(--lang-line);margin-bottom:20px;min-height:220px;
   display:flex;align-items:center;justify-content:space-between;gap:20px;
 }
 .ec-spk-hero::before{
@@ -38,18 +40,18 @@ const SPEAK_CSS = `
 }
 .ec-spk-hero-orb{position:absolute;top:-90px;right:180px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(212,245,92,.22),transparent 68%);animation:ec-spk-drift 14s ease-in-out infinite}
 @keyframes ec-spk-drift{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-18px,16px) scale(1.08)}}
-.ec-spk-hero-copy{position:relative;z-index:1;max-width:580px}
+.ec-spk-hero-copy{position:relative;z-index:1;max-width:580px;min-width:0;flex:1}
 .ec-spk-hero-badge{
   display:inline-flex;align-items:center;font-size:10.5px;font-weight:900;
   letter-spacing:.16em;text-transform:uppercase;padding:7px 14px;border-radius:999px;
   background:var(--lang-lime);color:var(--lang-ink);border:2px solid var(--lang-line);
-  box-shadow:0 3px 0 rgba(0,0,0,.4);margin-bottom:16px;
+  box-shadow:0 3px 0 rgba(0,0,0,.4);margin-bottom:14px;
 }
-.ec-spk-hero h1{margin:0 0 10px;font-size:clamp(26px,2.4vw + 16px,38px);font-weight:900;letter-spacing:-.035em;line-height:1.1;color:#fff}
+.ec-spk-hero h1{margin:0 0 10px;font-size:clamp(24px,2.4vw + 14px,38px);font-weight:900;letter-spacing:-.035em;line-height:1.1;color:#fff}
 .ec-spk-hero h1 em{font-style:normal;color:var(--lang-lime)}
-.ec-spk-hero p{margin:0 0 22px;font-size:14px;line-height:1.6;opacity:.92;font-weight:500;max-width:52ch}
+.ec-spk-hero p{margin:0 0 18px;font-size:14px;line-height:1.6;opacity:.92;font-weight:500;max-width:52ch}
 .ec-spk-hero-stats{display:flex;gap:10px;flex-wrap:wrap;position:relative;z-index:1}
-.ec-spk-hero-stat{display:flex;flex-direction:column;gap:2px;padding:9px 14px;border-radius:14px;background:var(--lang-lime);border:2px solid var(--lang-line);box-shadow:0 3px 0 var(--lang-line);min-width:80px}
+.ec-spk-hero-stat{display:flex;flex-direction:column;gap:2px;padding:9px 14px;border-radius:14px;background:var(--lang-lime);border:2px solid var(--lang-line);box-shadow:0 3px 0 var(--lang-line);min-width:76px}
 .ec-spk-hero-stat strong{font-size:20px;font-weight:900;line-height:1;letter-spacing:-.04em;color:var(--lang-ink)}
 .ec-spk-hero-stat span{font-size:9.5px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--lang-ink);opacity:.75}
 .ec-spk-hero-stat:nth-child(2){background:var(--lang-pink)}
@@ -60,14 +62,15 @@ const SPEAK_CSS = `
 .ec-spk-hero-mascot{position:relative;z-index:1;flex-shrink:0;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 14px 28px rgba(0,0,0,.28));animation:ec-spk-bob 4s ease-in-out infinite}
 @keyframes ec-spk-bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-10px) rotate(2deg)}}
 
-.ec-spk-tabs{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding:6px 4px 16px;margin-bottom:8px}
+/* TABS */
+.ec-spk-tabs{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding:6px 4px 16px;margin-bottom:4px;-webkit-overflow-scrolling:touch}
 .ec-spk-tabs::-webkit-scrollbar{display:none}
 .ec-spk-tab{
   flex:0 0 auto;display:inline-flex;align-items:center;gap:8px;
-  padding:11px 18px;border-radius:999px;border:2px solid var(--lang-line);
-  background:#fff;color:var(--lang-ink);font-size:13px;font-weight:900;
+  padding:12px 20px;border-radius:999px;border:2px solid var(--lang-line);
+  background:#fff;color:var(--lang-ink);font-size:13.5px;font-weight:900;
   cursor:pointer;white-space:nowrap;transition:all .18s ease;font-family:inherit;
-  box-shadow:0 3px 0 var(--lang-line);letter-spacing:.01em;
+  box-shadow:0 3px 0 var(--lang-line);letter-spacing:.01em;min-height:46px;
 }
 .ec-spk-tab:hover{background:var(--lang-lime-soft);transform:translateY(-2px);box-shadow:0 5px 0 var(--lang-line)}
 .ec-spk-tab:active{transform:translateY(1px);box-shadow:0 1px 0 var(--lang-line)}
@@ -75,14 +78,15 @@ const SPEAK_CSS = `
 .ec-spk-tab--active:hover{background:var(--lang-ink);color:var(--lang-lime)}
 .ec-spk-tab svg{width:16px;height:16px}
 
-.ec-spk-cats{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding:6px 4px 14px;margin-bottom:8px}
+/* CATEGORY PILLS */
+.ec-spk-cats{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding:6px 4px 14px;margin-bottom:4px;-webkit-overflow-scrolling:touch}
 .ec-spk-cats::-webkit-scrollbar{display:none}
 .ec-spk-cat{
-  flex:0 0 auto;padding:9px 16px;border-radius:999px;
+  flex:0 0 auto;padding:10px 16px;border-radius:999px;
   border:2px solid var(--lang-line);background:#fff;color:var(--lang-ink);
-  font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap;
+  font-size:12.5px;font-weight:900;cursor:pointer;white-space:nowrap;
   transition:all .16s ease;font-family:inherit;display:inline-flex;align-items:center;gap:6px;
-  box-shadow:0 3px 0 var(--lang-line);
+  box-shadow:0 3px 0 var(--lang-line);min-height:42px;
 }
 .ec-spk-cat:hover{background:var(--lang-lime-soft);transform:translateY(-2px);box-shadow:0 5px 0 var(--lang-line)}
 .ec-spk-cat:active{transform:translateY(1px);box-shadow:0 1px 0 var(--lang-line)}
@@ -90,12 +94,14 @@ const SPEAK_CSS = `
 .ec-spk-cat-count{font-size:10px;font-weight:900;padding:2px 7px;border-radius:999px;background:var(--lang-lime);color:var(--lang-ink);border:2px solid var(--lang-line)}
 .ec-spk-cat--active .ec-spk-cat-count{background:var(--lang-lime);color:var(--lang-ink);border-color:var(--lang-line)}
 
+/* LAYOUT */
 .ec-spk-grid{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:22px;align-items:start}
 
 .ec-spk-panel{
   background:#fff;border:3px solid var(--lang-line);border-radius:32px;padding:28px;
   box-shadow:0 10px 0 var(--lang-line);position:relative;overflow:hidden;
   background-image:radial-gradient(circle at 100% 0%,rgba(212,245,92,.14),transparent 55%);
+  text-align:center;
 }
 .ec-spk-prompt-counter{
   position:relative;z-index:1;font-size:12px;font-weight:900;
@@ -103,35 +109,38 @@ const SPEAK_CSS = `
   display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;
 }
 .ec-spk-prompt-tag{font-size:10.5px;font-weight:900;padding:4px 12px;border-radius:999px;background:var(--lang-lime);color:var(--lang-ink);border:2px solid var(--lang-line);box-shadow:0 2px 0 var(--lang-line);letter-spacing:.06em;text-transform:uppercase}
-.ec-spk-prompt-text{position:relative;z-index:1;font-size:clamp(18px,1.6vw + 12px,22px);font-weight:900;line-height:1.4;margin:12px 0 20px;color:var(--lang-ink);letter-spacing:-.02em;max-width:680px}
-.ec-spk-prompt-hint{position:relative;z-index:1;font-size:12.5px;color:var(--lang-ink-soft);margin:-12px 0 22px;font-weight:700}
+.ec-spk-prompt-text{position:relative;z-index:1;font-size:clamp(17px,1.6vw + 11px,22px);font-weight:900;line-height:1.4;margin:12px 0 8px;color:var(--lang-ink);letter-spacing:-.02em;text-align:left}
+.ec-spk-prompt-hint{position:relative;z-index:1;font-size:12.5px;color:var(--lang-ink-soft);margin:0 0 20px;font-weight:700;text-align:left}
 
-.ec-spk-record-wrap{position:relative;z-index:1;display:inline-flex;align-items:center;justify-content:center;width:130px;height:130px;margin:8px auto 4px}
-.ec-spk-record-ring{position:absolute;inset:0;border-radius:50%;border:3px solid rgba(123,92,240,.55);animation:ec-spk-ring 2.4s ease-out infinite}
+/* RECORD BUTTON */
+.ec-spk-record-wrap{position:relative;z-index:1;display:inline-flex;align-items:center;justify-content:center;width:140px;height:140px;margin:4px auto 0}
+.ec-spk-record-ring{position:absolute;inset:0;border-radius:50%;border:3px solid rgba(123,92,240,.55);animation:ec-spk-ring 2.4s ease-out infinite;pointer-events:none}
 .ec-spk-record-ring:nth-child(2){animation-delay:.8s}
 .ec-spk-record-ring:nth-child(3){animation-delay:1.6s}
 @keyframes ec-spk-ring{0%{transform:scale(.6);opacity:.9}80%{transform:scale(1.35);opacity:0}100%{opacity:0}}
 .ec-spk-record-wrap--active .ec-spk-record-ring{border-color:rgba(255,143,203,.75)}
 .ec-spk-record-btn{
-  position:relative;z-index:1;width:92px;height:92px;border-radius:50%;
+  position:relative;z-index:1;width:100px;height:100px;border-radius:50%;
   border:3px solid var(--lang-line);
   background:linear-gradient(135deg,var(--lang-purple) 0%,var(--lang-purple-2) 100%);
-  color:#fff;font-size:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;
+  color:#fff;font-size:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;
   box-shadow:0 6px 0 var(--lang-line);transition:transform .18s ease,box-shadow .18s ease;
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
 }
 .ec-spk-record-btn:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 9px 0 var(--lang-line)}
 .ec-spk-record-btn:active:not(:disabled){transform:translateY(2px);box-shadow:0 2px 0 var(--lang-line)}
 .ec-spk-record-btn:disabled{opacity:.55;cursor:not-allowed}
 .ec-spk-record-btn--active{background:linear-gradient(135deg,var(--lang-pink-2) 0%,#E0503C 100%);box-shadow:0 6px 0 var(--lang-line)}
 
-.ec-spk-record-status{position:relative;z-index:1;font-size:14px;font-weight:900;color:var(--lang-ink);margin:16px 0 4px;text-align:center;letter-spacing:.01em}
-.ec-spk-record-time{position:relative;z-index:1;font-size:26px;font-weight:900;color:var(--lang-ink);letter-spacing:-.03em;font-variant-numeric:tabular-nums;text-align:center;background:var(--lang-lime);border:2px solid var(--lang-line);border-radius:14px;padding:6px 18px;display:inline-block;box-shadow:0 3px 0 var(--lang-line)}
+.ec-spk-record-status{position:relative;z-index:1;font-size:14.5px;font-weight:900;color:var(--lang-ink);margin:14px 0 6px;text-align:center;letter-spacing:.01em}
+.ec-spk-record-time{position:relative;z-index:1;font-size:26px;font-weight:900;color:var(--lang-ink);letter-spacing:-.03em;font-variant-numeric:tabular-nums;text-align:center;background:var(--lang-lime);border:2px solid var(--lang-line);border-radius:14px;padding:6px 18px;display:inline-block;box-shadow:0 3px 0 var(--lang-line);margin:4px 0 0}
 
+/* LEVEL METER */
 .ec-spk-live-level{
   position:relative;z-index:1;
   display:flex;align-items:center;gap:10px;
-  max-width:360px;margin:10px auto 0;
-  padding:8px 14px;border-radius:999px;
+  max-width:380px;margin:12px auto 0;
+  padding:9px 14px;border-radius:999px;
   background:#fff;border:2px solid var(--lang-line);
   box-shadow:0 2px 0 var(--lang-line);
   font-size:11px;font-weight:900;
@@ -145,6 +154,7 @@ const SPEAK_CSS = `
   height:100%;border-radius:999px;
   background:linear-gradient(90deg,#B8E62E,#D4F55C);
   transition:width .08s linear;
+  will-change:width;
 }
 .ec-spk-live-level--silent .ec-spk-live-level-fill{background:linear-gradient(90deg,#FF8FCB,#E0503C)}
 .ec-spk-live-level--silent{color:#A52C1C}
@@ -162,27 +172,30 @@ const SPEAK_CSS = `
 }
 @keyframes ec-spk-warning-pulse{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
 
-.ec-spk-wave{position:relative;z-index:1;height:48px;margin:14px auto 8px;max-width:420px;display:flex;align-items:center;justify-content:center;gap:3px}
-.ec-spk-wave-bar{width:4px;background:var(--lang-ink);border-radius:2px;transition:height .15s ease}
-.ec-spk-wave-idle .ec-spk-wave-bar{height:4px !important;opacity:.35}
-.ec-spk-wave-live .ec-spk-wave-bar{background:linear-gradient(180deg,var(--lang-purple-2),var(--lang-purple));animation:ec-spk-wave-bounce .8s ease-in-out infinite}
-@keyframes ec-spk-wave-bounce{0%,100%{transform:scaleY(.5)}50%{transform:scaleY(1.2)}}
+/* WAVEFORM */
+.ec-spk-wave{position:relative;z-index:1;height:52px;margin:16px auto 8px;max-width:440px;display:flex;align-items:center;justify-content:center;gap:3px}
+.ec-spk-wave-bar{width:4px;height:4px;background:var(--lang-ink);border-radius:2px;opacity:.35;transition:background .2s ease,opacity .2s ease,height .15s ease;will-change:height}
+.ec-spk-wave-live .ec-spk-wave-bar{opacity:1;background:linear-gradient(180deg,var(--lang-purple-2),var(--lang-purple))}
+.ec-spk-wave-synth .ec-spk-wave-bar{opacity:1;background:linear-gradient(180deg,var(--lang-purple-2),var(--lang-purple));animation:ec-spk-wave-bounce 1.1s ease-in-out infinite}
+@keyframes ec-spk-wave-bounce{0%,100%{transform:scaleY(.4)}50%{transform:scaleY(1.1)}}
 
+/* ALERTS */
 .ec-spk-error{
   position:relative;z-index:1;font-size:13px;color:var(--lang-ink);
   background:var(--lang-pink-2);padding:12px 16px;border-radius:14px;
-  display:inline-block;margin:14px 0 0;font-weight:900;
+  display:block;margin:14px auto 0;font-weight:900;
   border:2px solid var(--lang-line);box-shadow:0 3px 0 var(--lang-line);
   max-width:520px;text-align:left;
 }
 .ec-spk-info{
   position:relative;z-index:1;font-size:13px;color:var(--lang-ink);
   background:var(--lang-yellow);padding:12px 16px;border-radius:14px;
-  display:inline-block;margin:14px 0 0;font-weight:900;
+  display:block;margin:14px 0 0;font-weight:900;
   border:2px solid var(--lang-line);box-shadow:0 3px 0 var(--lang-line);
   max-width:520px;text-align:left;
 }
 
+/* TRANSCRIPT */
 .ec-spk-transcript{
   position:relative;z-index:1;background:var(--lang-lime-soft);
   border:2px solid var(--lang-line);border-radius:18px;padding:18px 20px;
@@ -197,6 +210,7 @@ const SPEAK_CSS = `
 .ec-spk-transcript-meta{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:2px dashed rgba(23,16,46,.15);font-size:11.5px;font-weight:900;color:var(--lang-ink-soft);letter-spacing:.02em}
 .ec-spk-transcript-meta span{display:inline-flex;align-items:center;gap:4px}
 
+/* SCORES */
 .ec-spk-scores{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:24px;position:relative;z-index:1}
 .ec-spk-score{
   position:relative;background:#fff;border:2px solid var(--lang-line);border-radius:20px;
@@ -231,26 +245,87 @@ const SPEAK_CSS = `
 .ec-spk-band-value{font-size:28px;font-weight:900;color:var(--lang-ink);line-height:1;letter-spacing:-.03em}
 .ec-spk-band-value small{font-size:14px;font-weight:800;color:var(--lang-ink);opacity:.7;letter-spacing:0;margin-left:2px}
 
-.ec-spk-faults{margin-top:24px;position:relative;z-index:1;text-align:left}
+/* FAULT REPORT */
+.ec-spk-faults{margin-top:26px;position:relative;z-index:1;text-align:left}
 .ec-spk-faults-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap}
-.ec-spk-faults-title{margin:0;font-size:17px;font-weight:900;color:var(--lang-ink);letter-spacing:-.02em}
-.ec-spk-faults-pill{font-size:11px;font-weight:900;padding:6px 14px;border-radius:999px;letter-spacing:.06em;text-transform:uppercase;border:2px solid var(--lang-line);box-shadow:0 2px 0 var(--lang-line)}
+.ec-spk-faults-title{margin:0;font-size:18px;font-weight:900;color:var(--lang-ink);letter-spacing:-.02em;display:flex;align-items:center;gap:8px}
+.ec-spk-faults-title::before{content:'';display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--lang-purple-2);box-shadow:0 2px 0 var(--lang-line);border:2px solid var(--lang-line)}
+.ec-spk-faults-pill{font-size:11px;font-weight:900;padding:7px 15px;border-radius:999px;letter-spacing:.06em;text-transform:uppercase;border:2px solid var(--lang-line);box-shadow:0 3px 0 var(--lang-line);display:inline-flex;align-items:center;gap:6px}
 .ec-spk-faults-pill--ok{background:var(--lang-lime);color:var(--lang-ink)}
 .ec-spk-faults-pill--warn{background:var(--lang-yellow);color:var(--lang-ink)}
 .ec-spk-faults-pill--bad{background:var(--lang-pink-2);color:#fff}
-.ec-spk-fault{display:flex;gap:14px;align-items:flex-start;padding:14px 16px;border-radius:16px;margin-bottom:12px;background:#fff;border:2px solid var(--lang-line);box-shadow:0 3px 0 var(--lang-line);transition:transform .18s ease,box-shadow .18s ease}
-.ec-spk-fault:hover{transform:translateY(-2px);box-shadow:0 5px 0 var(--lang-line)}
-.ec-spk-fault-icon{width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;border:2px solid var(--lang-line);font-weight:900}
-.ec-spk-fault--ok .ec-spk-fault-icon{background:var(--lang-lime);color:var(--lang-ink)}
-.ec-spk-fault--warn .ec-spk-fault-icon{background:var(--lang-yellow);color:var(--lang-ink)}
-.ec-spk-fault--bad .ec-spk-fault-icon{background:var(--lang-pink-2);color:#fff}
-.ec-spk-fault--ok{background:linear-gradient(180deg,#fff 0%,rgba(212,245,92,.08) 100%)}
-.ec-spk-fault--warn{background:linear-gradient(180deg,#fff 0%,rgba(245,224,77,.10) 100%)}
-.ec-spk-fault--bad{background:linear-gradient(180deg,#fff 0%,rgba(255,143,203,.10) 100%)}
-.ec-spk-fault-body{flex:1;min-width:0}
-.ec-spk-fault-body p{margin:0 0 4px;font-size:13.5px;font-weight:900;color:var(--lang-ink)}
-.ec-spk-fault-body span{font-size:12.5px;color:var(--lang-ink-soft);line-height:1.55;font-weight:700;display:block}
-.ec-spk-fault-body em{font-style:normal;background:var(--lang-yellow);color:var(--lang-ink);padding:2px 8px;border-radius:6px;font-weight:900;font-size:12px;border:1.5px solid var(--lang-line)}
+
+.ec-spk-fault-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.ec-spk-fault-card{
+  position:relative;background:#fff;border:2px solid var(--lang-line);
+  border-radius:20px;padding:16px 16px 14px;
+  box-shadow:0 4px 0 var(--lang-line);
+  display:flex;flex-direction:column;gap:10px;
+  overflow:hidden;transition:transform .18s ease,box-shadow .18s ease;
+  animation:ec-spk-pop .4s cubic-bezier(.34,1.56,.64,1) both;
+}
+.ec-spk-fault-card:nth-child(1){animation-delay:.04s}
+.ec-spk-fault-card:nth-child(2){animation-delay:.10s}
+.ec-spk-fault-card:nth-child(3){animation-delay:.16s}
+.ec-spk-fault-card:nth-child(4){animation-delay:.22s}
+.ec-spk-fault-card:nth-child(5){animation-delay:.28s}
+.ec-spk-fault-card:hover{transform:translateY(-3px);box-shadow:0 7px 0 var(--lang-line)}
+.ec-spk-fault-card::before{content:'';position:absolute;top:0;left:0;right:0;height:6px;background:var(--sev-color,var(--lang-purple));border-bottom:2px solid var(--lang-line)}
+.ec-spk-fault-card--ok{--sev-color:#B8E62E}
+.ec-spk-fault-card--warn{--sev-color:#F5E04D}
+.ec-spk-fault-card--bad{--sev-color:#FF8FCB}
+
+.ec-spk-fault-card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:4px}
+.ec-spk-fault-emoji{
+  width:42px;height:42px;border-radius:13px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;
+  background:var(--sev-color,var(--lang-purple));
+  border:2px solid var(--lang-line);
+  box-shadow:0 3px 0 var(--lang-line);
+}
+.ec-spk-fault-card--bad .ec-spk-fault-emoji{background:var(--lang-pink-2);color:#fff}
+.ec-spk-fault-card--warn .ec-spk-fault-emoji{background:var(--lang-yellow);color:var(--lang-ink)}
+.ec-spk-fault-card--ok .ec-spk-fault-emoji{background:var(--lang-lime);color:var(--lang-ink)}
+
+.ec-spk-fault-sev{
+  font-size:9.5px;font-weight:900;
+  padding:4px 10px;border-radius:999px;
+  border:2px solid var(--lang-line);
+  box-shadow:0 2px 0 var(--lang-line);
+  letter-spacing:.08em;text-transform:uppercase;
+  white-space:nowrap;
+}
+.ec-spk-fault-sev--ok{background:var(--lang-lime);color:var(--lang-ink)}
+.ec-spk-fault-sev--warn{background:var(--lang-yellow);color:var(--lang-ink)}
+.ec-spk-fault-sev--bad{background:var(--lang-pink-2);color:#fff}
+
+.ec-spk-fault-label{margin:0;font-size:12.5px;font-weight:900;color:var(--lang-ink);letter-spacing:.02em;text-transform:uppercase;opacity:.7}
+.ec-spk-fault-value{
+  margin:0;font-size:26px;font-weight:900;color:var(--lang-ink);
+  line-height:1;letter-spacing:-.035em;font-variant-numeric:tabular-nums;
+  display:flex;align-items:baseline;gap:6px;
+}
+.ec-spk-fault-value small{font-size:12px;font-weight:800;color:var(--lang-ink-soft);letter-spacing:.02em;text-transform:uppercase}
+.ec-spk-fault-bar{height:8px;border-radius:999px;background:#E8E5F2;overflow:hidden;border:1.5px solid var(--lang-line)}
+.ec-spk-fault-bar-fill{height:100%;border-radius:999px;background:var(--sev-color);transition:width .8s cubic-bezier(.22,1,.36,1)}
+.ec-spk-fault-detail{margin:0;font-size:12px;line-height:1.55;color:var(--lang-ink-soft);font-weight:700}
+.ec-spk-fault-tip{
+  display:flex;gap:7px;align-items:flex-start;
+  margin:0;padding:9px 11px;border-radius:11px;
+  background:var(--lang-lime-soft);border:1.5px solid var(--lang-line);
+  font-size:11.5px;font-weight:800;color:var(--lang-ink);
+  line-height:1.45;
+}
+.ec-spk-fault-tip-icon{flex-shrink:0;font-size:13px}
+.ec-spk-fault-words{display:flex;flex-wrap:wrap;gap:5px;margin:2px 0 0}
+.ec-spk-fault-word{
+  font-size:10.5px;font-weight:900;
+  padding:3px 9px;border-radius:999px;
+  background:var(--lang-pink-2);color:#fff;
+  border:2px solid var(--lang-line);
+  box-shadow:0 1.5px 0 var(--lang-line);
+}
 
 .ec-spk-feedback{
   margin:20px 0 0;padding:18px 20px 18px 22px;background:#fff;
@@ -259,33 +334,40 @@ const SPEAK_CSS = `
   font-weight:700;box-shadow:0 4px 0 var(--lang-line);
 }
 
-.ec-spk-actions{display:flex;justify-content:center;gap:12px;margin-top:26px;flex-wrap:wrap;position:relative;z-index:1}
+/* ACTIONS */
+.ec-spk-actions{display:flex;justify-content:center;gap:12px;margin-top:24px;flex-wrap:wrap;position:relative;z-index:1}
 .ec-spk-btn-ghost{
   border:2px solid var(--lang-line);background:#fff;color:var(--lang-ink);
-  padding:13px 24px;border-radius:999px;font-size:13.5px;font-weight:900;
+  padding:14px 24px;border-radius:999px;font-size:13.5px;font-weight:900;
   cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:8px;
   transition:all .16s ease;box-shadow:0 4px 0 var(--lang-line);letter-spacing:.02em;
+  min-height:48px;-webkit-tap-highlight-color:transparent;
 }
 .ec-spk-btn-ghost:hover{background:var(--lang-lime-soft);transform:translateY(-2px);box-shadow:0 6px 0 var(--lang-line)}
 .ec-spk-btn-ghost:active{transform:translateY(2px);box-shadow:0 1px 0 var(--lang-line)}
 .ec-spk-btn-dark{
   border:2px solid var(--lang-line);background:var(--lang-ink);color:var(--lang-lime);
-  padding:13px 26px;border-radius:999px;font-size:13.5px;font-weight:900;
+  padding:14px 26px;border-radius:999px;font-size:13.5px;font-weight:900;
   cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:8px;
   transition:all .16s ease;box-shadow:0 4px 0 var(--lang-line);letter-spacing:.02em;
+  min-height:48px;-webkit-tap-highlight-color:transparent;
 }
 .ec-spk-btn-dark:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--lang-line)}
 .ec-spk-btn-dark:active{transform:translateY(2px);box-shadow:0 1px 0 var(--lang-line)}
 
+/* CONVERSATION */
 .ec-spk-convo{
   background:#fff;border:3px solid var(--lang-line);border-radius:32px;padding:26px;
   box-shadow:0 10px 0 var(--lang-line);display:flex;flex-direction:column;
-  height:calc(100vh - 300px);min-height:540px;max-height:760px;
+  min-height:520px;max-height:min(760px, calc(100dvh - 220px));
   background-image:radial-gradient(circle at 100% 0%,rgba(255,143,203,.12),transparent 55%);
+}
+@supports not (height: 100dvh) {
+  .ec-spk-convo{max-height:calc(100vh - 220px)}
 }
 .ec-spk-convo-head{margin:0 0 8px;font-size:18px;font-weight:900;color:var(--lang-ink);flex-shrink:0;letter-spacing:-.02em}
 .ec-spk-convo-sub{margin:0 0 20px;font-size:13px;color:var(--lang-ink-soft);line-height:1.55;flex-shrink:0;font-weight:700}
-.ec-spk-convo-log{flex:1;display:flex;flex-direction:column;gap:12px;overflow-y:auto;padding-right:6px;margin-bottom:16px;min-height:0}
+.ec-spk-convo-log{flex:1;display:flex;flex-direction:column;gap:12px;overflow-y:auto;padding-right:6px;margin-bottom:16px;min-height:0;-webkit-overflow-scrolling:touch}
 .ec-spk-convo-log::-webkit-scrollbar{width:6px}
 .ec-spk-convo-log::-webkit-scrollbar-thumb{background:var(--lang-purple-2);border-radius:999px}
 .ec-spk-convo-msg{
@@ -304,6 +386,7 @@ const SPEAK_CSS = `
 @keyframes ec-spk-dot{0%,80%,100%{opacity:.3;transform:scale(.8)}40%{opacity:1;transform:scale(1.1)}}
 .ec-spk-convo-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;flex-shrink:0}
 
+/* HISTORY */
 .ec-spk-history{display:flex;flex-direction:column;gap:14px}
 .ec-spk-history-item{
   display:flex;justify-content:space-between;align-items:center;gap:12px;background:#fff;
@@ -320,6 +403,7 @@ const SPEAK_CSS = `
 .ec-spk-empty-icon{width:64px;height:64px;border-radius:50%;background:var(--lang-lime);color:var(--lang-ink);display:flex;align-items:center;justify-content:center;font-size:24px;border:2px solid var(--lang-line);box-shadow:0 3px 0 var(--lang-line)}
 .ec-spk-empty-icon svg{width:28px;height:28px}
 
+/* SIDEBAR */
 .ec-spk-side{background:#fff;border:2px solid var(--lang-line);border-radius:24px;padding:22px;box-shadow:0 6px 0 var(--lang-line);margin-bottom:16px}
 .ec-spk-side:last-child{margin-bottom:0}
 .ec-spk-side h3{margin:0 0 16px;font-size:15px;font-weight:900;color:var(--lang-ink);display:flex;justify-content:space-between;align-items:center;gap:8px;letter-spacing:-.01em}
@@ -334,75 +418,1307 @@ const SPEAK_CSS = `
 .ec-spk-criteria-item:hover{transform:translateX(3px)}
 .ec-spk-criteria-item span:last-child{font-size:10.5px;color:var(--lang-ink);background:var(--lang-lime);padding:3px 10px;border-radius:999px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;border:2px solid var(--lang-line)}
 
-.ec-spk-toast{position:fixed;top:78px;right:20px;z-index:50;background:var(--lang-ink);color:var(--lang-lime);padding:12px 22px;border-radius:999px;font-weight:900;font-size:13px;border:2px solid var(--lang-lime);box-shadow:0 12px 28px rgba(23,16,46,.4);animation:ec-spk-toast-pop 1s ease both;letter-spacing:.03em}
+/* TOAST */
+.ec-spk-toast{position:fixed;top:78px;right:20px;z-index:9999;background:var(--lang-ink);color:var(--lang-lime);padding:12px 22px;border-radius:999px;font-weight:900;font-size:13px;border:2px solid var(--lang-lime);box-shadow:0 12px 28px rgba(23,16,46,.4);animation:ec-spk-toast-pop 1.2s ease both;letter-spacing:.03em}
 @keyframes ec-spk-toast-pop{0%{transform:translateY(-10px) scale(.9);opacity:0}20%{transform:translateY(0) scale(1);opacity:1}80%{transform:translateY(0) scale(1);opacity:1}100%{transform:translateY(-8px) scale(.98);opacity:0}}
 
 @keyframes ec-spk-fade-in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 .ec-spk-anim{animation:ec-spk-fade-in .45s ease both}
 
+/* LIVE TRANSCRIPT (mobile-friendly) */
+.ec-spk-transcript{scroll-margin-bottom:16px}
+.ec-spk-transcript-text{max-height:190px;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-right:4px}
+.ec-spk-hint{position:relative;z-index:1;margin:12px 0 0;padding:10px 14px;border-radius:14px;background:var(--lang-yellow);border:2px solid var(--lang-line);font-size:12.5px;font-weight:800;line-height:1.5;color:var(--lang-ink);text-align:left}
+.ec-spk-convo-msg--live{opacity:.92;border-style:dashed}
+.ec-spk-convo-msg--live em{font-style:normal;opacity:.7}
+
+/* RESPONSIVE */
 @media (max-width:900px){
   .ec-spk-grid{grid-template-columns:1fr;gap:18px}
-  .ec-spk-hero{flex-direction:column;align-items:flex-start;min-height:0}
-  .ec-spk-hero-mascot{position:absolute;right:14px;bottom:14px;transform:scale(.72);transform-origin:bottom right;animation:none}
+  .ec-spk-hero{flex-direction:column;align-items:flex-start;min-height:0;padding:24px 22px}
+  .ec-spk-hero-orb{animation:none;width:200px;height:200px;top:-60px;right:20px}
+  .ec-spk-hero-mascot{display:none;animation:none}
 }
+
 @media (max-width:720px){
-  .ec-spk-hero{padding:22px 20px;border-radius:26px}
-  .ec-spk-hero h1{font-size:23px}
-  .ec-spk-hero p{font-size:13px}
-  .ec-spk-hero-stats{gap:8px;margin-top:14px}
-  .ec-spk-hero-stat{padding:8px 12px;min-width:74px;border-radius:12px}
-  .ec-spk-hero-stat strong{font-size:17px}
-  .ec-spk-hero-stat span{font-size:9px}
-  .ec-spk-hero-mascot{display:none}
+  .ec-spk-head{margin-bottom:12px}
+  .ec-spk-hero{padding:20px 18px;border-radius:24px;margin-bottom:16px}
+  .ec-spk-hero h1{font-size:22px}
+  .ec-spk-hero p{font-size:13px;margin-bottom:14px}
+  .ec-spk-hero-badge{font-size:10px;padding:5px 11px;margin-bottom:12px}
+  .ec-spk-hero-stats{gap:8px;margin-top:12px}
+  .ec-spk-hero-stat{padding:7px 11px;min-width:66px;border-radius:11px}
+  .ec-spk-hero-stat strong{font-size:16px}
+  .ec-spk-hero-stat span{font-size:8.5px}
+
+  .ec-spk-tab{padding:11px 16px;font-size:12.5px;min-height:44px}
+  .ec-spk-cat{padding:9px 14px;font-size:12px;min-height:40px}
+
   .ec-spk-panel{padding:22px 18px;border-radius:26px;box-shadow:0 7px 0 var(--lang-line)}
-  .ec-spk-record-wrap{width:114px;height:114px}
-  .ec-spk-record-btn{width:82px;height:82px;font-size:28px}
-  .ec-spk-scores{grid-template-columns:1fr 1fr;gap:12px}
+  .ec-spk-prompt-counter{font-size:11px}
+  .ec-spk-prompt-text{font-size:17px;margin:10px 0 6px}
+  .ec-spk-prompt-hint{font-size:12px;margin-bottom:16px}
+
+  .ec-spk-record-wrap{width:150px;height:150px}
+  .ec-spk-record-btn{width:110px;height:110px;font-size:38px}
+  .ec-spk-record-status{font-size:15px;margin-top:16px}
+  .ec-spk-record-time{font-size:24px}
+
+  .ec-spk-scores{grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
   .ec-spk-score-ring{width:56px;height:56px}
   .ec-spk-score-num{font-size:22px}
   .ec-spk-score-label{font-size:9.5px}
   .ec-spk-band-value{font-size:24px}
-  .ec-spk-convo{padding:20px;border-radius:26px;height:auto;min-height:540px;max-height:none;box-shadow:0 7px 0 var(--lang-line)}
-  .ec-spk-convo-log{max-height:340px}
-  .ec-spk-convo-msg{max-width:92%}
+
+  .ec-spk-fault-grid{grid-template-columns:1fr;gap:12px}
+  .ec-spk-fault-card{padding:14px}
+  .ec-spk-fault-value{font-size:22px}
+  .ec-spk-fault-emoji{width:38px;height:38px;font-size:18px}
+  .ec-spk-faults-title{font-size:16px}
+  .ec-spk-faults-pill{font-size:10px;padding:6px 12px}
+
+  .ec-spk-convo{padding:20px;border-radius:26px;box-shadow:0 7px 0 var(--lang-line);min-height:440px;max-height:calc(100dvh - 200px)}
+  @supports not (height: 100dvh) {
+    .ec-spk-convo{max-height:calc(100vh - 200px)}
+  }
+  .ec-spk-convo-log{max-height:none}
+  .ec-spk-convo-msg{max-width:90%;font-size:13.5px;padding:12px 15px}
+
   .ec-spk-history-item{padding:14px 16px}
   .ec-spk-side{padding:18px;border-radius:20px;box-shadow:0 5px 0 var(--lang-line)}
-  .ec-spk-fault{padding:12px 14px}
-  .ec-spk-faults-title{font-size:16px}
+
+  .ec-spk-transcript{padding:16px 16px}
+  .ec-spk-transcript-text{font-size:14px}
+
+  .ec-spk-btn-ghost,.ec-spk-btn-dark{min-height:50px;font-size:14px;padding:14px 22px}
+  .ec-spk-actions{flex-direction:column-reverse;align-items:stretch}
+  .ec-spk-actions > button{width:100%;justify-content:center}
 }
+
+@media (max-width:420px){
+  .ec-spk-hero h1{font-size:20px}
+  .ec-spk-hero-stats{gap:6px}
+  .ec-spk-hero-stat{padding:6px 10px;min-width:60px}
+  .ec-spk-hero-stat strong{font-size:15px}
+  .ec-spk-hero-stat span{font-size:8px}
+}
+
 @media (max-width:380px){
   .ec-spk-scores{grid-template-columns:1fr 1fr;gap:10px}
   .ec-spk-score{padding:12px 8px}
   .ec-spk-score-num{font-size:20px}
+  .ec-spk-score-ring{width:50px;height:50px}
   .ec-spk-tab{padding:10px 14px;font-size:12px}
-  .ec-spk-cat{padding:8px 13px;font-size:11.5px}
+  .ec-spk-cat{padding:8px 12px;font-size:11.5px}
 }
+
 @media (prefers-reduced-motion: reduce){
-  .ec-spk-anim,.ec-spk-score,.ec-spk-convo-msg,.ec-spk-history-item,.ec-spk-toast,.ec-spk-record-warning{animation:none!important}
-  .ec-spk-hero-orb,.ec-spk-hero-mascot,.ec-spk-record-ring,.ec-spk-wave-bar,.ec-spk-convo-thinking span{animation:none!important}
-  .ec-spk-record-btn,.ec-spk-tab,.ec-spk-cat,.ec-spk-btn-ghost,.ec-spk-btn-dark,.ec-spk-fault,.ec-spk-history-item,.ec-spk-criteria-item{transition:none!important}
-  .ec-spk-score-ring-fill{transition:none!important}
+  .ec-spk-anim,.ec-spk-score,.ec-spk-convo-msg,.ec-spk-history-item,.ec-spk-toast,.ec-spk-record-warning,.ec-spk-fault-card{animation:none!important}
+  .ec-spk-hero-orb,.ec-spk-hero-mascot,.ec-spk-record-ring,.ec-spk-wave-synth .ec-spk-wave-bar,.ec-spk-convo-thinking span{animation:none!important}
+  .ec-spk-record-btn,.ec-spk-tab,.ec-spk-cat,.ec-spk-btn-ghost,.ec-spk-btn-dark,.ec-spk-fault-card,.ec-spk-history-item,.ec-spk-criteria-item,.ec-spk-wave-bar{transition:none!important}
+  .ec-spk-score-ring-fill,.ec-spk-fault-bar-fill{transition:none!important}
 }
 `;
 
 /* ============================================================
-   SCORING CONFIG
-   These thresholds decide when we refuse to score and how the
-   score evolves. Tuned for IELTS-style speaking (Parts 1-3).
+   SECTION 2 — SCORING CONSTANTS
    ============================================================ */
 const SCORING = {
-  silencePeak: 0.035,       // RMS peak below this = silence
-  minDurationSec: 2,        // refuse to score under 2s
-  minWords: 5,              // refuse to score transcripts under 5 words
-  longAnswerWords: 60,      // IELTS Part 2 target length
-  idealWpm: [110, 160],     // ideal pace
-  acceptWpm: [90, 180],     // acceptable pace
-  // Base score for a just-barely-valid answer. 4 ≈ IELTS "Limited user".
+  silencePeak: 0.035,
+  minDurationSec: 2,
+  minWords: 5,
+  longAnswerWords: 60,
+  idealWpm: [110, 160],
+  acceptWpm: [90, 180],
   base: 4,
 };
 
+const FILLER_WORDS = [
+  'um', 'uh', 'er', 'ah', 'like', 'you know', 'basically', 'actually',
+  'literally', 'so', 'well', 'anyway', 'kind of', 'sort of',
+];
+
+// Cohesive devices — genuine (if crude) evidence of organised, linked speech.
+// Rewards exactly the behaviour the "Recording tips" sidebar asks users for.
+const LINKING_WORDS = [
+  'first', 'firstly', 'second', 'secondly', 'finally', 'in conclusion',
+  'however', 'therefore', 'because', 'so that', 'as a result', 'moreover',
+  'furthermore', 'in addition', 'also', 'for example', 'for instance',
+  'on the other hand', 'in contrast', 'although', 'even though', 'while',
+  'since', 'unless', 'in my opinion', 'to sum up', 'overall', 'meanwhile',
+  'then', 'after that', 'next', 'in fact',
+];
+
+// A few subordinating/complex-structure markers — a crude but real proxy for
+// grammatical range (IELTS rewards complex sentences, not just length).
+const COMPLEX_MARKERS = [
+  'because', 'although', 'though', 'while', 'if', 'when', 'since', 'unless',
+  'whereas', 'which', 'who', 'that', 'in order to', 'so that',
+];
+
+const CRITERIA = [
+  { id: 'c1', label: 'Fluency & coherence', weight: '25%' },
+  { id: 'c2', label: 'Lexical resource', weight: '25%' },
+  { id: 'c3', label: 'Grammatical range', weight: '25%' },
+  { id: 'c4', label: 'Pronunciation', weight: '25%' },
+];
+
 /* ============================================================
-   PROMPT BANK (unchanged from before — 1,004 prompts)
+   SECTION 3 — UTILITIES
+   ============================================================ */
+function detectEnvironment() {
+  if (typeof window === 'undefined') {
+    return {
+      https: true,
+      speechRecognition: false,
+      isIOS: false,
+      isAndroid: false,
+      isMobile: false,
+      isSafari: false,
+      isInApp: false,
+      realMicMeter: false,
+    };
+  }
+  const https =
+    location.protocol === 'https:' ||
+    location.hostname === 'localhost' ||
+    location.hostname === '127.0.0.1';
+  const speechRecognition = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+  const ua = navigator.userAgent || '';
+  const isIPadOS = navigator.platform === 'MacIntel' && (navigator.maxTouchPoints || 0) > 1;
+  const isIOS = (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) || isIPadOS;
+  const isAndroid = /Android/i.test(ua);
+  const isMobile =
+    isIOS || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+  const isSafari =
+    /Safari/i.test(ua) && !/Chrome|Chromium|CriOS|FxiOS|EdgiOS|Edg|OPR|Android/i.test(ua);
+  // Facebook / Messenger / Instagram / Telegram / WebView browsers — no speech API.
+  const isInApp =
+    /FBAN|FBAV|FB_IAB|FBIOS|Instagram|Messenger|Line\/|Snapchat|MicroMessenger|Telegram|TikTok|musical_ly|; wv\)/i.test(ua);
+  // Only desktop Chromium-style browsers can safely open a 2nd mic stream for the level meter.
+  const realMicMeter = !isMobile && !isSafari && !isInApp;
+  return {
+    https,
+    speechRecognition,
+    isIOS,
+    isAndroid,
+    isMobile,
+    isSafari,
+    isInApp,
+    realMicMeter,
+  };
+}
+
+function formatTime(totalSeconds) {
+  const m = Math.floor(totalSeconds / 60);
+  const s = totalSeconds % 60;
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+function countWords(text) {
+  return text ? text.trim().split(/\s+/).filter(Boolean).length : 0;
+}
+
+/* ============================================================
+   SECTION 4 — SCORING ENGINE
+   ============================================================ */
+function detectFaults(transcript, durationSec, avgConfidence = null) {
+  const text = (transcript || '').toLowerCase().trim();
+  const words = text.split(/\s+/).filter(Boolean);
+  const result = {
+    fillers: { count: 0, words: {}, severity: 'ok' },
+    repetition: { count: 0, examples: [], severity: 'ok' },
+    pace: { wpm: 0, severity: 'ok' },
+    length: { words: words.length, severity: 'ok' },
+    vocabulary: { unique: 0, ratio: 0, ttr: 0, severity: 'ok' },
+    coherence: { count: 0, found: [], severity: 'ok' },
+    complexity: { count: 0, severity: 'ok' },
+    confidence: avgConfidence, // real ASR confidence (0..1) when the browser reports it
+  };
+
+  const fillerMap = {};
+  for (const f of FILLER_WORDS) {
+    const regex = new RegExp(`\\b${f.replace(/\s+/g, '\\s+')}\\b`, 'g');
+    const matches = text.match(regex);
+    if (matches) {
+      fillerMap[f] = matches.length;
+      result.fillers.count += matches.length;
+    }
+  }
+  result.fillers.words = fillerMap;
+  const fillerRatio = words.length ? result.fillers.count / words.length : 0;
+  result.fillers.severity = fillerRatio > 0.12 ? 'bad' : fillerRatio > 0.06 ? 'warn' : 'ok';
+
+  // Repetition: catch immediate stutters (word repeated 2+ times in a row —
+  // catching the 2nd repeat, not just the 3rd, so it isn't missed on short
+  // answers) AND redundant repeated two-word phrases spaced apart in the
+  // answer, which the old 3-in-a-row check never saw.
+  for (let i = 0; i < words.length - 1; i++) {
+    if (words[i].length > 2 && words[i] === words[i + 1]) {
+      result.repetition.count += 1;
+      result.repetition.examples.push(words[i]);
+    }
+  }
+  const bigramSeen = new Map();
+  for (let i = 0; i < words.length - 1; i++) {
+    const a = words[i], b = words[i + 1];
+    if (a.length <= 2 || b.length <= 2) continue; // skip "a of", "to the", etc.
+    const bigram = `${a} ${b}`;
+    const seenAt = bigramSeen.get(bigram);
+    if (seenAt !== undefined && i - seenAt > 2) {
+      result.repetition.count += 1;
+      result.repetition.examples.push(bigram);
+    }
+    bigramSeen.set(bigram, i);
+  }
+  result.repetition.severity = result.repetition.count >= 3
+    ? 'bad'
+    : result.repetition.count >= 1
+      ? 'warn'
+      : 'ok';
+
+  result.pace.wpm = durationSec > 0 && words.length > 0
+    ? Math.round((words.length / durationSec) * 60)
+    : 0;
+  if (words.length === 0) result.pace.severity = 'bad';
+  else if (result.pace.wpm < 80 || result.pace.wpm > 200) result.pace.severity = 'bad';
+  else if (result.pace.wpm < 100 || result.pace.wpm > 170) result.pace.severity = 'warn';
+
+  if (words.length < 20) result.length.severity = 'bad';
+  else if (words.length < 45) result.length.severity = 'warn';
+
+  // Corrected type-token ratio (unique / sqrt(2*N)) instead of raw
+  // unique/N. Raw TTR mathematically falls as an answer gets longer even
+  // when vocabulary stays equally varied, so it was quietly punishing
+  // people for speaking more — exactly backwards for a speaking test.
+  const unique = new Set(words).size;
+  result.vocabulary.unique = unique;
+  result.vocabulary.ratio = words.length ? unique / words.length : 0;
+  result.vocabulary.ttr = words.length ? unique / Math.sqrt(2 * words.length) : 0;
+  if (words.length < 5) result.vocabulary.severity = 'bad';
+  else if (result.vocabulary.ttr < 3.2) result.vocabulary.severity = 'bad';
+  else if (result.vocabulary.ttr < 4.2) result.vocabulary.severity = 'warn';
+
+  // Coherence: cohesive devices signal organised, linked speech.
+  const foundLinks = [];
+  let coherenceCount = 0;
+  for (const l of LINKING_WORDS) {
+    const regex = new RegExp(`\\b${l.replace(/\s+/g, '\\s+')}\\b`, 'g');
+    const matches = text.match(regex);
+    if (matches) {
+      coherenceCount += matches.length;
+      foundLinks.push(l);
+    }
+  }
+  result.coherence.count = coherenceCount;
+  result.coherence.found = foundLinks;
+  if (words.length >= 30 && coherenceCount === 0) result.coherence.severity = 'warn';
+
+  // Complexity: subordinating/relative structures — a crude but real signal
+  // that the speaker is attempting more than simple sentences.
+  let complexityCount = 0;
+  for (const m of COMPLEX_MARKERS) {
+    const regex = new RegExp(`\\b${m.replace(/\s+/g, '\\s+')}\\b`, 'g');
+    const matches = text.match(regex);
+    if (matches) complexityCount += matches.length;
+  }
+  result.complexity.count = complexityCount;
+  if (words.length >= 30 && complexityCount === 0) result.complexity.severity = 'warn';
+
+  return result;
+}
+
+function scoreFromAnalysis(faults) {
+  const words = faults.length.words;
+  if (words < SCORING.minWords) return null;
+
+  const wpm = faults.pace.wpm;
+  const fillerRatio = faults.fillers.count / Math.max(1, words);
+  const vocabTtr = faults.vocabulary.ttr;      // length-corrected, fair at any length
+  const [idealLo, idealHi] = SCORING.idealWpm;
+  const [acceptLo, acceptHi] = SCORING.acceptWpm;
+  const rep = faults.repetition.count;
+  const coherence = faults.coherence.count;
+  const complexity = faults.complexity.count;
+  const confidence = faults.confidence; // 0..1 real ASR signal, or null
+
+  let fluency = SCORING.base;
+  if (wpm >= idealLo && wpm <= idealHi) fluency += 2.0;
+  else if (wpm >= acceptLo && wpm <= acceptHi) fluency += 1.2;
+  else if (wpm > 0) fluency -= 0.5;
+  if (words >= 30) fluency += 0.5;
+  if (words >= 60) fluency += 0.5;
+  if (words >= 90) fluency += 0.5;
+  if (words >= 120) fluency += 0.5;
+  if (fillerRatio > 0.04) fluency -= 0.5;
+  if (fillerRatio > 0.08) fluency -= 1.0;
+  if (fillerRatio > 0.15) fluency -= 1.5;
+  if (rep >= 1) fluency -= 0.3;
+  if (rep >= 3) fluency -= 0.5;
+  // Cohesion is literally half of "Fluency & coherence" — reward it directly.
+  if (coherence >= 1) fluency += 0.5;
+  if (coherence >= 3) fluency += 0.5;
+
+  let vocabulary = SCORING.base;
+  if (vocabTtr > 3.6) vocabulary += 1.0;
+  if (vocabTtr > 4.4) vocabulary += 1.0;
+  if (vocabTtr > 5.2) vocabulary += 1.0;
+  if (words >= 60) vocabulary += 0.5;
+  if (words >= 100) vocabulary += 0.5;
+  if (vocabTtr < 3.0 && words >= 20) vocabulary -= 1.0;
+
+  let grammar = SCORING.base;
+  if (words >= 15) grammar += 0.5;
+  if (words >= 40) grammar += 0.5;
+  if (words >= 70) grammar += 0.5;
+  if (words >= 100) grammar += 0.5;
+  // Complex/subordinate structures are real evidence of grammatical range,
+  // where the old version only ever looked at raw word count.
+  if (complexity >= 1) grammar += 0.5;
+  if (complexity >= 3) grammar += 0.5;
+  if (rep >= 1) grammar -= 0.5;
+  if (rep >= 3) grammar -= 1.0;
+
+  let pronunciation = SCORING.base;
+  if (confidence !== null) {
+    // Real signal available (Chrome/Edge/Android report it): weight it
+    // heavily — it's the closest thing to actual pronunciation/clarity
+    // evidence this client-side engine can get, since the ASR itself
+    // struggled to recognise unclear speech.
+    pronunciation += (confidence - 0.5) * 6; // confidence 0.5 → +0, 1.0 → +3
+    if (fillerRatio < 0.04) pronunciation += 0.5;
+    if (fillerRatio > 0.12) pronunciation -= 0.5;
+  } else {
+    // No confidence reported (e.g. iOS Safari) — fall back to the pace/filler
+    // proxy used before, clearly weaker evidence than real ASR confidence.
+    if (wpm >= idealLo && wpm <= idealHi) pronunciation += 2.0;
+    else if (wpm >= acceptLo && wpm <= acceptHi) pronunciation += 1.0;
+    if (fillerRatio < 0.04) pronunciation += 1.0;
+    if (fillerRatio > 0.12) pronunciation -= 1.0;
+  }
+
+  const clamp = (n) => Math.max(3, Math.min(9, Math.round(n * 10) / 10));
+
+  return {
+    fluency: clamp(fluency),
+    vocabulary: clamp(vocabulary),
+    grammar: clamp(grammar),
+    pronunciation: clamp(pronunciation),
+  };
+}
+
+function scoreExplanation(faults) {
+  const words = faults.length.words;
+  const wpm = faults.pace.wpm;
+  const [idealLo, idealHi] = SCORING.idealWpm;
+
+  const lines = [];
+  lines.push(`You said ${words} words in about ${wpm ? Math.round((words / wpm) * 60) : 0}s.`);
+
+  if (wpm >= idealLo && wpm <= idealHi) {
+    lines.push(`Your pace (${wpm} wpm) is in the ideal ${idealLo}–${idealHi} range.`);
+  } else if (wpm > 0) {
+    lines.push(`Your pace was ${wpm} wpm — aim for ${idealLo}–${idealHi}.`);
+  }
+
+  if (faults.fillers.count > 0) {
+    const top = Object.keys(faults.fillers.words).slice(0, 3);
+    lines.push(`Reduce filler words (${faults.fillers.count} found: ${top.join(', ')}).`);
+  }
+
+  if (words < SCORING.longAnswerWords) {
+    lines.push(`Speak longer — aim for ${SCORING.longAnswerWords}+ words to lift fluency.`);
+  }
+
+  if (faults.vocabulary.ttr < 4.2 && words >= 20) {
+    lines.push('Vary your word choice — repeating the same words hurts your vocabulary score.');
+  }
+
+  if (faults.coherence.severity === 'warn') {
+    lines.push('Add linking words ("however", "for example", "as a result") to connect your ideas.');
+  }
+
+  if (faults.complexity.severity === 'warn') {
+    lines.push('Try a few complex sentences (using "because", "although", "which") for grammatical range.');
+  }
+
+  if (faults.repetition.count >= 1) {
+    lines.push('Watch for repeated words or phrases — it reads as hesitation.');
+  }
+
+  if (typeof faults.confidence === 'number' && faults.confidence < 0.6) {
+    lines.push('Speak a little closer to the mic and more clearly — the recognizer had trouble with some words.');
+  }
+
+  return lines.join(' ');
+}
+
+/* ============================================================
+   SECTION 5 — SPEECH CAPTURE HOOK (mobile-first)
+   ------------------------------------------------------------
+   Uses ONLY the Web Speech API — never MediaRecorder and never a
+   second getUserMedia stream — so the microphone isn't contended
+   on mobile browsers (Android Chrome / iOS Safari can't share it).
+
+   Reliability notes:
+   • The transcript is REBUILT from event.results on every event
+     (instead of appended) so mobile browsers can't duplicate text.
+   • Text from finished sessions is committed to `committedRef`, so
+     auto-restarts never lose words.
+   • Android Chrome's continuous mode is unreliable → we use
+     single-utterance sessions there and restart on `end`.
+   • Fatal errors (permission, no mic, dictation off) stop the
+     session and show a clear message instead of looping forever.
+   • A synthetic `levelRef` (driven by recognition events) feeds the
+     waveform where the real mic can't be metered.
+
+   Usage:
+     const capture = useSpeechCapture();
+     capture.start();            // in a user gesture
+     const { transcript, durationSec } = await capture.stop();
+   ============================================================ */
+function joinText(a, b) {
+  return `${a || ''} ${b || ''}`.replace(/\s+/g, ' ').trim();
+}
+
+function useSpeechCapture() {
+  const [supported, setSupported] = useState(false);
+  const [active, setActive] = useState(false);
+  const [transcript, setTranscript] = useState('');
+  const [interim, setInterim] = useState('');
+  const [error, setError] = useState(null);
+  const [hint, setHint] = useState(null);
+  const [seconds, setSeconds] = useState(0);
+
+  const recogRef = useRef(null);
+  const committedRef = useRef('');      // text from finished sessions
+  const sessionFinalRef = useRef('');   // final text of the current session
+  const interimRef = useRef('');        // in-flight (not yet final) text
+  const lastLenRef = useRef(0);
+  const wantActiveRef = useRef(false);
+  const runningRef = useRef(false);
+  const restartTimerRef = useRef(null);
+  const restartFailsRef = useRef(0);
+  const errorCountRef = useRef(0);
+  const endResolversRef = useRef([]);
+  const tickRef = useRef(null);
+  const decayRef = useRef(null);
+  const startedAtRef = useRef(0);
+  const audioStartedRef = useRef(false);
+  const heardRef = useRef(false);
+  const levelRef = useRef(0);           // synthetic voice-activity level (0..~0.3)
+  const wakeLockRef = useRef(null);
+  const confSumRef = useRef(0);         // sum of ASR confidence across final results
+  const confCountRef = useRef(0);       // number of final results counted
+
+  /* ---- Push refs → React state ---- */
+  const publish = useCallback(() => {
+    setTranscript(joinText(committedRef.current, sessionFinalRef.current));
+    setInterim(interimRef.current);
+  }, []);
+
+  /* ---- Move the current session's text into the committed transcript ---- */
+  const commitSession = useCallback(() => {
+    const pending = joinText(sessionFinalRef.current, interimRef.current);
+    if (pending) committedRef.current = joinText(committedRef.current, pending);
+    sessionFinalRef.current = '';
+    interimRef.current = '';
+    lastLenRef.current = 0;
+  }, []);
+
+  const stopTimers = useCallback(() => {
+    clearTimeout(restartTimerRef.current);
+    clearInterval(tickRef.current);
+    clearInterval(decayRef.current);
+    levelRef.current = 0;
+  }, []);
+
+  /* ---- Screen wake lock (best-effort): a locked phone kills recognition ---- */
+  const requestWakeLock = useCallback(async () => {
+    try {
+      if (typeof navigator !== 'undefined' && 'wakeLock' in navigator && !wakeLockRef.current) {
+        wakeLockRef.current = await navigator.wakeLock.request('screen');
+        wakeLockRef.current.addEventListener?.('release', () => {
+          wakeLockRef.current = null;
+        });
+      }
+    } catch {
+      wakeLockRef.current = null;
+    }
+  }, []);
+
+  const releaseWakeLock = useCallback(() => {
+    try {
+      wakeLockRef.current?.release?.();
+    } catch {
+      /* noop */
+    }
+    wakeLockRef.current = null;
+  }, []);
+
+  /* ---- Fatal failure: stop everything and show a clear message ---- */
+  const failHard = useCallback(
+    (message) => {
+      wantActiveRef.current = false;
+      stopTimers();
+      releaseWakeLock();
+      commitSession();
+      publish();
+      setError(message);
+      setActive(false);
+      const resolvers = endResolversRef.current;
+      endResolversRef.current = [];
+      resolvers.forEach((fn) => fn());
+      try {
+        recogRef.current?.abort();
+      } catch {
+        /* noop */
+      }
+    },
+    [stopTimers, releaseWakeLock, commitSession, publish]
+  );
+
+  /* ---- (Re)start the recognizer with retry/back-off ---- */
+  const tryStart = useCallback(() => {
+    const recog = recogRef.current;
+    if (!recog || !wantActiveRef.current || runningRef.current) return;
+    try {
+      recog.start();
+    } catch {
+      restartFailsRef.current += 1;
+      if (restartFailsRef.current > 6) {
+        failHard('Speech recognition stopped unexpectedly. Tap the mic to try again.');
+        return;
+      }
+      restartTimerRef.current = setTimeout(tryStart, 200 * restartFailsRef.current);
+    }
+  }, [failHard]);
+
+  /* ---- Initialise the recognizer once ---- */
+  useEffect(() => {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) return undefined;
+
+    const env = detectEnvironment();
+    setSupported(true);
+
+    const recog = new SR();
+    // Android Chrome's continuous mode duplicates / drops words → emulate it by restarting.
+    recog.continuous = !env.isAndroid;
+    recog.interimResults = true;
+    recog.lang = 'en-US';
+    recog.maxAlternatives = 1;
+
+    recog.onstart = () => {
+      runningRef.current = true;
+    };
+
+    recog.onaudiostart = () => {
+      audioStartedRef.current = true;
+    };
+
+    recog.onspeechstart = () => {
+      heardRef.current = true;
+      levelRef.current = 0.32;
+      setHint(null);
+    };
+
+    recog.onresult = (event) => {
+      heardRef.current = true;
+      errorCountRef.current = 0;
+      restartFailsRef.current = 0;
+      levelRef.current = 0.32;
+      setHint(null);
+
+      // Some mobile engines restart their results list without firing `end`.
+      if (event.results.length < lastLenRef.current) commitSession();
+      lastLenRef.current = event.results.length;
+
+      // Rebuild from the FULL results list — never append (prevents duplicates).
+      let finals = '';
+      let partial = '';
+      for (let i = 0; i < event.results.length; i++) {
+        const res = event.results[i];
+        const alt = res[0] || {};
+        const text = alt.transcript || '';
+        if (res.isFinal) {
+          finals += ` ${text}`;
+          // Real ASR confidence per finalised chunk — the strongest signal
+          // this engine has for pronunciation/clarity. Some engines report
+          // 0 or omit it entirely, so only count usable values.
+          if (typeof alt.confidence === 'number' && alt.confidence > 0) {
+            confSumRef.current += alt.confidence;
+            confCountRef.current += 1;
+          }
+        } else {
+          partial += ` ${text}`;
+        }
+      }
+      sessionFinalRef.current = joinText(finals, '');
+      interimRef.current = joinText(partial, '');
+      publish();
+    };
+
+    recog.onerror = (event) => {
+      const code = event.error;
+
+      // Benign — the session simply ends and onend restarts it.
+      if (code === 'aborted' || code === 'no-speech') return;
+
+      if (code === 'not-allowed') {
+        failHard(
+          'Microphone permission is blocked. Allow the microphone for this site in your browser settings, then reload the page.'
+        );
+        return;
+      }
+      if (code === 'service-not-allowed') {
+        failHard(
+          env.isIOS
+            ? 'Speech recognition is turned off on this iPhone. Go to Settings → General → Keyboard → turn on Enable Dictation, then reload this page in Safari.'
+            : 'Your browser blocked its speech service. Use Chrome, Edge or Samsung Internet (not Brave / in-app browsers) and make sure Google voice typing is enabled.'
+        );
+        return;
+      }
+      if (code === 'audio-capture') {
+        failHard(
+          'No microphone found, or another app is using it. Close other apps that use the mic (calls, voice recorders) and try again.'
+        );
+        return;
+      }
+      if (code === 'language-not-supported') {
+        failHard('English speech recognition is not available on this device.');
+        return;
+      }
+
+      // network / unknown: tolerate a couple of hiccups, then give up cleanly.
+      errorCountRef.current += 1;
+      if (errorCountRef.current >= 3) {
+        failHard(
+          code === 'network'
+            ? 'Network error — speech recognition needs a stable internet connection.'
+            : `Speech recognition error: ${code}`
+        );
+      }
+    };
+
+    recog.onend = () => {
+      runningRef.current = false;
+
+      // Commit whatever this session captured (finals + dangling interim).
+      commitSession();
+      publish();
+
+      // Resolve any pending stop() promise.
+      const resolvers = endResolversRef.current;
+      endResolversRef.current = [];
+      resolvers.forEach((fn) => fn());
+
+      // Auto-restart if the session is still meant to be active.
+      if (wantActiveRef.current) {
+        clearTimeout(restartTimerRef.current);
+        restartTimerRef.current = setTimeout(tryStart, env.isAndroid ? 120 : 200);
+      }
+    };
+
+    recogRef.current = recog;
+
+    return () => {
+      wantActiveRef.current = false;
+      clearTimeout(restartTimerRef.current);
+      clearInterval(tickRef.current);
+      clearInterval(decayRef.current);
+      recog.onstart = null;
+      recog.onaudiostart = null;
+      recog.onspeechstart = null;
+      recog.onresult = null;
+      recog.onerror = null;
+      recog.onend = null;
+      try {
+        recog.abort();
+      } catch {
+        /* noop */
+      }
+      releaseWakeLock();
+      recogRef.current = null;
+    };
+  }, [commitSession, publish, failHard, tryStart, releaseWakeLock]);
+
+  /* ---- Recover when the tab comes back (phone unlocked / app switched) ---- */
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState !== 'visible' || !wantActiveRef.current) return;
+      requestWakeLock();
+      restartFailsRef.current = 0;
+      tryStart();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
+  }, [requestWakeLock, tryStart]);
+
+  /* ---- Start ---- */
+  const start = useCallback(() => {
+    const recog = recogRef.current;
+    if (!recog) {
+      setError('Live speech recognition is not available in this browser.');
+      return false;
+    }
+
+    // Reset everything.
+    stopTimers();
+    committedRef.current = '';
+    sessionFinalRef.current = '';
+    interimRef.current = '';
+    lastLenRef.current = 0;
+    audioStartedRef.current = false;
+    heardRef.current = false;
+    errorCountRef.current = 0;
+    restartFailsRef.current = 0;
+    confSumRef.current = 0;
+    confCountRef.current = 0;
+    setTranscript('');
+    setInterim('');
+    setError(null);
+    setHint(null);
+    setSeconds(0);
+
+    // Arm auto-restart.
+    wantActiveRef.current = true;
+
+    // Duration timer + "can't hear you" watchdog.
+    startedAtRef.current = Date.now();
+    tickRef.current = setInterval(() => {
+      const s = Math.floor((Date.now() - startedAtRef.current) / 1000);
+      setSeconds(s);
+      if (s >= 7 && !heardRef.current) {
+        setHint(
+          audioStartedRef.current
+            ? "The mic is on, but we haven't heard speech yet. Speak clearly and close to your phone."
+            : "The microphone hasn't started. Check that this site has mic permission and that no other app (call, recorder) is using it."
+        );
+      }
+    }, 1000);
+
+    // Voice-activity level decays smoothly between recognition events.
+    decayRef.current = setInterval(() => {
+      levelRef.current = levelRef.current > 0.005 ? levelRef.current * 0.93 : 0;
+    }, 60);
+
+    requestWakeLock();
+
+    // Start recognition (must be inside the user gesture).
+    try {
+      recog.start();
+    } catch (err) {
+      if (err?.name !== 'InvalidStateError') {
+        failHard('Could not start speech recognition. Try reloading the page.');
+        return false;
+      }
+      // A previous session is still winding down — onend / tryStart will retry.
+      if (!runningRef.current) restartTimerRef.current = setTimeout(tryStart, 250);
+    }
+
+    setActive(true);
+    return true;
+  }, [stopTimers, requestWakeLock, failHard, tryStart]);
+
+  /* ---- Stop and return the final transcript + duration ---- */
+  const stop = useCallback(async () => {
+    wantActiveRef.current = false;
+    const durationSec = Math.max(1, Math.round((Date.now() - startedAtRef.current) / 1000));
+    stopTimers();
+    releaseWakeLock();
+
+    const recog = recogRef.current;
+    if (recog && runningRef.current) {
+      await new Promise((resolve) => {
+        let settled = false;
+        let safety = null;
+        const finish = () => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(safety);
+          resolve();
+        };
+        endResolversRef.current.push(finish);
+        // Safety net — mobile browsers sometimes take >1s to fire onend.
+        safety = setTimeout(() => {
+          try {
+            recog.abort();
+          } catch {
+            /* noop */
+          }
+          finish();
+        }, 2500);
+        try {
+          recog.stop();
+        } catch {
+          finish();
+        }
+      });
+    }
+
+    // Final flush of anything still pending.
+    commitSession();
+    const finalText = committedRef.current.trim();
+    publish();
+
+    setSeconds(durationSec);
+    setActive(false);
+    setHint(null);
+
+    // Average real ASR confidence across finalised chunks (0..1), when the
+    // engine reports it. null means no usable signal — callers should fall
+    // back to the heuristic estimate rather than treat 0 as "bad".
+    const avgConfidence = confCountRef.current > 0
+      ? confSumRef.current / confCountRef.current
+      : null;
+
+    return { transcript: finalText, durationSec, avgConfidence };
+  }, [stopTimers, releaseWakeLock, commitSession, publish]);
+
+  /* ---- Abort without returning results ---- */
+  const cancel = useCallback(() => {
+    wantActiveRef.current = false;
+    stopTimers();
+    releaseWakeLock();
+    try {
+      recogRef.current?.abort();
+    } catch {
+      /* noop */
+    }
+    committedRef.current = '';
+    sessionFinalRef.current = '';
+    interimRef.current = '';
+    lastLenRef.current = 0;
+    confSumRef.current = 0;
+    confCountRef.current = 0;
+    setTranscript('');
+    setInterim('');
+    setSeconds(0);
+    setHint(null);
+    setActive(false);
+  }, [stopTimers, releaseWakeLock]);
+
+  /* ---- Clear displayed text ---- */
+  const reset = useCallback(() => {
+    committedRef.current = '';
+    sessionFinalRef.current = '';
+    interimRef.current = '';
+    lastLenRef.current = 0;
+    setTranscript('');
+    setInterim('');
+    setError(null);
+    setHint(null);
+    setSeconds(0);
+  }, []);
+
+  return {
+    supported,
+    active,
+    transcript,
+    interim,
+    error,
+    hint,
+    seconds,
+    levelRef,
+    start,
+    stop,
+    cancel,
+    reset,
+  };
+}
+
+/* ============================================================
+   SECTION 6 — MIC LEVEL HOOK (desktop-only visualisation)
+   ------------------------------------------------------------
+   Opens a second getUserMedia stream ONLY for the level meter, and
+   ONLY where that is safe (desktop Chromium/Firefox). On phones and
+   Safari this stays disabled — a second mic stream there makes the
+   speech recogniser hear silence. The waveform then uses the
+   recogniser's own voice-activity level instead (capture.levelRef).
+   ============================================================ */
+function useMicLevel(enabled) {
+  const levelRef = useRef(0);
+  const [available, setAvailable] = useState(false);
+
+  useEffect(() => {
+    if (!enabled || typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
+      levelRef.current = 0;
+      setAvailable(false);
+      return undefined;
+    }
+
+    let cancelled = false;
+    let stream = null;
+    let ctx = null;
+    let raf = null;
+
+    // Small delay: let SpeechRecognition grab the mic first.
+    const startTimer = setTimeout(async () => {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        if (cancelled) {
+          stream.getTracks().forEach((t) => t.stop());
+          return;
+        }
+
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        ctx = new AudioCtx();
+        if (ctx.state === 'suspended') {
+          await ctx.resume().catch(() => {});
+        }
+
+        const source = ctx.createMediaStreamSource(stream);
+        const analyser = ctx.createAnalyser();
+        analyser.fftSize = 512;
+        analyser.smoothingTimeConstant = 0.5;
+        source.connect(analyser);
+        const buffer = new Uint8Array(analyser.fftSize);
+
+        const tick = () => {
+          analyser.getByteTimeDomainData(buffer);
+          let peak = 0;
+          for (let i = 0; i < buffer.length; i += 2) {
+            const v = Math.abs(buffer[i] - 128) / 128;
+            if (v > peak) peak = v;
+          }
+          levelRef.current = peak;
+          raf = requestAnimationFrame(tick);
+        };
+        tick();
+        setAvailable(true);
+      } catch {
+        // Mic is busy — that's OK, the synthetic level takes over.
+        if (!cancelled) setAvailable(false);
+      }
+    }, 600);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(startTimer);
+      if (raf) cancelAnimationFrame(raf);
+      try {
+        ctx?.close();
+      } catch {
+        /* noop */
+      }
+      stream?.getTracks().forEach((t) => t.stop());
+      levelRef.current = 0;
+      setAvailable(false);
+    };
+  }, [enabled]);
+
+  return { levelRef, available };
+}
+
+/* ============================================================
+   SECTION 7 — SUB-COMPONENTS
+   ============================================================ */
+
+function LangutMascot({ size = 170 }) {
+  return (
+    <svg viewBox="0 0 170 170" width={size} height={size} fill="none" aria-hidden="true">
+      <ellipse cx="85" cy="158" rx="46" ry="7" fill="#000" opacity="0.22" />
+      <path d="M40 70c-8-4-16 0-18 8s2 16 10 18" stroke="#17102E" strokeWidth="4" fill="#F5E04D" strokeLinejoin="round" />
+      <path d="M130 70c8-4 16 0 18 8s-2 16-10 18" stroke="#17102E" strokeWidth="4" fill="#F5E04D" strokeLinejoin="round" />
+      <path d="M85 18c-30 0-54 24-54 54 0 17 7 31 15 40 5 6 8 12 8 19 0 4 3 7 7 7h48c4 0 7-3 7-7 0-7 3-13 8-19 8-9 15-23 15-40 0-30-24-54-54-54z" fill="#F5E04D" stroke="#17102E" strokeWidth="4" strokeLinejoin="round" />
+      <path d="M85 40c-20 0-36 14-36 34 0 13 6 22 12 29" stroke="#FBF0A0" strokeWidth="7" strokeLinecap="round" fill="none" />
+      <circle cx="68" cy="76" r="11" fill="#fff" stroke="#17102E" strokeWidth="3.5" />
+      <circle cx="70" cy="78" r="4.8" fill="#17102E" />
+      <circle cx="71.6" cy="76.4" r="1.5" fill="#fff" />
+      <circle cx="102" cy="76" r="11" fill="#fff" stroke="#17102E" strokeWidth="3.5" />
+      <circle cx="104" cy="78" r="4.8" fill="#17102E" />
+      <circle cx="105.6" cy="76.4" r="1.5" fill="#fff" />
+      <path d="M76 98c3 5 6 7 9 7s6-2 9-7" stroke="#17102E" strokeWidth="3.5" strokeLinecap="round" fill="none" />
+      <circle cx="56" cy="94" r="4.5" fill="#FF8FCB" opacity="0.55" />
+      <circle cx="114" cy="94" r="4.5" fill="#FF8FCB" opacity="0.55" />
+      <ellipse cx="70" cy="132" rx="12" ry="5.5" fill="#F5E04D" stroke="#17102E" strokeWidth="3.5" />
+      <ellipse cx="100" cy="132" rx="12" ry="5.5" fill="#F5E04D" stroke="#17102E" strokeWidth="3.5" />
+      <path d="M22 40l3-7 3 7-7 3 7 3-3 7-3-7-7-3z" fill="#D4F55C" />
+      <path d="M148 46l2.5-6 2.5 6-6 2.5 6 2.5-2.5 6-2.5-6-6-2.5z" fill="#FF8FCB" />
+    </svg>
+  );
+}
+
+/* Waveform — reacts to mic level if available, else synthetic pulses */
+function Waveform({ active, levelRef, useLevel }) {
+  const containerRef = useRef(null);
+  const phaseRef = useRef(0);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return undefined;
+    const bars = container.querySelectorAll('.ec-spk-wave-bar');
+    if (!bars.length) return undefined;
+
+    if (!active) {
+      bars.forEach((b) => {
+        b.style.height = '4px';
+      });
+      return undefined;
+    }
+
+    let raf;
+    const tick = () => {
+      phaseRef.current += 0.16;
+      const level = useLevel ? (levelRef?.current || 0) : 0.5;
+      const amplitude = useLevel ? Math.min(1, level * 6) : 0.7;
+      bars.forEach((bar, i) => {
+        const wave = Math.sin(phaseRef.current + i * 0.45) * 0.5 + 0.5;
+        const jitter = Math.random() * 0.25;
+        const h = 5 + (amplitude * 32 + jitter * 8) * wave;
+        bar.style.height = `${Math.min(44, h)}px`;
+      });
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [active, levelRef, useLevel]);
+
+  const cls = `ec-spk-wave ${active ? (useLevel ? 'ec-spk-wave-live' : 'ec-spk-wave-synth') : 'ec-spk-wave-idle'}`;
+  return (
+    <div ref={containerRef} className={cls}>
+      {Array.from({ length: 36 }).map((_, i) => (
+        <div key={i} className="ec-spk-wave-bar" />
+      ))}
+    </div>
+  );
+}
+
+function LiveLevelMeter({ levelRef, active }) {
+  const fillRef = useRef(null);
+  const [silent, setSilent] = useState(true);
+  const lastCheckRef = useRef(0);
+
+  useEffect(() => {
+    if (!active) return undefined;
+    let raf;
+    const tick = (now) => {
+      const level = levelRef.current || 0;
+      const pct = Math.max(2, Math.min(100, Math.round(level * 400)));
+      if (fillRef.current) fillRef.current.style.width = `${pct}%`;
+      if (now - lastCheckRef.current > 350) {
+        const isSilent = level < SCORING.silencePeak;
+        setSilent((prev) => (prev === isSilent ? prev : isSilent));
+        lastCheckRef.current = now;
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [active, levelRef]);
+
+  const cls = `ec-spk-live-level${silent && active ? ' ec-spk-live-level--silent' : ''}`;
+  return (
+    <div className={cls}>
+      <span>{silent && active ? '🔇 Silent' : '🎤 Mic'}</span>
+      <div className="ec-spk-live-level-track">
+        <div ref={fillRef} className="ec-spk-live-level-fill" style={{ width: '2%' }} />
+      </div>
+    </div>
+  );
+}
+
+function HighlightedTranscript({ text }) {
+  if (!text) return null;
+  const parts = text.split(/(\s+)/);
+  return (
+    <>
+      {parts.map((part, i) => {
+        const lower = part.toLowerCase().replace(/[.,!?]/g, '');
+        if (FILLER_WORDS.includes(lower)) {
+          return <mark key={i}>{part}</mark>;
+        }
+        return <span key={i}>{part}</span>;
+      })}
+    </>
+  );
+}
+
+function scoreClass(v) {
+  if (v >= 8) return 'ec-spk-score--excellent';
+  if (v >= 6.5) return 'ec-spk-score--good';
+  if (v >= 5) return 'ec-spk-score--fair';
+  return 'ec-spk-score--low';
+}
+
+function ScoreCard({ label, value }) {
+  const R = 26;
+  const CIRC = 2 * Math.PI * R;
+  const pct = Math.max(0, Math.min(1, value / 9));
+  return (
+    <div className={`ec-spk-score ${scoreClass(value)}`}>
+      <div className="ec-spk-score-ring">
+        <svg viewBox="0 0 64 64">
+          <circle className="ec-spk-score-ring-track" cx="32" cy="32" r={R} />
+          <circle
+            className="ec-spk-score-ring-fill"
+            cx="32"
+            cy="32"
+            r={R}
+            strokeDasharray={CIRC}
+            strokeDashoffset={CIRC * (1 - pct)}
+          />
+        </svg>
+        <span className="ec-spk-score-num">{value}</span>
+      </div>
+      <span className="ec-spk-score-label">{label}</span>
+    </div>
+  );
+}
+
+function FaultReport({ faults }) {
+  const items = [
+    {
+      id: 'fillers',
+      emoji: faults.fillers.count === 0 ? '✨' : '🗣️',
+      label: 'Filler words',
+      value: faults.fillers.count === 0 ? 'None' : faults.fillers.count,
+      unit: faults.fillers.count === 0 ? '' : 'found',
+      severity: faults.fillers.severity,
+      progress: Math.min(100, Math.round((faults.fillers.count / 20) * 100)),
+      detail:
+        faults.fillers.count > 0
+          ? `Top: ${Object.entries(faults.fillers.words)
+              .sort((a, b) => b[1] - a[1])
+              .slice(0, 3)
+              .map(([w, n]) => `${w} (${n})`)
+              .join(', ')}`
+          : 'None detected — clean delivery.',
+      words: Object.keys(faults.fillers.words).slice(0, 5),
+      tip: 'Replace fillers with a short, confident pause.',
+    },
+    {
+      id: 'repetition',
+      emoji: faults.repetition.count === 0 ? '✨' : '🔁',
+      label: 'Word repetition',
+      value: faults.repetition.count === 0 ? 'None' : faults.repetition.count,
+      unit: faults.repetition.count === 0 ? '' : 'blocks',
+      severity: faults.repetition.severity,
+      progress: Math.min(100, Math.round((faults.repetition.count / 5) * 100)),
+      detail:
+        faults.repetition.count > 0
+          ? `Repeated: ${[...new Set(faults.repetition.examples)].slice(0, 4).join(', ')}`
+          : 'No repeated word blocks.',
+      words: [...new Set(faults.repetition.examples)].slice(0, 5),
+      tip: 'Swap repeated words for synonyms.',
+    },
+    {
+      id: 'pace',
+      emoji: faults.pace.wpm === 0 ? '❓' : faults.pace.severity === 'ok' ? '🎯' : '⚡',
+      label: 'Speaking pace',
+      value: faults.pace.wpm || '—',
+      unit: faults.pace.wpm ? 'wpm' : '',
+      severity: faults.pace.severity,
+      progress: Math.min(100, Math.round((faults.pace.wpm / 220) * 100)),
+      detail:
+        faults.pace.wpm > 0
+          ? `Ideal ${SCORING.idealWpm[0]}–${SCORING.idealWpm[1]} wpm.`
+          : 'Not enough audio to measure.',
+      words: [],
+      tip:
+        faults.pace.wpm && faults.pace.wpm < SCORING.idealWpm[0]
+          ? 'Speak a little faster — aim for a steady rhythm.'
+          : faults.pace.wpm && faults.pace.wpm > SCORING.idealWpm[1]
+            ? 'Slow down — let your ideas breathe.'
+            : 'Pace sounds natural.',
+    },
+    {
+      id: 'length',
+      emoji: faults.length.severity === 'ok' ? '📏' : '📐',
+      label: 'Answer length',
+      value: faults.length.words,
+      unit: 'words',
+      severity: faults.length.severity,
+      progress: Math.min(100, Math.round((faults.length.words / 120) * 100)),
+      detail: `Target ${SCORING.longAnswerWords}+ words.`,
+      words: [],
+      tip:
+        faults.length.words < SCORING.longAnswerWords
+          ? `Add ~${SCORING.longAnswerWords - faults.length.words} more words next time.`
+          : 'Great length — well developed.',
+    },
+    {
+      id: 'vocab',
+      emoji: faults.vocabulary.ratio > 0.6 ? '📚' : '🔤',
+      label: 'Vocabulary richness',
+      value: `${Math.round(faults.vocabulary.ratio * 100)}%`,
+      unit: 'unique',
+      severity: faults.vocabulary.severity,
+      progress: Math.round(faults.vocabulary.ratio * 100),
+      detail: `${faults.vocabulary.unique} unique words used.`,
+      words: [],
+      tip:
+        faults.vocabulary.ratio < 0.55
+          ? 'Try richer synonyms for common words.'
+          : 'Varied, natural vocabulary.',
+    },
+  ];
+
+  const worstSeverity = items.reduce((acc, i) => {
+    const rank = { ok: 0, warn: 1, bad: 2 };
+    return rank[i.severity] > rank[acc] ? i.severity : acc;
+  }, 'ok');
+
+  const pillClass =
+    worstSeverity === 'ok'
+      ? 'ec-spk-faults-pill--ok'
+      : worstSeverity === 'warn'
+        ? 'ec-spk-faults-pill--warn'
+        : 'ec-spk-faults-pill--bad';
+  const pillText =
+    worstSeverity === 'ok'
+      ? '✓ Clean delivery'
+      : worstSeverity === 'warn'
+        ? '⚠ Needs polish'
+        : '✕ Fix these issues';
+  const sevLabel = { ok: 'Good', warn: 'Watch', bad: 'Fix' };
+
+  return (
+    <div className="ec-spk-faults">
+      <div className="ec-spk-faults-head">
+        <h3 className="ec-spk-faults-title">Speech analysis</h3>
+        <span className={`ec-spk-faults-pill ${pillClass}`}>{pillText}</span>
+      </div>
+      <div className="ec-spk-fault-grid">
+        {items.map((it) => (
+          <div key={it.id} className={`ec-spk-fault-card ec-spk-fault-card--${it.severity}`}>
+            <div className="ec-spk-fault-card-head">
+              <span className="ec-spk-fault-emoji" aria-hidden="true">{it.emoji}</span>
+              <span className={`ec-spk-fault-sev ec-spk-fault-sev--${it.severity}`}>
+                {sevLabel[it.severity]}
+              </span>
+            </div>
+            <p className="ec-spk-fault-label">{it.label}</p>
+            <p className="ec-spk-fault-value">
+              {it.value}
+              {it.unit && <small>{it.unit}</small>}
+            </p>
+            <div className="ec-spk-fault-bar">
+              <div className="ec-spk-fault-bar-fill" style={{ width: `${it.progress}%` }} />
+            </div>
+            <p className="ec-spk-fault-detail">{it.detail}</p>
+            {it.words.length > 0 && (
+              <div className="ec-spk-fault-words">
+                {it.words.map((w) => (
+                  <span key={w} className="ec-spk-fault-word">{w}</span>
+                ))}
+              </div>
+            )}
+            <p className="ec-spk-fault-tip">
+              <span className="ec-spk-fault-tip-icon" aria-hidden="true">💡</span>
+              <span>{it.tip}</span>
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   SECTION 8 — PROMPT BANK
    ============================================================ */
 const PROMPT_BANK = {
   pron: {
@@ -554,31 +1870,6 @@ const PROMPT_BANK = {
       'Wait — did you just say that?',
       'Honestly, I have absolutely no idea.',
       'What on earth were you thinking?',
-      'Throughout the thoroughly thought-provoking third Thursday, the thriving theatre welcomed thirty-three thousand thoughtful guests.',
-      'Sheila Shaw shined her shiny silver shoes and shuffled slowly to the shimmering shore.',
-      'Peter’s poodle pranced proudly past the pretty purple pansies in the park.',
-      'Betty’s brother bounced a big blue ball beside the bubbling brook.',
-      'Chester chatted cheerfully with the charming children at the chilly church.',
-      'Frank fried fresh fish for Fred and Fran on Friday morning.',
-      'Grumpy Greg grabbed grapes and greeted the grinning green grocer.',
-      'Harriet’s happy hamster hopped happily around the huge hollow house.',
-      'Jolly Jack jiggled his jug of juice while joking with Jane.',
-      'Kevin kindly kept kicking the colourful kite in the kitchen.',
-      'Larry laughed loudly at the lovely lady’s little lamb.',
-      'Mary made many marvellous muffins on Monday morning.',
-      'Nina’s noisy nephew never noticed the neat new notebook.',
-      'Oliver officially offered old Olivia an orange on October the eighth.',
-      'Patty patiently painted pink peonies on a plain paper plate.',
-      'Quincy quickly questioned the quiet queen about her quirky quilt.',
-      'Rita really ran rapidly around the narrow red road.',
-      'Sammy slowly sipped sweet strawberry smoothies on Saturday.',
-      'Tommy tried to tie the tiny tiger’s tie twice.',
-      'Uma usually uses unusual umbrellas under the umbrella stand.',
-      'Victor vividly viewed the vast valley from the very high van.',
-      'Wendy wondered why Willy whistled wildly while walking west.',
-      'Xena excitedly explained the excellent new exercise.',
-      'Yolanda yelled at the young yellow yak yesterday.',
-      'Zack zealously zoomed through the zany zebra zone.',
       'Say: comfortable, vegetable, chocolate, interesting.',
       'Say: February, Wednesday, library, secretary.',
       'Say: schedule, receipt, debt, subtle.',
@@ -599,75 +1890,6 @@ const PROMPT_BANK = {
       'Say: island, aisle, muscle, castle, whistle.',
       'Say: salmon, almond, calm, palm, half.',
       'Say: iron, environment, government, maintenance.',
-      'A proper cup of coffee in a proper copper coffee pot.',
-      'Betty Botter bought a bit of better butter.',
-      'Black bugs bleed black blood.',
-      'Bring back the bright blue blistering barnacles.',
-      'Clean clams crammed in clean cans.',
-      'Eleven elves licked eleven little liquorice lollipops.',
-      'Fat frogs flying past fast.',
-      'Four furious friends fought for the phone.',
-      'Fresh fried fish, fish fried fresh.',
-      'Great grey geese graze in green grassy groves.',
-      'Harry Hunt hunts heavy hairy hares.',
-      'How many yaks could a yak chuck chuck if a yak could chuck yaks?',
-      'I saw a kitten eating chicken in the kitchen.',
-      'If two witches were watching two watches, which witch would watch which watch?',
-      'Irish wristwatch, Swiss wristwatch, Irish wristwatch.',
-      'Just think, that sphinx has a sphincter that stinks.',
-      'Knapsack straps snap on strong strapping young men.',
-      'Lemon liniment, lemon liniment, lemon liniment.',
-      'Mixed biscuits, mixed biscuits, mixed biscuits.',
-      'Nine nice night nurses nursing nicely.',
-      'Old oily Ollie oils old oily autos.',
-      'One-one was a racehorse, two-two was one too.',
-      'Pack a pink plastic pencil pouch.',
-      'Picky people pick Peter Pan peanut butter.',
-      'Please put the plump plum on the pretty plate.',
-      'Quick queens quickly quarrelled with quirky quails.',
-      'Really leery, rarely Larry, really, really leery Larry.',
-      'Red blood, black blood, blue blood — say each clearly.',
-      'Really rural, really rural, really rural.',
-      'Rolling red wagons, rolling red wagons.',
-      'Rubber baby buggy bumpers, rubber baby buggy bumpers.',
-      'Sally sells sea shells by the sea shore.',
-      'Send toast to ten tense stout saints’ ten tall tents.',
-      'Seven slick slimy snakes slid sideways.',
-      'She sees cheese, she sews sheets, she shushes.',
-      'Simple Simon sat sipping cider slowly.',
-      'Six sick hicks nick six slick bricks with picks and sticks.',
-      'Snap crackle pop, snap crackle pop.',
-      'Stupid superstition, stupid superstition.',
-      'The big black bug bit the big black bear.',
-      'The blue bluebird blinks, the blue bluebird blinks.',
-      'The epitome of femininity is a woman who says what she means.',
-      'The excellent execution of the exercise exhausted him.',
-      'The great Greek grape growers grow great Greek grapes.',
-      'The myth of Miss Muffet, the myth of Miss Muffet.',
-      'The oboe and the obelisk, the oboe and the obelisk.',
-      'The owner of the inside inn was outside his inside inn.',
-      'The sad sheik’s sad sheep’s sick.',
-      'The seething sea ceaseth, the seething sea sufficeth us.',
-      'The sixth sheikh’s sixth sheep is sick.',
-      'The sun shines on shop signs and ship signs.',
-      'The very very very very very very very very weary traveller.',
-      'Three grey geese in a green field grazing.',
-      'Three hundred and thirty-three thousand thirsty travellers.',
-      'Three short sharp sheep, three short sharp sheep.',
-      'Thrice the brinded cat hath mewed.',
-      'Tie twine to three tree twigs.',
-      'Truly rural, truly rural, truly rural.',
-      'Twelve twins twirled twelve twigs twice.',
-      'Two tiny tigers take two taxis to town.',
-      'Unique New York, unique New York, unique New York.',
-      'We surely shall see the sun shine soon.',
-      'We will walk the wet wide way westward.',
-      'Which Swiss witch switched the Swiss wristwatches?',
-      'Which wristwatches are Swiss wristwatches?',
-      'Will you, William, will you wash the windows?',
-      'Willy’s real rear wheel, Willy’s real rear wheel.',
-      'You know New York, you need New York.',
-      'Zebras zig and zebras zag in the zoo.',
     ],
   },
   ielts1: {
@@ -1600,772 +2822,249 @@ const PROMPT_BANK = {
 };
 
 const ALL_CATEGORIES = Object.entries(PROMPT_BANK).map(([id, c]) => ({
-  id, label: c.name, icon: c.icon, prompts: c.prompts, count: c.prompts.length,
+  id,
+  label: c.name,
+  icon: c.icon,
+  prompts: c.prompts,
+  count: c.prompts.length,
 }));
 
 const TOTAL_PROMPTS = ALL_CATEGORIES.reduce((s, c) => s + c.count, 0);
 
-const CRITERIA = [
-  { id: 'c1', label: 'Fluency & coherence', weight: '25%' },
-  { id: 'c2', label: 'Lexical resource', weight: '25%' },
-  { id: 'c3', label: 'Grammatical range', weight: '25%' },
-  { id: 'c4', label: 'Pronunciation', weight: '25%' },
-];
-
 /* ============================================================
-   FAULT DETECTION
-   ============================================================ */
-const FILLER_WORDS = ['um', 'uh', 'er', 'ah', 'like', 'you know', 'basically', 'actually', 'literally', 'so', 'well', 'anyway', 'kind of', 'sort of'];
-
-function detectFaults(transcript, durationSec) {
-  const text = (transcript || '').toLowerCase().trim();
-  const words = text.split(/\s+/).filter(Boolean);
-  const result = {
-    fillers: { count: 0, words: {}, severity: 'ok' },
-    repetition: { count: 0, examples: [], severity: 'ok' },
-    pace: { wpm: 0, severity: 'ok' },
-    length: { words: words.length, severity: 'ok' },
-    vocabulary: { unique: 0, ratio: 0, severity: 'ok' },
-  };
-
-  const fillerMap = {};
-  for (const f of FILLER_WORDS) {
-    const regex = new RegExp(`\\b${f.replace(/\s+/g, '\\s+')}\\b`, 'g');
-    const matches = text.match(regex);
-    if (matches) {
-      fillerMap[f] = matches.length;
-      result.fillers.count += matches.length;
-    }
-  }
-  result.fillers.words = fillerMap;
-  const fillerRatio = words.length ? result.fillers.count / words.length : 0;
-  result.fillers.severity = fillerRatio > 0.12 ? 'bad' : fillerRatio > 0.06 ? 'warn' : 'ok';
-
-  for (let i = 0; i < words.length - 2; i++) {
-    if (words[i].length > 2 && words[i] === words[i + 1] && words[i] === words[i + 2]) {
-      result.repetition.count += 1;
-      result.repetition.examples.push(words[i]);
-    }
-  }
-  result.repetition.severity = result.repetition.count >= 2 ? 'bad' : result.repetition.count === 1 ? 'warn' : 'ok';
-
-  result.pace.wpm = durationSec > 0 && words.length > 0
-    ? Math.round((words.length / durationSec) * 60)
-    : 0;
-  if (words.length === 0) result.pace.severity = 'bad';
-  else if (result.pace.wpm < 80 || result.pace.wpm > 200) result.pace.severity = 'bad';
-  else if (result.pace.wpm < 100 || result.pace.wpm > 170) result.pace.severity = 'warn';
-
-  if (words.length < 20) result.length.severity = 'bad';
-  else if (words.length < 45) result.length.severity = 'warn';
-
-  const unique = new Set(words).size;
-  result.vocabulary.unique = unique;
-  result.vocabulary.ratio = words.length ? unique / words.length : 0;
-  if (words.length < 5) result.vocabulary.severity = 'bad';
-  else if (result.vocabulary.ratio < 0.4) result.vocabulary.severity = 'bad';
-  else if (result.vocabulary.ratio < 0.55) result.vocabulary.severity = 'warn';
-
-  return result;
-}
-
-/* ============================================================
-   SCORING ENGINE
-   ------------------------------------------------------------------
-   Returns { fluency, vocabulary, grammar, pronunciation } or null.
-
-   Design principles:
-   1. Base = SCORING.base (4). Even a minimal valid answer is worth
-      ~4 (IELTS "Limited user"). It is NOT a passing band.
-   2. Each criterion starts at base and ACCUMULATES evidence-based
-      bonuses. Bonus magnitudes reflect how strong the evidence is.
-   3. Penalties are applied AFTER bonuses and are steep enough to
-      cancel gains for poor speech (e.g. heavy filler use).
-   4. Pronunciation is a proxy derived from pace + filler signals.
-      This is NOT true pronunciation analysis — it's a rough
-      browser-only estimate.
-   ============================================================ */
-function scoreFromAnalysis(faults) {
-  const words = faults.length.words;
-  if (words < SCORING.minWords) return null;
-
-  const wpm = faults.pace.wpm;
-  const fillerRatio = faults.fillers.count / Math.max(1, words);
-  const vocabRatio = faults.vocabulary.ratio;
-  const [idealLo, idealHi] = SCORING.idealWpm;
-  const [acceptLo, acceptHi] = SCORING.acceptWpm;
-  const rep = faults.repetition.count;
-
-  // ---------------- FLUENCY ----------------
-  // The strongest signal of fluency is *pace in the ideal range*.
-  // Length comes second; filler density is a penalty.
-  let fluency = SCORING.base;
-  if (wpm >= idealLo && wpm <= idealHi) fluency += 2.5;
-  else if (wpm >= acceptLo && wpm <= acceptHi) fluency += 1.5;
-  else if (wpm > 0) fluency -= 0.5;
-
-  if (words >= 30) fluency += 0.5;
-  if (words >= 60) fluency += 0.5;
-  if (words >= 90) fluency += 0.5;
-  if (words >= 120) fluency += 0.5;
-
-  if (fillerRatio > 0.04) fluency -= 0.5;
-  if (fillerRatio > 0.08) fluency -= 1.0;
-  if (fillerRatio > 0.15) fluency -= 1.5;
-
-  // ---------------- VOCABULARY ----------------
-  // Lexical diversity is the primary signal; length adds a little.
-  let vocabulary = SCORING.base;
-  if (vocabRatio > 0.50) vocabulary += 1.0;
-  if (vocabRatio > 0.60) vocabulary += 1.0;
-  if (vocabRatio > 0.70) vocabulary += 1.0;
-  if (words >= 60) vocabulary += 1.0;
-  if (words >= 100) vocabulary += 1.0;
-  if (vocabRatio < 0.35 && words >= 20) vocabulary -= 1.0;
-
-  // ---------------- GRAMMAR ----------------
-  // We can't judge grammar from a transcript without an NLP parser.
-  // Absence of repetition + length is the best proxy available.
-  let grammar = SCORING.base;
-  if (words >= 15) grammar += 0.5;
-  if (words >= 40) grammar += 1.0;
-  if (words >= 70) grammar += 1.0;
-  if (words >= 100) grammar += 0.5;
-  if (rep >= 1) grammar -= 0.5;
-  if (rep >= 3) grammar -= 1.0;
-
-  // ---------------- PRONUNCIATION (proxy) ----------------
-  // Pace in the ideal range AND low filler density → likely clear.
-  // This is the weakest of the four scores — labelled as a proxy in the UI.
-  let pronunciation = SCORING.base;
-  if (wpm >= idealLo && wpm <= idealHi) pronunciation += 2.0;
-  else if (wpm >= acceptLo && wpm <= acceptHi) pronunciation += 1.0;
-  if (fillerRatio < 0.04) pronunciation += 1.0;
-  if (fillerRatio > 0.12) pronunciation -= 1.0;
-
-  const clamp = (n) => Math.max(3, Math.min(9, Math.round(n * 10) / 10));
-
-  return {
-    fluency: clamp(fluency),
-    vocabulary: clamp(vocabulary),
-    grammar: clamp(grammar),
-    pronunciation: clamp(pronunciation),
-  };
-}
-
-/* Explain what drove the score. Used in the auto-feedback message. */
-function scoreExplanation(faults, bands) {
-  const words = faults.length.words;
-  const wpm = faults.pace.wpm;
-  const fillerRatio = faults.fillers.count / Math.max(1, words);
-  const vocabRatio = faults.vocabulary.ratio;
-  const [idealLo, idealHi] = SCORING.idealWpm;
-
-  const lines = [];
-  lines.push(`You said ${words} words in about ${faults.pace.wpm ? Math.round(words / faults.pace.wpm * 60) : 0}s.`);
-
-  if (wpm >= idealLo && wpm <= idealHi) {
-    lines.push(`Your pace (${wpm} wpm) is in the ideal ${idealLo}–${idealHi} range.`);
-  } else if (wpm > 0) {
-    lines.push(`Your pace was ${wpm} wpm — aim for ${idealLo}–${idealHi}.`);
-  }
-
-  if (faults.fillers.count > 0) {
-    const top = Object.keys(faults.fillers.words).slice(0, 3);
-    lines.push(`Reduce filler words (${faults.fillers.count} found: ${top.join(', ')}).`);
-  }
-
-  if (words < SCORING.longAnswerWords) {
-    lines.push(`Speak longer — aim for ${SCORING.longAnswerWords}+ words to lift fluency.`);
-  }
-
-  if (vocabRatio < 0.5 && words >= 20) {
-    lines.push('Vary your word choice — repetition hurts your vocabulary score.');
-  }
-
-  return lines.join(' ');
-}
-
-/* ============================================================
-   SPEECH RECOGNITION HOOK
-   ============================================================ */
-function useSpeechRecognition() {
-  const [supported, setSupported] = useState(false);
-  const [transcript, setTranscript] = useState('');
-  const [interim, setInterim] = useState('');
-  const recogRef = useRef(null);
-
-  useEffect(() => {
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) return;
-    setSupported(true);
-    const r = new SR();
-    r.continuous = true;
-    r.interimResults = true;
-    r.lang = 'en-US';
-    r.onresult = (e) => {
-      let final = '';
-      let pending = '';
-      for (let i = e.resultIndex; i < e.results.length; i++) {
-        const res = e.results[i];
-        if (res.isFinal) final += res[0].transcript + ' ';
-        else pending += res[0].transcript;
-      }
-      if (final) setTranscript((t) => (t + ' ' + final).trim());
-      setInterim(pending);
-    };
-    r.onerror = () => {};
-    recogRef.current = r;
-    return () => { try { r.stop(); } catch { /* noop */ } };
-  }, []);
-
-  const startRecog = useCallback(() => {
-    setTranscript('');
-    setInterim('');
-    try { recogRef.current?.start(); } catch { /* noop */ }
-  }, []);
-  const stopRecog = useCallback(() => {
-    try { recogRef.current?.stop(); } catch { /* noop */ }
-    setInterim('');
-  }, []);
-  const reset = useCallback(() => {
-    setTranscript('');
-    setInterim('');
-  }, []);
-
-  return { supported, transcript, interim, startRecog, stopRecog, reset };
-}
-
-/* ============================================================
-   AUDIO RECORDER + LEVEL MONITOR
-   ============================================================ */
-function pickMimeType() {
-  const candidates = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg;codecs=opus'];
-  for (const type of candidates) {
-    if (window.MediaRecorder?.isTypeSupported?.(type)) return type;
-  }
-  return '';
-}
-
-function useAudioRecorder() {
-  const [recording, setRecording] = useState(false);
-  const [error, setError] = useState(null);
-  const [seconds, setSeconds] = useState(0);
-  const [liveLevel, setLiveLevel] = useState(0);
-
-  const mediaRecorderRef = useRef(null);
-  const streamRef = useRef(null);
-  const chunksRef = useRef([]);
-  const timerRef = useRef(null);
-  const secondsRef = useRef(0);
-  const peakLevelRef = useRef(0);
-  const audioCtxRef = useRef(null);
-  const rafRef = useRef(null);
-
-  const stopStream = () => {
-    streamRef.current?.getTracks().forEach((t) => t.stop());
-    streamRef.current = null;
-  };
-
-  const startTimer = () => {
-    secondsRef.current = 0;
-    setSeconds(0);
-    timerRef.current = setInterval(() => {
-      secondsRef.current += 1;
-      setSeconds(secondsRef.current);
-    }, 1000);
-  };
-  const stopTimer = () => {
-    clearInterval(timerRef.current);
-    timerRef.current = null;
-  };
-
-  const startLevelMonitor = (stream) => {
-    try {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return;
-      const ctx = new AudioCtx();
-      const source = ctx.createMediaStreamSource(stream);
-      const analyser = ctx.createAnalyser();
-      analyser.fftSize = 2048;
-      source.connect(analyser);
-      const buffer = new Uint8Array(analyser.fftSize);
-      audioCtxRef.current = ctx;
-
-      const tick = () => {
-        analyser.getByteTimeDomainData(buffer);
-        let peak = 0;
-        for (let i = 0; i < buffer.length; i++) {
-          const v = Math.abs(buffer[i] - 128) / 128;
-          if (v > peak) peak = v;
-        }
-        if (peak > peakLevelRef.current) peakLevelRef.current = peak;
-        setLiveLevel(peak);
-        rafRef.current = requestAnimationFrame(tick);
-      };
-      tick();
-    } catch { /* ignore */ }
-  };
-
-  const stopLevelMonitor = () => {
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    rafRef.current = null;
-    try { audioCtxRef.current?.close(); } catch { /* noop */ }
-    audioCtxRef.current = null;
-    setLiveLevel(0);
-  };
-
-  const start = async () => {
-    setError(null);
-    peakLevelRef.current = 0;
-    setLiveLevel(0);
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      streamRef.current = stream;
-      chunksRef.current = [];
-      const mimeType = pickMimeType();
-      const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
-      recorder.ondataavailable = (e) => {
-        if (e.data && e.data.size > 0) chunksRef.current.push(e.data);
-      };
-      mediaRecorderRef.current = recorder;
-      recorder.start();
-      setRecording(true);
-      startTimer();
-      startLevelMonitor(stream);
-      return true;
-    } catch (err) {
-      setError(
-        err?.name === 'NotAllowedError'
-          ? 'Microphone access denied. Allow mic access in your browser settings.'
-          : 'Could not access your microphone.'
-      );
-      setRecording(false);
-      stopStream();
-      return false;
-    }
-  };
-
-  const stop = () =>
-    new Promise((resolve) => {
-      const recorder = mediaRecorderRef.current;
-      stopTimer();
-      if (!recorder || recorder.state === 'inactive') {
-        setRecording(false);
-        stopLevelMonitor();
-        resolve(null);
-        return;
-      }
-      const finalSeconds = secondsRef.current;
-      recorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: recorder.mimeType || 'audio/webm' });
-        chunksRef.current = [];
-        stopStream();
-        stopLevelMonitor();
-        setRecording(false);
-        resolve({ blob, peak: peakLevelRef.current, seconds: finalSeconds });
-      };
-      recorder.stop();
-    });
-
-  const cancel = () => {
-    const recorder = mediaRecorderRef.current;
-    stopTimer();
-    if (recorder && recorder.state !== 'inactive') {
-      recorder.onstop = null;
-      recorder.stop();
-    }
-    chunksRef.current = [];
-    stopStream();
-    stopLevelMonitor();
-    setRecording(false);
-    setSeconds(0);
-    secondsRef.current = 0;
-    peakLevelRef.current = 0;
-  };
-
-  useEffect(() => () => cancel(), []);
-
-  return { recording, error, seconds, liveLevel, start, stop, cancel };
-}
-
-/* ============================================================
-   WAVEFORM
-   ============================================================ */
-function Waveform({ active }) {
-  const bars = useMemo(
-    () => Array.from({ length: 32 }).map((_, i) => 18 + Math.sin(i * 0.7) * 10 + Math.random() * 14),
-    [active]
-  );
-  return (
-    <div className={`ec-spk-wave ${active ? 'ec-spk-wave-live' : 'ec-spk-wave-idle'}`}>
-      {bars.map((h, i) => (
-        <div key={i} className="ec-spk-wave-bar" style={{ height: `${h}px`, animationDelay: `${i * 0.045}s` }} />
-      ))}
-    </div>
-  );
-}
-
-/* ============================================================
-   LIVE INPUT LEVEL METER
-   ============================================================ */
-function LiveLevelMeter({ level }) {
-  const pct = Math.max(2, Math.min(100, Math.round(level * 400)));
-  const isSilent = level < SCORING.silencePeak;
-  return (
-    <div className={`ec-spk-live-level${isSilent ? ' ec-spk-live-level--silent' : ''}`}>
-      <span>{isSilent ? '🔇 Silent' : '🎤 Mic'}</span>
-      <div className="ec-spk-live-level-track">
-        <div className="ec-spk-live-level-fill" style={{ width: `${pct}%` }} />
-      </div>
-      <span>{pct}%</span>
-    </div>
-  );
-}
-
-/* ============================================================
-   TRANSCRIPT WITH HIGHLIGHTS
-   ============================================================ */
-function HighlightedTranscript({ text }) {
-  if (!text) return null;
-  const parts = text.split(/(\s+)/);
-  return (
-    <>
-      {parts.map((part, i) => {
-        const lower = part.toLowerCase().replace(/[.,!?]/g, '');
-        if (FILLER_WORDS.includes(lower)) {
-          return <mark key={i}>{part}</mark>;
-        }
-        return <span key={i}>{part}</span>;
-      })}
-    </>
-  );
-}
-
-/* ============================================================
-   SCORE CARD
-   ============================================================ */
-function scoreClass(v) {
-  if (v >= 8) return 'ec-spk-score--excellent';
-  if (v >= 6.5) return 'ec-spk-score--good';
-  if (v >= 5) return 'ec-spk-score--fair';
-  return 'ec-spk-score--low';
-}
-
-function ScoreCard({ label, value }) {
-  const R = 26;
-  const CIRC = 2 * Math.PI * R;
-  const pct = Math.max(0, Math.min(1, value / 9));
-  return (
-    <div className={`ec-spk-score ${scoreClass(value)}`}>
-      <div className="ec-spk-score-ring">
-        <svg viewBox="0 0 64 64">
-          <circle className="ec-spk-score-ring-track" cx="32" cy="32" r={R} />
-          <circle
-            className="ec-spk-score-ring-fill"
-            cx="32" cy="32" r={R}
-            strokeDasharray={CIRC}
-            strokeDashoffset={CIRC * (1 - pct)}
-          />
-        </svg>
-        <span className="ec-spk-score-num">{value}</span>
-      </div>
-      <span className="ec-spk-score-label">{label}</span>
-    </div>
-  );
-}
-
-/* ============================================================
-   FAULT REPORT
-   ============================================================ */
-function FaultReport({ faults }) {
-  const severityToIcon = { ok: '✓', warn: '!', bad: '✕' };
-  const items = [
-    {
-      id: 'fillers',
-      label: 'Filler words',
-      severity: faults.fillers.severity,
-      detail: faults.fillers.count > 0
-        ? `Found ${faults.fillers.count} filler${faults.fillers.count === 1 ? '' : 's'}: ${Object.entries(faults.fillers.words).map(([w, n]) => `${w} (${n})`).join(', ')}`
-        : 'No filler words detected. Excellent.',
-    },
-    {
-      id: 'rep',
-      label: 'Word repetition',
-      severity: faults.repetition.severity,
-      detail: faults.repetition.count > 0
-        ? `Repeated words: ${[...new Set(faults.repetition.examples)].join(', ')}`
-        : 'No repeated word blocks detected.',
-    },
-    {
-      id: 'pace',
-      label: 'Speaking pace',
-      severity: faults.pace.severity,
-      detail: faults.pace.wpm > 0
-        ? `You spoke at ${faults.pace.wpm} words per minute. Ideal range: ${SCORING.idealWpm[0]}–${SCORING.idealWpm[1]} wpm.`
-        : 'Not enough audio to measure pace.',
-    },
-    {
-      id: 'len',
-      label: 'Answer length',
-      severity: faults.length.severity,
-      detail: `${faults.length.words} words spoken. Aim for ${SCORING.longAnswerWords}+ words for IELTS Part 2.`,
-    },
-    {
-      id: 'vocab',
-      label: 'Vocabulary richness',
-      severity: faults.vocabulary.severity,
-      detail: `${faults.vocabulary.unique} unique words (${Math.round(faults.vocabulary.ratio * 100)}% uniqueness).`,
-    },
-  ];
-
-  const worstSeverity = items.reduce((acc, i) => {
-    const rank = { ok: 0, warn: 1, bad: 2 };
-    return rank[i.severity] > rank[acc] ? i.severity : acc;
-  }, 'ok');
-
-  const pillClass = worstSeverity === 'ok' ? 'ec-spk-faults-pill--ok' : worstSeverity === 'warn' ? 'ec-spk-faults-pill--warn' : 'ec-spk-faults-pill--bad';
-  const pillText = worstSeverity === 'ok' ? 'Clean delivery' : worstSeverity === 'warn' ? 'Needs polish' : 'Fix these issues';
-
-  return (
-    <div className="ec-spk-faults">
-      <div className="ec-spk-faults-head">
-        <h3 className="ec-spk-faults-title">Speech analysis</h3>
-        <span className={`ec-spk-faults-pill ${pillClass}`}>{pillText}</span>
-      </div>
-      {items.map((it) => (
-        <div key={it.id} className={`ec-spk-fault ec-spk-fault--${it.severity}`}>
-          <span className="ec-spk-fault-icon">{severityToIcon[it.severity]}</span>
-          <div className="ec-spk-fault-body">
-            <p>{it.label}</p>
-            <span>{it.detail}</span>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-/* ============================================================
-   Mascot
-   ============================================================ */
-function LangutMascot({ size = 170 }) {
-  return (
-    <svg viewBox="0 0 170 170" width={size} height={size} fill="none" aria-hidden="true">
-      <ellipse cx="85" cy="158" rx="46" ry="7" fill="#000" opacity="0.22" />
-      <path d="M40 70c-8-4-16 0-18 8s2 16 10 18" stroke="#17102E" strokeWidth="4" fill="#F5E04D" strokeLinejoin="round" />
-      <path d="M130 70c8-4 16 0 18 8s-2 16-10 18" stroke="#17102E" strokeWidth="4" fill="#F5E04D" strokeLinejoin="round" />
-      <path d="M85 18c-30 0-54 24-54 54 0 17 7 31 15 40 5 6 8 12 8 19 0 4 3 7 7 7h48c4 0 7-3 7-7 0-7 3-13 8-19 8-9 15-23 15-40 0-30-24-54-54-54z" fill="#F5E04D" stroke="#17102E" strokeWidth="4" strokeLinejoin="round" />
-      <path d="M85 40c-20 0-36 14-36 34 0 13 6 22 12 29" stroke="#FBF0A0" strokeWidth="7" strokeLinecap="round" fill="none" />
-      <circle cx="68" cy="76" r="11" fill="#fff" stroke="#17102E" strokeWidth="3.5" />
-      <circle cx="70" cy="78" r="4.8" fill="#17102E" />
-      <circle cx="71.6" cy="76.4" r="1.5" fill="#fff" />
-      <circle cx="102" cy="76" r="11" fill="#fff" stroke="#17102E" strokeWidth="3.5" />
-      <circle cx="104" cy="78" r="4.8" fill="#17102E" />
-      <circle cx="105.6" cy="76.4" r="1.5" fill="#fff" />
-      <path d="M76 98c3 5 6 7 9 7s6-2 9-7" stroke="#17102E" strokeWidth="3.5" strokeLinecap="round" fill="none" />
-      <circle cx="56" cy="94" r="4.5" fill="#FF8FCB" opacity="0.55" />
-      <circle cx="114" cy="94" r="4.5" fill="#FF8FCB" opacity="0.55" />
-      <ellipse cx="70" cy="132" rx="12" ry="5.5" fill="#F5E04D" stroke="#17102E" strokeWidth="3.5" />
-      <ellipse cx="100" cy="132" rx="12" ry="5.5" fill="#F5E04D" stroke="#17102E" strokeWidth="3.5" />
-      <path d="M22 40l3-7 3 7-7 3 7 3-3 7-3-7-7-3z" fill="#D4F55C" />
-      <path d="M148 46l2.5-6 2.5 6-6 2.5 6 2.5-2.5 6-2.5-6-6-2.5z" fill="#FF8FCB" />
-    </svg>
-  );
-}
-
-/* ============================================================
-   MAIN COMPONENT
+   SECTION 9 — MAIN COMPONENT
    ============================================================ */
 export function Speaking() {
+  const env = useMemo(() => detectEnvironment(), []);
+
+  /* --- Tab / prompt state --- */
   const [tab, setTab] = useState('practice');
   const [catId, setCatId] = useState('ielts2');
   const [promptIndex, setPromptIndex] = useState(0);
 
+  /* --- Result state --- */
   const [result, setResult] = useState(null);
   const [faults, setFaults] = useState(null);
   const [scoring, setScoring] = useState(false);
   const [submitError, setSubmitError] = useState(null);
 
+  /* --- History --- */
   const [history, setHistory] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(true);
 
+  /* --- Conversation --- */
   const [sessionId, setSessionId] = useState(null);
   const [turns, setTurns] = useState([]);
   const [conversationBusy, setConversationBusy] = useState(false);
   const [conversationError, setConversationError] = useState(null);
 
+  /* --- UI sugar --- */
   const [toast, setToast] = useState(null);
   const [xp, setXp] = useState(0);
+  const toastTimerRef = useRef(null);
 
-  const practiceRecorder = useAudioRecorder();
-  const conversationRecorder = useAudioRecorder();
-  const speech = useSpeechRecognition();
-  const audioUrlsRef = useRef([]);
+  /* --- Speech capture (mobile-first: no MediaRecorder) --- */
+  const capture = useSpeechCapture();
+  // Real mic meter only where it is safe (desktop); otherwise use the recogniser's activity level.
+  const micLevel = useMicLevel(capture.active && env.realMicMeter);
+  const meterLevelRef = micLevel.available ? micLevel.levelRef : capture.levelRef;
+  const transcriptBoxRef = useRef(null);
+  const transcriptTextRef = useRef(null);
+  const convoLogRef = useRef(null);
 
+  /* --- Cleanup on unmount --- */
   useEffect(() => () => {
-    audioUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
+    clearTimeout(toastTimerRef.current);
   }, []);
 
-  const showToast = (text) => {
+  /* --- Toast helper --- */
+  const showToast = useCallback((text) => {
     setToast(text);
-    setTimeout(() => setToast(null), 1200);
-  };
+    clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = setTimeout(() => setToast(null), 1400);
+  }, []);
 
+  /* --- Load history once --- */
   useEffect(() => {
     setHistoryLoading(true);
-    speakingApi.history()
-      .then((h) => setHistory(h || []))
+    speakingApi
+      .history()
+      .then((h) => setHistory(Array.isArray(h) ? h : []))
       .catch(() => setHistory([]))
       .finally(() => setHistoryLoading(false));
   }, []);
 
+  /* --- Derived --- */
   const cat = ALL_CATEGORIES.find((c) => c.id === catId) || ALL_CATEGORIES[0];
   const promptText = cat.prompts[promptIndex] || '';
+  const averageScore = result
+    ? Math.round(((result.fluency + result.pronunciation + result.vocabulary + result.grammar) / 4) * 10) / 10
+    : null;
+  const practiceError = capture.error || submitError;
+  const showTranscriptPanel = capture.active || capture.transcript || capture.interim || result;
+  const liveWordCount = countWords(`${capture.transcript} ${capture.interim}`);
 
-  /* ---------- PRACTICE ---------- */
-  const handleToggleRecord = async () => {
+  /* --- Keep the newest words visible --- */
+  useEffect(() => {
+    const el = transcriptTextRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [capture.transcript, capture.interim]);
+
+  useEffect(() => {
+    const el = convoLogRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [turns, conversationBusy, capture.active, capture.transcript, capture.interim]);
+
+  /* --- Score a transcript --- */
+  const processTranscript = useCallback(async (transcript, durationSec, avgConfidence = null) => {
+    setScoring(true);
+    try {
+      const detected = detectFaults(transcript, durationSec, avgConfidence);
+      const bands = scoreFromAnalysis(detected);
+
+      if (!bands) {
+        setSubmitError('Not enough speech to score. Try a longer answer.');
+        return;
+      }
+
+      // Best-effort backend call — the client-side score is authoritative.
+      let feedback = '';
+      try {
+        const promptId = `${catId}-${promptIndex}`;
+        const emptyBlob = new Blob([], { type: 'audio/webm' });
+        const data = await speakingApi.submitAttempt(promptId, emptyBlob);
+        if (data?.feedback) feedback = data.feedback;
+      } catch {
+        /* offline is fine */
+      }
+
+      if (!feedback) feedback = scoreExplanation(detected);
+
+      setFaults(detected);
+      setResult({
+        ...bands,
+        feedback,
+        transcript,
+        duration: durationSec,
+      });
+      setXp((x) => x + 20);
+      showToast('+20 XP 🎤');
+    } finally {
+      setScoring(false);
+    }
+  }, [catId, promptIndex, showToast]);
+
+  /* --- Record toggle --- */
+  const handleToggleRecord = useCallback(async () => {
     setSubmitError(null);
 
-    if (practiceRecorder.recording) {
-      const captured = await practiceRecorder.stop();
-      speech.stopRecog();
+    if (capture.active) {
+      /* ---------- STOP ---------- */
+      const { transcript: finalText, durationSec, avgConfidence } = await capture.stop();
 
-      if (!captured || !captured.blob || captured.blob.size === 0) {
-        setSubmitError('No audio captured. Try again.');
-        return;
-      }
-
-      const { blob, peak, seconds: dur } = captured;
-
-      // Gate 1: silence
-      if (peak < SCORING.silencePeak) {
+      if (!finalText) {
         setSubmitError(
-          'We didn\'t hear anything. Move closer to the mic, check it\'s not muted, and try again.'
+          "We didn't catch any words. Speak clearly, closer to the mic, in a quieter room."
         );
         return;
       }
 
-      // Gate 2: duration
-      if (dur < SCORING.minDurationSec) {
+      if (durationSec < SCORING.minDurationSec) {
         setSubmitError(
-          `Recording too short (${dur}s). Aim for at least ${SCORING.minDurationSec} seconds.`
+          `Recording too short (${durationSec}s). Aim for at least ${SCORING.minDurationSec} seconds.`
         );
         return;
       }
 
-      // Let the last final transcript land
-      await new Promise((r) => setTimeout(r, 500));
-
-      const finalText = speech.transcript || '';
-      const wordList = finalText.trim().split(/\s+/).filter(Boolean);
-
-      // Gate 3: transcript
-      if (speech.supported && wordList.length < SCORING.minWords) {
-        if (wordList.length === 0) {
-          setSubmitError(
-            'We detected audio but couldn\'t transcribe any words. Speak more clearly, reduce background noise, or use Chrome/Edge for better recognition.'
-          );
-        } else {
-          setSubmitError(
-            `Only ${wordList.length} word${wordList.length === 1 ? '' : 's'} detected — aim for a longer answer.`
-          );
-        }
+      const wordCount = countWords(finalText);
+      if (wordCount < SCORING.minWords) {
+        setSubmitError(
+          `Only ${wordCount} word${wordCount === 1 ? '' : 's'} detected — aim for a longer answer.`
+        );
         return;
       }
 
-      setScoring(true);
-
-      try {
-        const detected = detectFaults(finalText, dur);
-        const bands = scoreFromAnalysis(detected);
-
-        if (!bands) {
-          setSubmitError('Not enough speech to score. Try a longer answer.');
-          setScoring(false);
-          return;
-        }
-
-        let feedback = '';
-        try {
-          const data = await speakingApi.submitAttempt(promptText, blob);
-          if (data?.feedback) feedback = data.feedback;
-        } catch { /* ignore */ }
-
-        if (!feedback) {
-          feedback = scoreExplanation(detected, bands);
-        }
-
-        setFaults(detected);
-        setResult({ ...bands, feedback, transcript: finalText, duration: dur });
-        setXp((x) => x + 20);
-        showToast('+20 XP 🎤');
-      } finally {
-        setScoring(false);
-      }
+      await processTranscript(finalText, durationSec, avgConfidence);
     } else {
+      /* ---------- START ---------- */
       setResult(null);
       setFaults(null);
-      speech.reset();
-      const ok = await practiceRecorder.start();
-      if (ok) speech.startRecog();
+      setSubmitError(null);
+      capture.reset();
+      const ok = capture.start();
+      if (!ok) {
+        setSubmitError('Could not start speech recognition. Try reloading the page.');
+      } else if (env.isMobile) {
+        // On phones the transcript sits below the mic — bring it into view.
+        setTimeout(() => {
+          transcriptBoxRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }, 350);
+      }
     }
-  };
+  }, [capture, processTranscript, env.isMobile]);
 
-  const goToNextPrompt = () => {
-    practiceRecorder.cancel();
-    speech.stopRecog();
-    speech.reset();
+  /* --- Next prompt --- */
+  const goToNextPrompt = useCallback(() => {
+    capture.cancel();
     setResult(null);
     setFaults(null);
     setSubmitError(null);
     setPromptIndex((i) => (i + 1) % cat.prompts.length);
-  };
+  }, [capture, cat.prompts.length]);
 
-  const pickCategory = (id) => {
-    practiceRecorder.cancel();
-    speech.stopRecog();
-    speech.reset();
+  /* --- Pick category --- */
+  const pickCategory = useCallback((id) => {
+    capture.cancel();
     setCatId(id);
     setPromptIndex(0);
     setResult(null);
     setFaults(null);
     setSubmitError(null);
-  };
+  }, [capture]);
+
+  /* --- Switch tab (never keep recording in the background) --- */
+  const switchTab = useCallback((id) => {
+    capture.cancel();
+    setSubmitError(null);
+    setConversationError(null);
+    setTab(id);
+  }, [capture]);
 
   /* ---------- CONVERSATION ---------- */
-  const startConversation = () => {
+  const startConversation = useCallback(() => {
     setConversationError(null);
     setSessionId(`session-${Date.now()}`);
-    setTurns([{ role: 'ai', text: "Hi! Let's start simple — can you tell me a little about your hometown?" }]);
-  };
+    setTurns([
+      {
+        role: 'ai',
+        text: "Hi! Let's start simple — can you tell me a little about your hometown?",
+      },
+    ]);
+  }, []);
 
-  const handleConversationToggle = async () => {
+  const handleConversationToggle = useCallback(async () => {
     setConversationError(null);
 
-    if (conversationRecorder.recording) {
-      const captured = await conversationRecorder.stop();
+    if (capture.active) {
+      const { transcript: finalText } = await capture.stop();
 
-      if (!captured || !captured.blob || captured.blob.size === 0) {
-        setConversationError('No audio captured. Try again.');
-        return;
-      }
-      if (captured.peak < SCORING.silencePeak) {
-        setConversationError('We didn\'t hear anything. Try again.');
+      if (!finalText) {
+        setConversationError("We didn't hear anything. Try again.");
         return;
       }
 
-      const { blob } = captured;
       setConversationBusy(true);
-      const audioUrl = URL.createObjectURL(blob);
-      audioUrlsRef.current.push(audioUrl);
-      setTurns((t) => [...t, { role: 'user', text: '(your response)', audioUrl }]);
+      setTurns((t) => [...t, { role: 'user', text: finalText }]);
 
       try {
-        const data = await speakingApi.conversationTurn(sessionId, blob);
-        setTurns((t) => [...t, { role: 'ai', text: data?.reply || data?.text || 'Thanks — tell me more.' }]);
+        const emptyBlob = new Blob([], { type: 'audio/webm' });
+        const data = await speakingApi.conversationTurn(sessionId, emptyBlob);
+        setTurns((t) => [
+          ...t,
+          { role: 'ai', text: data?.reply || data?.text || 'Thanks — tell me more.' },
+        ]);
       } catch {
-        const keywordPrompts = [
+        const fallback = [
           "That's interesting — can you tell me more about that?",
           'Why do you think that matters to you?',
           'How did that make you feel at the time?',
@@ -2373,7 +3072,7 @@ export function Speaking() {
           "Let's move on — how does that compare to your daily life?",
           'Can you give me a specific example?',
         ];
-        const reply = keywordPrompts[turns.length % keywordPrompts.length];
+        const reply = fallback[turns.length % fallback.length];
         setTurns((t) => [...t, { role: 'ai', text: reply }]);
       } finally {
         setConversationBusy(false);
@@ -2381,39 +3080,35 @@ export function Speaking() {
       }
     } else {
       if (!sessionId) startConversation();
-      await conversationRecorder.start();
+      capture.reset();
+      const ok = capture.start();
+      if (!ok) setConversationError('Could not start recording.');
     }
-  };
+  }, [capture, sessionId, turns.length, startConversation]);
 
-  const formatTime = (s) => {
-    const m = Math.floor(s / 60);
-    const sec = s % 60;
-    return `${m}:${sec.toString().padStart(2, '0')}`;
-  };
+  const statusLabel = scoring
+    ? 'Analysing your speech…'
+    : capture.active
+      ? 'Recording… tap to stop'
+      : 'Tap the mic to start';
 
-  const averageScore = result
-    ? Math.round(((result.fluency + result.pronunciation + result.vocabulary + result.grammar) / 4) * 10) / 10
-    : null;
-
-  const showSilentWarning =
-    practiceRecorder.recording &&
-    practiceRecorder.seconds >= 2 &&
-    practiceRecorder.liveLevel < SCORING.silencePeak;
-
+  /* ============================================================
+     RENDER
+     ============================================================ */
   return (
     <div className="ec-spk">
       <style>{SPEAK_CSS}</style>
 
+      {/* ---------- HEAD ---------- */}
       <div className="ec-spk-head ec-spk-anim">
-        <div>
-          <p className="ec-spk-eyebrow">Speaking</p>
-          <h1 className="ec-page-title">Speak English with confidence</h1>
-          <p className="ec-page-sub">
-            {TOTAL_PROMPTS.toLocaleString()}+ exercises, live transcription, fault detection, and an AI conversation partner.
-          </p>
-        </div>
+        <p className="ec-spk-eyebrow">Speaking</p>
+        <h1 className="ec-page-title">Speak English with confidence</h1>
+        <p className="ec-page-sub">
+          {TOTAL_PROMPTS.toLocaleString()}+ exercises, live transcription, fault detection, and an AI conversation partner.
+        </p>
       </div>
 
+      {/* ---------- HERO ---------- */}
       <div className="ec-spk-hero ec-spk-anim">
         <div className="ec-spk-hero-orb" aria-hidden="true" />
         <div className="ec-spk-hero-copy">
@@ -2432,6 +3127,7 @@ export function Speaking() {
         </div>
       </div>
 
+      {/* ---------- TABS ---------- */}
       <div className="ec-spk-tabs" role="tablist">
         {[
           { id: 'practice', label: 'Practice', icon: 'mic' },
@@ -2443,7 +3139,8 @@ export function Speaking() {
             role="tab"
             aria-selected={tab === t.id}
             className={`ec-spk-tab${tab === t.id ? ' ec-spk-tab--active' : ''}`}
-            onClick={() => setTab(t.id)}
+            onClick={() => switchTab(t.id)}
+            type="button"
           >
             <Icon name={t.icon} />
             {t.label}
@@ -2451,6 +3148,7 @@ export function Speaking() {
         ))}
       </div>
 
+      {/* ---------- CATEGORY PILLS (Practice tab only) ---------- */}
       {tab === 'practice' && (
         <div className="ec-spk-cats">
           {ALL_CATEGORIES.map((c) => (
@@ -2458,6 +3156,7 @@ export function Speaking() {
               key={c.id}
               className={`ec-spk-cat${catId === c.id ? ' ec-spk-cat--active' : ''}`}
               onClick={() => pickCategory(c.id)}
+              type="button"
             >
               <Icon name={c.icon} />
               {c.label}
@@ -2469,8 +3168,10 @@ export function Speaking() {
 
       {toast && <div className="ec-spk-toast">{toast}</div>}
 
+      {/* ---------- MAIN GRID ---------- */}
       <div className="ec-spk-grid">
         <section>
+          {/* ============ PRACTICE TAB ============ */}
           {tab === 'practice' && (
             <div className="ec-spk-panel ec-spk-anim" key="practice">
               <div className="ec-spk-prompt-counter">
@@ -2482,66 +3183,91 @@ export function Speaking() {
               <h3 className="ec-spk-prompt-text">{promptText}</h3>
               <p className="ec-spk-prompt-hint">Read the prompt or answer it in your own words.</p>
 
-              <div className={`ec-spk-record-wrap${practiceRecorder.recording ? ' ec-spk-record-wrap--active' : ''}`}>
+              {/* Record button */}
+              <div
+                className={`ec-spk-record-wrap${capture.active ? ' ec-spk-record-wrap--active' : ''}`}
+              >
                 <span className="ec-spk-record-ring" aria-hidden="true" />
                 <span className="ec-spk-record-ring" aria-hidden="true" />
                 <span className="ec-spk-record-ring" aria-hidden="true" />
                 <button
-                  className={`ec-spk-record-btn${practiceRecorder.recording ? ' ec-spk-record-btn--active' : ''}`}
+                  type="button"
+                  className={`ec-spk-record-btn${capture.active ? ' ec-spk-record-btn--active' : ''}`}
                   onClick={handleToggleRecord}
                   disabled={scoring}
-                  aria-label={practiceRecorder.recording ? 'Stop recording' : 'Start recording'}
+                  aria-label={capture.active ? 'Stop recording' : 'Start recording'}
                 >
-                  {practiceRecorder.recording ? '■' : '●'}
+                  {capture.active ? '■' : '●'}
                 </button>
               </div>
 
-              <Waveform active={practiceRecorder.recording} />
+              {/* Waveform (uses real mic level if available) */}
+              <Waveform active={capture.active} levelRef={meterLevelRef} useLevel />
 
-              {practiceRecorder.recording && (
-                <LiveLevelMeter level={practiceRecorder.liveLevel} />
+              {/* Level meter (real mic on desktop, voice-activity on phones) */}
+              {capture.active && (
+                <LiveLevelMeter levelRef={meterLevelRef} active={capture.active} />
               )}
 
-              <p className="ec-spk-record-status">
-                {scoring
-                  ? 'Analysing your speech…'
-                  : practiceRecorder.recording
-                  ? 'Recording… tap to stop'
-                  : 'Tap the mic to start'}
-              </p>
-              {practiceRecorder.recording && (
-                <p className="ec-spk-record-time">{formatTime(practiceRecorder.seconds)}</p>
+              <p className="ec-spk-record-status">{statusLabel}</p>
+              {capture.active && (
+                <p className="ec-spk-record-time">{formatTime(capture.seconds)}</p>
               )}
 
-              {showSilentWarning && (
-                <p className="ec-spk-record-warning">🔇 We can\'t hear you — check your mic</p>
+              {/* Environment warnings */}
+              {!env.https && (
+                <p className="ec-spk-error">
+                  ⚠️ Speech recognition needs HTTPS. Open this page over a secure connection.
+                </p>
               )}
-
-              {(practiceRecorder.error || submitError) && (
-                <p className="ec-spk-error">{practiceRecorder.error || submitError}</p>
+              {!env.speechRecognition && (
+                <p className="ec-spk-error">
+                  {env.isInApp ? (
+                    <>
+                      ⚠️ You're inside an in-app browser (Facebook, Messenger, Instagram…), which blocks speech
+                      recognition. Tap the <strong>⋮ / Share</strong> menu and choose{' '}
+                      <strong>Open in Chrome</strong> (Android) or <strong>Open in Safari</strong> (iPhone).
+                    </>
+                  ) : env.isIOS ? (
+                    <>⚠️ On iPhone / iPad, live transcription only works in <strong>Safari</strong>. Open this page in Safari.</>
+                  ) : (
+                    <>
+                      ⚠️ This browser doesn't support live speech recognition. Try <strong>Chrome</strong>,{' '}
+                      <strong>Edge</strong> or <strong>Samsung Internet</strong> (Firefox has no speech support).
+                    </>
+                  )}
+                </p>
               )}
+              {practiceError && <p className="ec-spk-error">{practiceError}</p>}
 
-              {(practiceRecorder.recording || speech.transcript || speech.interim) && (
-                <div className="ec-spk-transcript">
+              {/* Transcript panel */}
+              {showTranscriptPanel && (
+                <div className="ec-spk-transcript" ref={transcriptBoxRef}>
                   <p className="ec-spk-transcript-label">
-                    Live transcript {speech.supported ? '' : '(not supported in this browser)'}
+                    Live transcript {capture.supported ? '' : '(not supported in this browser)'}
                   </p>
-                  {speech.transcript || speech.interim ? (
-                    <p className="ec-spk-transcript-text">
-                      <HighlightedTranscript text={speech.transcript} />
-                      {speech.interim && <em> {speech.interim}</em>}
+                  {capture.transcript || capture.interim ? (
+                    <p className="ec-spk-transcript-text" ref={transcriptTextRef}>
+                      <HighlightedTranscript text={capture.transcript} />
+                      {capture.interim && <em> {capture.interim}</em>}
                     </p>
                   ) : (
-                    <p className="ec-spk-transcript-empty">Start speaking — your words will appear here.</p>
+                    <p className="ec-spk-transcript-empty">
+                      {capture.active
+                        ? 'Start speaking — your words will appear here.'
+                        : 'No speech captured this time.'}
+                    </p>
                   )}
+                  {capture.active && capture.hint && <p className="ec-spk-hint">{capture.hint}</p>}
                   <div className="ec-spk-transcript-meta">
-                    <span>⏱ {formatTime(practiceRecorder.seconds)}</span>
-                    <span>📝 {speech.transcript.split(/\s+/).filter(Boolean).length} words</span>
-                    {practiceRecorder.recording && <span style={{ color: '#E0503C' }}>● REC</span>}
+                    <span>⏱ {formatTime(capture.seconds)}</span>
+                    <span>📝 {liveWordCount} words</span>
+                    {capture.active && <span style={{ color: '#E0503C' }}>● REC</span>}
                   </div>
                 </div>
               )}
 
+              {/* Scores + feedback */}
               {result && (
                 <>
                   <div className="ec-spk-scores">
@@ -2553,29 +3279,30 @@ export function Speaking() {
                   {averageScore != null && (
                     <div className="ec-spk-band">
                       <span className="ec-spk-band-label">Estimated band</span>
-                      <span className="ec-spk-band-value">{averageScore}<small>/ 9</small></span>
+                      <span className="ec-spk-band-value">
+                        {averageScore}
+                        <small>/ 9</small>
+                      </span>
                     </div>
                   )}
                   {result.feedback && <p className="ec-spk-feedback">{result.feedback}</p>}
                   <p className="ec-spk-info">
                     ℹ️ Fluency, vocabulary, and grammar are derived from your transcript (pace, length,
                     lexical diversity, repetition). Pronunciation is a pace/clarity proxy, not a real
-                    acoustic analysis. For true pronunciation scoring, a dedicated STT service is required.
+                    acoustic analysis.
                   </p>
                 </>
               )}
 
               {faults && <FaultReport faults={faults} />}
 
+              {/* Actions */}
               <div className="ec-spk-actions">
-                <button className="ec-spk-btn-ghost" onClick={goToNextPrompt}>
+                <button type="button" className="ec-spk-btn-ghost" onClick={goToNextPrompt}>
                   Next prompt →
                 </button>
-                {practiceRecorder.recording && (
-                  <button
-                    className="ec-spk-btn-ghost"
-                    onClick={() => { practiceRecorder.cancel(); speech.stopRecog(); }}
-                  >
+                {capture.active && (
+                  <button type="button" className="ec-spk-btn-ghost" onClick={capture.cancel}>
                     Cancel
                   </button>
                 )}
@@ -2583,21 +3310,37 @@ export function Speaking() {
             </div>
           )}
 
+          {/* ============ CONVERSATION TAB ============ */}
           {tab === 'conversation' && (
             <div className="ec-spk-convo ec-spk-anim" key="conv">
               <h3 className="ec-spk-convo-head">AI conversation partner</h3>
-              <p className="ec-spk-convo-sub">Real spoken back-and-forth with an examiner that adapts to your answers.</p>
+              <p className="ec-spk-convo-sub">
+                Real spoken back-and-forth with an examiner that adapts to your answers.
+              </p>
 
-              <div className="ec-spk-convo-log">
-                {turns.length === 0 && (
-                  <p className="ec-spk-convo-sub" style={{ margin: 0 }}>Tap the mic below to start the conversation.</p>
+              <div className="ec-spk-convo-log" ref={convoLogRef}>
+                {turns.length === 0 && !capture.active && (
+                  <p className="ec-spk-convo-sub" style={{ margin: 0 }}>
+                    Tap the mic below to start the conversation.
+                  </p>
                 )}
                 {turns.map((t, i) => (
                   <div key={i} className={`ec-spk-convo-msg ec-spk-convo-msg--${t.role}`}>
                     {t.text}
-                    {t.audioUrl && <audio controls src={t.audioUrl} />}
                   </div>
                 ))}
+                {capture.active && (
+                  <div className="ec-spk-convo-msg ec-spk-convo-msg--user ec-spk-convo-msg--live">
+                    {capture.transcript || capture.interim ? (
+                      <>
+                        {capture.transcript}
+                        {capture.interim && <em> {capture.interim}</em>}
+                      </>
+                    ) : (
+                      'Listening… start speaking'
+                    )}
+                  </div>
+                )}
                 {conversationBusy && (
                   <div className="ec-spk-convo-thinking">
                     <span /> <span /> <span />
@@ -2606,66 +3349,83 @@ export function Speaking() {
                 )}
               </div>
 
-              {(conversationRecorder.error || conversationError) && (
-                <p className="ec-spk-error">{conversationRecorder.error || conversationError}</p>
+              {(capture.error || conversationError) && (
+                <p className="ec-spk-error">{capture.error || conversationError}</p>
               )}
+              {capture.active && capture.hint && <p className="ec-spk-hint">{capture.hint}</p>}
 
-              <div className={`ec-spk-record-wrap${conversationRecorder.recording ? ' ec-spk-record-wrap--active' : ''}`}>
+              <div
+                className={`ec-spk-record-wrap${capture.active ? ' ec-spk-record-wrap--active' : ''}`}
+              >
                 <span className="ec-spk-record-ring" aria-hidden="true" />
                 <span className="ec-spk-record-ring" aria-hidden="true" />
                 <span className="ec-spk-record-ring" aria-hidden="true" />
                 <button
-                  className={`ec-spk-record-btn${conversationRecorder.recording ? ' ec-spk-record-btn--active' : ''}`}
+                  type="button"
+                  className={`ec-spk-record-btn${capture.active ? ' ec-spk-record-btn--active' : ''}`}
                   onClick={handleConversationToggle}
                   disabled={conversationBusy}
-                  aria-label={conversationRecorder.recording ? 'Stop recording' : 'Start recording'}
+                  aria-label={capture.active ? 'Stop recording' : 'Start recording'}
                 >
-                  {conversationRecorder.recording ? '■' : '●'}
+                  {capture.active ? '■' : '●'}
                 </button>
               </div>
 
-              {conversationRecorder.recording && (
+              {capture.active && (
                 <>
-                  <LiveLevelMeter level={conversationRecorder.liveLevel} />
-                  <p className="ec-spk-record-time">{formatTime(conversationRecorder.seconds)}</p>
+                  <Waveform active={capture.active} levelRef={meterLevelRef} useLevel />
+                  <p className="ec-spk-record-time">{formatTime(capture.seconds)}</p>
                 </>
               )}
+
               <p className="ec-spk-record-status">
-                {conversationRecorder.recording ? 'Recording… tap to stop' : 'Tap to speak'}
+                {capture.active ? 'Recording… tap to stop' : 'Tap to speak'}
               </p>
 
-              <div className="ec-spk-convo-actions">
-                {turns.length > 0 && (
+              {turns.length > 0 && !capture.active && (
+                <div className="ec-spk-convo-actions">
                   <button
+                    type="button"
                     className="ec-spk-btn-ghost"
                     onClick={() => {
-                      conversationRecorder.cancel();
+                      capture.cancel();
                       startConversation();
                     }}
                   >
                     Restart
                   </button>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           )}
 
+          {/* ============ HISTORY TAB ============ */}
           {tab === 'history' && (
             <div className="ec-spk-history ec-spk-anim" key="history">
               {historyLoading ? (
                 <div className="ec-spk-empty">
-                  <span className="ec-spk-empty-icon"><Icon name="trophy" /></span>
+                  <span className="ec-spk-empty-icon">
+                    <Icon name="trophy" />
+                  </span>
                   <span>Loading history…</span>
                 </div>
               ) : history.length === 0 ? (
                 <div className="ec-spk-empty">
-                  <span className="ec-spk-empty-icon"><Icon name="mic" /></span>
+                  <span className="ec-spk-empty-icon">
+                    <Icon name="mic" />
+                  </span>
                   <span>No past attempts yet</span>
-                  <span style={{ fontSize: 12, opacity: 0.75 }}>Finish a practice prompt to see it here.</span>
+                  <span style={{ fontSize: 12, opacity: 0.75 }}>
+                    Finish a practice prompt to see it here.
+                  </span>
                 </div>
               ) : (
                 history.map((h, i) => (
-                  <div className="ec-spk-history-item" key={h.id} style={{ animationDelay: `${i * 0.05}s` }}>
+                  <div
+                    className="ec-spk-history-item"
+                    key={h.id}
+                    style={{ animationDelay: `${i * 0.05}s` }}
+                  >
                     <div style={{ minWidth: 0 }}>
                       <p className="ec-spk-history-title">{h.prompt}</p>
                       <span className="ec-spk-history-date">{h.date}</span>
@@ -2678,6 +3438,7 @@ export function Speaking() {
           )}
         </section>
 
+        {/* ---------- SIDEBAR ---------- */}
         <aside>
           <div className="ec-spk-side ec-spk-anim">
             <h3>Recording tips <span>Guide</span></h3>
@@ -2718,12 +3479,14 @@ export function Speaking() {
             </p>
           </div>
 
-          {!speech.supported && (
+          {!env.speechRecognition && (
             <div className="ec-spk-side ec-spk-anim" style={{ background: 'var(--lang-yellow)' }}>
               <h3>Browser note</h3>
               <p style={{ margin: 0, fontSize: 12.5, color: 'var(--lang-ink)', lineHeight: 1.6, fontWeight: 700 }}>
-                Live transcription requires Chrome, Edge, or Safari. You can still record in this browser,
-                but scoring is disabled because we can't verify what you said.
+                Live transcription works best in <strong>Safari</strong> on iOS, and{' '}
+                <strong>Chrome</strong>/<strong>Edge</strong>/<strong>Samsung Internet</strong> on Android and
+                desktop. On iOS, open this page in Safari — Chrome on iOS can't run speech recognition. Links
+                opened inside Facebook, Messenger or Instagram must be re-opened in your real browser.
               </p>
             </div>
           )}
