@@ -11,6 +11,7 @@ import authRoutes        from './modules/auth/routes.js';
 import usersRoutes       from './modules/users/routes.js';
 import vocabRoutes       from './modules/vocab/routes.js';
 import grammarRoutes     from './modules/grammar/routes.js';
+import progressRoutes from './modules/progress/routes.js';
 import curriculumRoutes  from './modules/curriculum/routes.js';
 import examsRoutes       from './modules/exams/routes.js';
 import speakingRoutes    from './modules/speaking/routes.js';
@@ -42,6 +43,7 @@ export function createApp() {
   app.use('/api/users',        usersRoutes);
   app.use('/api/vocab',        vocabRoutes);
   app.use('/api/grammar',      grammarRoutes);
+  app.use('/api/progress', progressRoutes);
   app.use('/api/curriculum',   curriculumRoutes);
   app.use('/api/exams',        examsRoutes);
   app.use('/api/speaking',     speakingRoutes);
