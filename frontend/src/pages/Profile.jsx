@@ -751,8 +751,9 @@ export function Profile() {
 
   const [animateBars, setAnimateBars] = useState(false);
 
-  const loadXp = useCallback(() => {
-    setXpLoading(true);
+  // silent=true refreshes in the background without flashing the skeleton
+  const loadXp = useCallback((silent = false) => {
+    if (!silent) setXpLoading(true);
     setXpError(false);
     gamificationApi
       .summary()
@@ -762,7 +763,6 @@ export function Profile() {
   }, []);
 
   const loadBadges = useCallback(() => {
-    setBadgesLoading(true);
     gamificationApi
       .badges()
       .then((data) => setBadges(Array.isArray(data) && data.length ? data : DEFAULT_BADGES))
@@ -774,7 +774,24 @@ export function Profile() {
     loadXp();
     loadBadges();
     const t = requestAnimationFrame(() => setAnimateBars(true));
-    return () => cancelAnimationFrame(t);
+
+    // Keep XP fresh: refetch when the tab/window regains focus and every 30s.
+    const refresh = () => {
+      if (document.visibilityState === 'visible') {
+        loadXp(true);
+        loadBadges();
+      }
+    };
+    document.addEventListener('visibilitychange', refresh);
+    window.addEventListener('focus', refresh);
+    const timer = setInterval(refresh, 30000);
+
+    return () => {
+      cancelAnimationFrame(t);
+      document.removeEventListener('visibilitychange', refresh);
+      window.removeEventListener('focus', refresh);
+      clearInterval(timer);
+    };
   }, [loadXp, loadBadges]);
 
   const xpToday = xp?.xpToday ?? 0;
@@ -864,7 +881,7 @@ export function Profile() {
           {xpError ? (
             <div className="ec-prof-error">
               <span>Couldn’t load today’s progress.</span>
-              <button className="ec-prof-retry" onClick={loadXp}>Retry</button>
+              <button className="ec-prof-retry" onClick={() => loadXp()}>Retry</button>
             </div>
           ) : (
             <div className="ec-prof-card" style={{ animation: 'ec-prof-slide-in .5s cubic-bezier(.22,1,.36,1) both', animationDelay: '.1s' }}>

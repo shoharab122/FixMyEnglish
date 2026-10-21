@@ -1,7 +1,9 @@
 import 'dotenv/config';
 
 function required(name: string, fallback?: string): string {
-  const v = process.env[name] ?? fallback;
+  // Fallbacks are OK in dev only. In production a missing secret must crash.
+  const fromEnv = process.env[name];
+  const v = fromEnv ?? (process.env.NODE_ENV !== 'production' ? fallback : undefined);
   if (!v) throw new Error(`Missing env var: ${name}`);
   return v;
 }
@@ -11,7 +13,7 @@ export const env = {
   port:            Number(process.env.PORT ?? 4000),
   corsOrigin:      process.env.CORS_ORIGIN ?? 'http://localhost:5173',
   appUrl:          process.env.APP_URL ?? 'http://localhost:5173',
-  accessSecret:    required('JWT_ACCESS_SECRET', 'dev_access_secret_change_me_1234567890'),
+  accessSecret:    required('JWT_ACCESS_SECRET',  'dev_access_secret_change_me_1234567890'),
   refreshSecret:   required('JWT_REFRESH_SECRET', 'dev_refresh_secret_change_me_1234567890'),
   accessTtl:       process.env.ACCESS_TTL ?? '15m',
   refreshTtlDays:  Number(process.env.REFRESH_TTL_DAYS ?? 30),
