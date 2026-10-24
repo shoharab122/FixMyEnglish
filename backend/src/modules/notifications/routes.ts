@@ -19,21 +19,29 @@ router.get('/', authOptional, async (req: any, res, next) => {
     const items: any[] = [];
 
     if (req.user) {
-      // Badges earned but not seen
+      // Badges earned — schema uses unlockedAt; achievement relation is not
+      // exposed on the TS client, so fetch separately and join.
       try {
         const badges = await prisma.userAchievement.findMany({
           where: { userId: req.user.id },
           take: 5,
-          orderBy: { earnedAt: 'desc' },
-          include: { achievement: true },
+          orderBy: { unlockedAt: 'desc' },
         });
-        for (const b of badges) {
+        const achievementIds = badges.map((b: any) => b.achievementId);
+        const achievements = achievementIds.length
+          ? await prisma.achievement.findMany({ where: { id: { in: achievementIds } } })
+          : [];
+        const achievementById = new Map<string, any>(
+          achievements.map((a: any) => [a.id, a]),
+        );
+        for (const b of badges as any[]) {
+          const ach = achievementById.get(b.achievementId);
           items.push({
             id: `badge-${b.id}`,
             kind: 'badge',
             title: '🏆 Badge earned!',
-            body: b.achievement?.title ?? 'New badge',
-            ts: b.earnedAt?.toISOString?.() ?? new Date().toISOString(),
+            body: ach?.title ?? 'New badge',
+            ts: b.unlockedAt?.toISOString?.() ?? new Date().toISOString(),
             read: false,
             to: '/progress',
           });
