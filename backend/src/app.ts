@@ -7,19 +7,19 @@ import { env } from './config/env.js';
 import { globalLimiter } from './middleware/rateLimit.js';
 import { errorHandler, notFound } from './middleware/error.js';
 
-import authRoutes        from './modules/auth/routes.js';
-import usersRoutes       from './modules/users/routes.js';
-import vocabRoutes       from './modules/vocab/routes.js';
-import grammarRoutes     from './modules/grammar/routes.js';
+import authRoutes from './modules/auth/routes.js';
+import usersRoutes from './modules/users/routes.js';
+import vocabRoutes from './modules/vocab/routes.js';
+import grammarRoutes from './modules/grammar/routes.js';
 import progressRoutes from './modules/progress/routes.js';
-import curriculumRoutes  from './modules/curriculum/routes.js';
-import examsRoutes       from './modules/exams/routes.js';
-import speakingRoutes    from './modules/speaking/routes.js';
+import curriculumRoutes from './modules/curriculum/routes.js';
+import examsRoutes from './modules/exams/routes.js';
+import speakingRoutes from './modules/speaking/routes.js';
 import gamificationRoutes from './modules/gamification/routes.js';
-import communityRoutes   from './modules/community/routes.js';
-import liveRoomsRoutes   from './modules/liveRooms/routes.js';
-import paymentsRoutes    from './modules/payments/routes.js';
-import adminRoutes       from './modules/admin/routes.js';
+import communityRoutes from './modules/community/routes.js';
+import liveRoomsRoutes from './modules/liveRooms/routes.js';
+import paymentsRoutes from './modules/payments/routes.js';
+import adminRoutes from './modules/admin/routes.js';
 import examPapersUserRouter from './modules/exam-papers/user.routes.js';
 import examPapersAdminRouter from './modules/exam-papers/admin.routes.js';
 import gimiRoutes from './modules/gimi/routes.js';
@@ -39,11 +39,16 @@ export function createApp() {
 
   app.get('/health', (_req, res) => res.json({ ok: true, ts: Date.now() }));
 
+  // Mount the more specific routers BEFORE their parents.
+  // Otherwise a future catch-all in the parent silently shadows these.
+  app.use('/api/admin/exam-papers', examPapersAdminRouter);
+  app.use('/api/exams/papers',      examPapersUserRouter);
+
   app.use('/api/auth',         authRoutes);
   app.use('/api/users',        usersRoutes);
   app.use('/api/vocab',        vocabRoutes);
   app.use('/api/grammar',      grammarRoutes);
-  app.use('/api/progress', progressRoutes);
+  app.use('/api/progress',     progressRoutes);
   app.use('/api/curriculum',   curriculumRoutes);
   app.use('/api/exams',        examsRoutes);
   app.use('/api/speaking',     speakingRoutes);
@@ -52,12 +57,9 @@ export function createApp() {
   app.use('/api/live-rooms',   liveRoomsRoutes);
   app.use('/api/payments',     paymentsRoutes);
   app.use('/api/admin',        adminRoutes);
-  app.use('/api/gimi', gimiRoutes);
-  app.use('/api/search', searchRoutes);
-  app.use('/api/notifications', notificationsRoutes);
-
-  app.use('/api/exams/papers', examPapersUserRouter);
-  app.use('/api/admin/exam-papers', examPapersAdminRouter);
+  app.use('/api/gimi',         gimiRoutes);
+  app.use('/api/search',       searchRoutes);
+  app.use('/api/notifications',notificationsRoutes);
 
   app.use(notFound);
   app.use(errorHandler);

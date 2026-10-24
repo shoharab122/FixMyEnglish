@@ -21,13 +21,10 @@ export interface ChatOptions {
 }
 
 function pickProvider(): 'openai' | 'anthropic' | 'mock' {
-  const p = (env as any).aiProvider;
-  const oa = (env as any).openaiApiKey;
-  const an = (env as any).anthropicApiKey;
-  if (p === 'openai' && oa) return 'openai';
-  if (p === 'anthropic' && an) return 'anthropic';
-  if (oa) return 'openai';
-  if (an) return 'anthropic';
+  if (env.aiProvider === 'openai' && env.openaiApiKey) return 'openai';
+  if (env.aiProvider === 'anthropic' && env.anthropicApiKey) return 'anthropic';
+  if (env.openaiApiKey) return 'openai';
+  if (env.anthropicApiKey) return 'anthropic';
   return 'mock';
 }
 
@@ -60,9 +57,9 @@ function trimHistory(messages: ChatMessage[], maxTurns = 8): ChatMessage[] {
 }
 
 async function streamOpenAI(opts: ChatOptions): Promise<ReadableStream<Uint8Array>> {
-  const apiKey = (env as any).openaiApiKey;
-  const base = (env as any).openaiBaseUrl || 'https://api.openai.com/v1';
-  const model = (env as any).aiModel || 'gpt-4o-mini';
+  const apiKey = env.openaiApiKey!;
+  const base = env.openaiBaseUrl || 'https://api.openai.com/v1';
+  const model = env.aiModel || 'gpt-4o-mini';
 
   const body = {
     model,
@@ -93,9 +90,9 @@ async function streamOpenAI(opts: ChatOptions): Promise<ReadableStream<Uint8Arra
 }
 
 async function streamAnthropic(opts: ChatOptions): Promise<ReadableStream<Uint8Array>> {
-  const apiKey = (env as any).anthropicApiKey;
-  const base = (env as any).anthropicBaseUrl || 'https://api.anthropic.com/v1';
-  const model = (env as any).aiModel || 'claude-3-5-haiku-latest';
+  const apiKey = env.anthropicApiKey!;
+  const base = env.anthropicBaseUrl || 'https://api.anthropic.com/v1';
+  const model = env.aiModel || 'claude-3-5-haiku-latest';
 
   const body = {
     model,
@@ -111,7 +108,7 @@ async function streamAnthropic(opts: ChatOptions): Promise<ReadableStream<Uint8A
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': apiKey!,
+      'x-api-key': apiKey,
       'anthropic-version': '2023-06-01',
     },
     body: JSON.stringify(body),
@@ -204,7 +201,7 @@ function normalizeStream(
               }
             }
           } catch {
-            /* skip */
+            /* skip malformed chunk */
           }
         }
       } catch (err: any) {
@@ -250,7 +247,7 @@ export async function askOnce(opts: ChatOptions): Promise<string> {
       try {
         const p = JSON.parse(t.slice(5).trim());
         if (p.delta) out += p.delta;
-      } catch {}
+      } catch { /* skip */ }
     }
   }
   return out.trim();

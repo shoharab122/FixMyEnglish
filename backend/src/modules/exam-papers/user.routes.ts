@@ -1,10 +1,9 @@
 import { Router } from 'express';
 import { prisma } from '../../lib/prisma.js';
-import { requireAuth } from '../../middleware/auth.js';
+import { requireAuth, optionalAuth } from '../../middleware/auth.js';
 import { uid } from '../../lib/req.js';
 
 const router = Router();
-router.use(requireAuth);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Row = any;
@@ -31,7 +30,8 @@ function buildReview(sections: Row[], answers: Record<string, unknown>) {
   }));
 }
 
-router.get('/', async (_req, res, next) => {
+// Guests can browse the paper list; only submit/start require a user.
+router.get('/', optionalAuth, async (_req, res, next) => {
   try {
     const papers = await prisma.examPaper.findMany({
       where: { status: { in: ['published', 'live', 'ended'] } },
@@ -52,7 +52,9 @@ router.get('/', async (_req, res, next) => {
   } catch (err) { next(err); }
 });
 
-router.post('/attempts/:attemptId/submit', async (req, res, next) => {
+// NOTE: /attempts/* must be declared BEFORE /:id so /:id doesn't
+// swallow the path as id="attempts".
+router.post('/attempts/:attemptId/submit', requireAuth, async (req, res, next) => {
   try {
     const userId = uid(req);
     const attempt = await prisma.examPaperAttempt.findUnique({
@@ -80,7 +82,6 @@ router.post('/attempts/:attemptId/submit', async (req, res, next) => {
     const total = all.length;
     const score = total ? Math.round((correct / total) * 100) : 0;
 
-    // Only one request can flip submittedAt from null, so a double-click can't submit twice.
     const { count } = await prisma.examPaperAttempt.updateMany({
       where: { id: attempt.id, submittedAt: null },
       data: { answers: answers as any, score, total, submittedAt: new Date() },
@@ -91,8 +92,7 @@ router.post('/attempts/:attemptId/submit', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
-/** Answer key + explanations for an attempt the user has already submitted. */
-router.get('/attempts/:attemptId/review', async (req, res, next) => {
+router.get('/attempts/:attemptId/review', requireAuth, async (req, res, next) => {
   try {
     const attempt = await prisma.examPaperAttempt.findUnique({
       where: { id: req.params.attemptId },
@@ -108,7 +108,7 @@ router.get('/attempts/:attemptId/review', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
-router.get('/:id', async (req, res, next) => {
+router.get('/:id', optionalAuth, async (req, res, next) => {
   try {
     const paper = await prisma.examPaper.findUnique({
       where: { id: req.params.id },
@@ -120,7 +120,7 @@ router.get('/:id', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
-router.post('/:id/start', async (req, res, next) => {
+router.post('/:id/start', requireAuth, async (req, res, next) => {
   try {
     const paper = await prisma.examPaper.findUnique({ where: { id: req.params.id } });
     if (!paper) return res.status(404).json({ error: 'Paper not found' });

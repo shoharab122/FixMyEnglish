@@ -2,6 +2,8 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { authLimiter } from '../../middleware/rateLimit.js';
 import { validateBody } from '../../middleware/validate.js';
+import { requireAuth } from '../../middleware/auth.js';
+import { prisma } from '../../lib/prisma.js';
 import { env } from '../../config/env.js';
 import {
   REFRESH_COOKIE_NAME, register, login, guest, refresh, logout,
@@ -68,6 +70,17 @@ router.post('/refresh', async (req, res, next) => {
     const { user, accessToken, refreshToken } = await refresh(token, deviceInfo);
     setRefreshCookie(res, refreshToken);
     res.json({ user: shapeUser(user), accessToken });
+  } catch (e) { next(e); }
+});
+
+// Current user — AuthContext.refreshUser() calls this on window focus so
+// admin-driven tier/role changes reach the UI without a re-login.
+router.get('/me', requireAuth, async (req, res, next) => {
+  try {
+    const user = await prisma.user.findUnique({ where: { id: req.user!.id } });
+    if (!user) return res.status(401).json({ error: 'User no longer exists' });
+    res.set('Cache-Control', 'no-store');
+    res.json(shapeUser(user));
   } catch (e) { next(e); }
 });
 

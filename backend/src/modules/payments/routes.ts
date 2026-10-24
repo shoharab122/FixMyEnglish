@@ -28,35 +28,57 @@ router.get('/packages', async (_req, res, next) => {
 router.post('/checkout', requireAuth, async (req, res, next) => {
   try {
     const userId = uid(req);
-    const { productType, method } = req.body ?? {};
+    const { productType, method, coupon } = req.body ?? {};
     const product = await prisma.product.findUnique({ where: { slug: productType } });
     if (!product) return res.status(404).json({ error: 'Unknown product' });
+
+    // Apply coupon (if provided) BEFORE creating the purchase.
+    let finalAmount = product.priceBdt;
+    let appliedCode: string | null = null;
+    if (coupon) {
+      const code = String(coupon).trim().toUpperCase();
+      const c = await prisma.coupon.findUnique({ where: { code } });
+      if (c && c.usedCount < c.maxUses && (!c.validTo || c.validTo > new Date())) {
+        finalAmount = Math.round(product.priceBdt * (1 - c.discountPct / 100));
+        appliedCode = c.code;
+      }
+    }
 
     const purchase = await prisma.purchase.create({
       data: {
         userId, productId: product.id,
-        amountBdt: product.priceBdt, method: method ?? 'bkash', status: 'pending',
+        amountBdt: finalAmount, method: method ?? 'bkash', status: 'pending',
       },
     });
     const provider = getPaymentProvider(method ?? 'bkash');
     const init = await provider.init({
       purchaseId: purchase.id,
-      amountBdt: product.priceBdt,
+      amountBdt: finalAmount,
       description: product.name,
     });
     await prisma.purchase.update({
       where: { id: purchase.id }, data: { gatewayTxnId: init.gatewayTxnId },
     });
 
-    // Mock mode only: pretend the gateway confirmed. With a real provider the
-    // purchase stays "pending" until the gateway callback verifies it.
     const paid = mockMode();
     if (paid) {
       await prisma.purchase.update({ where: { id: purchase.id }, data: { status: 'paid' } });
       if (product.type === 'subscription') await setUserTier(userId, 'premium');
+      if (appliedCode) {
+        await prisma.coupon.update({
+          where: { code: appliedCode },
+          data: { usedCount: { increment: 1 } },
+        }).catch(() => { /* race: coupon already deleted */ });
+      }
     }
 
-    res.json({ purchaseId: purchase.id, redirectUrl: init.redirectUrl, amountBdt: product.priceBdt, paid });
+    res.json({
+      purchaseId: purchase.id,
+      redirectUrl: init.redirectUrl,
+      amountBdt: finalAmount,
+      paid,
+      ...(appliedCode ? { coupon: appliedCode } : {}),
+    });
   } catch (e) {
     next(e);
   }
@@ -102,7 +124,7 @@ router.get('/history', requireAuth, async (req, res, next) => {
 router.post('/coupon/apply', requireAuth, async (req, res, next) => {
   try {
     const { code } = req.body ?? {};
-    const c = await prisma.coupon.findUnique({ where: { code } });
+    const c = await prisma.coupon.findUnique({ where: { code: String(code).trim().toUpperCase() } });
     if (!c || c.usedCount >= c.maxUses) return res.status(400).json({ error: 'Invalid coupon' });
     res.json({ code: c.code, discountPct: c.discountPct });
   } catch (e) {

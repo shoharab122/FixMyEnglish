@@ -1,52 +1,61 @@
-# Dependencies
+# ── Dependencies ──
 node_modules/
-**/node_modules/
+.pnp
+.pnp.js
 
-# Build outputs
-dist/
-build/
-**/dist/
-**/build/
-
-# Secrets — never commit these
+# ── Env / secrets (never commit) ──
 .env
 .env.*
-**/.env
-**/.env.*
 !.env.example
-!**/.env.example
+*.pem
+*.key
+*.crt
 
-# Logs
+# ── Build output ──
+backend/dist/
+backend/build/
+frontend/dist/
+frontend/build/
+frontend/.vite/
+
+# ── Backups from patching ──
+backend/.backup-*/
+
+# ── Prisma local data ──
+backend/prisma/*.db
+backend/prisma/*.db-journal
+backend/prisma/migrations/dev.db*
+
+# ── Uploads / temp ──
+backend/uploads/
+backend/tmp/
+backend/.cache/
+backend/logs/
+
+# ── Logs ──
 *.log
 npm-debug.log*
 yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
-# OS
+# ── macOS ──
 .DS_Store
-Thumbs.db
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
 
-# Editor
+# ── Editors ──
 .vscode/
 .idea/
 *.swp
 *.swo
-
-# Local Postgres data
-coach_pgdata/
-
-# Editor and tool backups
-*.bak
-*.bak.*
-*.orig
-*.tmp
-*.swp
 *~
+*.sublime-workspace
+*.sublime-project
 
-# Editor and tool backups
-*.bak
-*.bak.*
-*.orig
-*.tmp
-*.swp
-*~
-*.bak
+# ── Test / coverage ──
+coverage/
+.nyc_output/

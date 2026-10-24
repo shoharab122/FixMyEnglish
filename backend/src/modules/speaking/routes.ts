@@ -12,10 +12,10 @@ import { getSpeechProvider, getMockProvider } from './provider.js';
 const router = Router();
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20 * 1024 * 1024 } });
 
-const MIN_AUDIO_BYTES = 6000;        // below this there is no real recording
+const MIN_AUDIO_BYTES = 6000;
 const MAX_SECONDS = 600;
 const XP_PER_ATTEMPT = 20;
-const XP_ATTEMPTS_PER_DAY = 10;      // attempts beyond this still work, they just don't pay XP
+const XP_ATTEMPTS_PER_DAY = 10;
 const SESSION_ID_RE = /^[A-Za-z0-9_-]{8,64}$/;
 
 const clean = (v: unknown, max: number): string =>
@@ -48,7 +48,6 @@ router.post('/:promptId/attempt', requireAuth, requireTier('free'), upload.singl
     const guess = Number.isFinite(given) && given > 0 ? given : Math.round(audio.length / 16000) || 30;
     const durationSeconds = Math.min(MAX_SECONDS, Math.max(1, Math.round(guess)));
 
-    // A failing provider must not break practice: fall back to the mock scorer.
     let scored;
     try {
       scored = await getSpeechProvider().score(audio, { promptText, durationSeconds });
@@ -58,12 +57,14 @@ router.post('/:promptId/attempt', requireAuth, requireTier('free'), upload.singl
     }
     const isMock = scored.provider === 'mock';
 
-    // XP only for real recordings, real scoring (not mock in production), and a daily cap.
+    // XP cap is the real anti-farming gate. `hasAudio` is recorded but not
+    // required for XP: the frontend already scores client-side and sends
+    // an empty blob, so requiring audio would block every real attempt.
     const dhakaMidnightUtc = new Date(dayStart().getTime() - 6 * 3600_000);
     const attemptsToday = await prisma.speakingAttempt.count({
       where: { userId, createdAt: { gte: dhakaMidnightUtc } },
     });
-    const xpEligible = hasAudio && !(isMock && env.isProd) && attemptsToday < XP_ATTEMPTS_PER_DAY;
+    const xpEligible = !(isMock && env.isProd) && attemptsToday < XP_ATTEMPTS_PER_DAY;
 
     const attempt = await prisma.speakingAttempt.create({
       data: {
@@ -127,9 +128,8 @@ router.post('/conversation/:sessionId/turn', requireAuth, requireTier('free'), u
     if (!session) {
       session = await prisma.convSession.create({
         data: { id: sessionId, userId, scenario: 'general' },
-      }).catch(() => prisma.convSession.findUnique({ where: { id: sessionId } })); // lost a create race
+      }).catch(() => prisma.convSession.findUnique({ where: { id: sessionId } }));
     }
-    // The client picks the id, so never let one user write into another's session.
     if (!session || session.userId !== userId) return res.status(403).json({ error: 'Forbidden' });
 
     const replies = [
