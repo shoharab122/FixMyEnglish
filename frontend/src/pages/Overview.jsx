@@ -473,7 +473,7 @@ const PlanCard = memo(function PlanCard({ word, xp }) {
   const remaining = xp ? Math.max(0, (xp.xpGoal || 0) - (xp.xpToday || 0)) : null;
   const goalDone = xp && xp.xpGoal > 0 && remaining === 0;
   return (
-    <div className="ec-plan-card ec-anim-in" style={{ animationDelay: '0.06s' }}>
+    <div className="ec-plan-card ec-o-plan ec-anim-in" style={{ animationDelay: '0.06s' }}>
       <div className="ec-plan-head">
         <h3>Today’s plan</h3>
         <span className="ec-plan-count">{goalDone ? 'Goal reached' : '3 steps'}</span>
@@ -534,7 +534,7 @@ const CalendarCard = memo(function CalendarCard({ weeks, xpToday, streak }) {
   else if (activeDay) detail = 'No session recorded';
 
   return (
-    <div className="ec-calendar-card ec-anim-in" style={{ animationDelay: '0.1s' }}>
+    <div className="ec-calendar-card ec-o-calendar ec-anim-in" style={{ animationDelay: '0.1s' }}>
       <div className="ec-calendar-head">
         <div className="ec-calendar-head-copy">
           <span className="ec-calendar-eyebrow">Practice calendar</span>
@@ -688,6 +688,18 @@ export function Overview() {
     };
   }, []);
 
+  /* Pause the hero's infinite animations while it is off-screen (saves battery on phones) */
+  useEffect(() => {
+    const hero = heroRef.current;
+    if (!hero || typeof IntersectionObserver === 'undefined') return undefined;
+    const io = new IntersectionObserver(
+      ([entry]) => hero.classList.toggle('is-offscreen', !entry.isIntersecting),
+      { rootMargin: '60px' },
+    );
+    io.observe(hero);
+    return () => io.disconnect();
+  }, []);
+
   const buyCourse = useCallback((course) => {
     if (buyingRef.current || boughtRef.current.has(course.id)) return;
     buyingRef.current = course.id;
@@ -732,7 +744,7 @@ export function Overview() {
       <div className="ec-grid">
         <div className="ec-col-main">
           {/* ============================ HERO ============================ */}
-          <section className="ec-hero ec-anim-in" style={{ animationDelay: '0.04s' }} ref={heroRef} aria-label="Today’s focus">
+          <section className="ec-hero ec-o-hero ec-anim-in" style={{ animationDelay: '0.04s' }} ref={heroRef} aria-label="Today’s focus">
             <div className="ec-hero-orb ec-hero-orb--a" aria-hidden="true" />
             <div className="ec-hero-orb ec-hero-orb--b" aria-hidden="true" />
 
@@ -793,6 +805,7 @@ export function Overview() {
           </section>
 
           {/* ========================= CATEGORIES ========================= */}
+          <section className="ec-block ec-o-cats">
           <div className="ec-section-head ec-section-head--tight">
             <h2 className="ec-section-title">Choose what to learn</h2>
             <Link to="/curriculum" className="ec-section-link">See all</Link>
@@ -800,8 +813,10 @@ export function Overview() {
           <nav className="ec-categories" aria-label="Learning categories">
             {CATEGORIES.map((cat, i) => <CategoryCard key={cat.id} cat={cat} index={i} />)}
           </nav>
+          </section>
 
           {/* =========================== ACTIVITY ========================= */}
+          <section className="ec-block ec-o-activity">
           <div className="ec-section-head ec-section-head--tight">
             <h2 className="ec-section-title">Your activity</h2>
             <Link to="/progress" className="ec-section-link">Full stats</Link>
@@ -872,9 +887,10 @@ export function Overview() {
           </div>
 
           <WeeklyChart days={todayWeekDays} xpToday={xp?.xpToday} xpGoal={xp?.xpGoal} />
+          </section>
 
           {/* ============================ LESSONS ========================= */}
-          <section className="ec-defer">
+          <section className="ec-defer ec-o-lessons">
             <div className="ec-section-head">
               <div className="ec-section-head-copy">
                 <h2 className="ec-section-title">Your lessons</h2>
@@ -890,7 +906,7 @@ export function Overview() {
           </section>
 
           {/* ============================ ARTICLES ======================== */}
-          <section className="ec-defer">
+          <section className="ec-defer ec-o-articles">
             <div className="ec-section-head">
               <h2 className="ec-section-title">Top articles</h2>
               <Link to="/curriculum" className="ec-section-link">Browse all</Link>
@@ -906,7 +922,7 @@ export function Overview() {
           <PlanCard word={wordOfDay?.word} xp={xp} />
           <CalendarCard weeks={weeks} xpToday={xp?.xpToday} streak={xp?.streak} />
 
-          <section className="ec-defer ec-course-section">
+          <section className="ec-defer ec-course-section ec-o-courses">
             <div className="ec-section-head ec-section-head--aside">
               <h2 className="ec-section-title">Courses</h2>
               <Link to="/pricing" className="ec-section-link">All</Link>
