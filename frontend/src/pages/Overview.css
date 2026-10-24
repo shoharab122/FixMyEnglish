@@ -949,3 +949,99 @@
   .ec-btn-primary { min-height: 52px; }
   .ec-article-bookmark { width: 40px; height: 40px; }
 }
+
+/* ============================================================
+   MOBILE OPTIMISATION
+   - phone-first section order (plan right after the hero)
+   - swipe carousels, 44px touch targets, safe-area padding
+   - cheaper rendering: no blur, fewer infinite animations,
+     no sticky hover states on touch screens
+   ============================================================ */
+.ec-overview { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+.ec-hero.is-offscreen * { animation-play-state: paused !important; }
+
+@media (max-width: 900px) {
+  /* leave room for a bottom tab bar if the app shell sets --lang-nav-h */
+  .ec-overview { padding-bottom: calc(var(--lang-nav-h, 0px) + env(safe-area-inset-bottom, 0px) + 8px); }
+
+  /* flatten the two columns, then order sections for thumbs */
+  .ec-grid { display: flex; flex-direction: column; gap: 24px; }
+  .ec-col-main, .ec-col-side { display: contents; }
+  .ec-o-hero      { order: 1; }
+  .ec-o-plan      { order: 2; }
+  .ec-o-cats      { order: 3; }
+  .ec-o-activity  { order: 4; }
+  .ec-o-calendar  { order: 5; }
+  .ec-o-lessons   { order: 6; }
+  .ec-o-courses   { order: 7; }
+  .ec-o-articles  { order: 8; }
+  .ec-block > .ec-section-head:first-child,
+  .ec-defer > .ec-section-head:first-child { margin-top: 0; }
+  .ec-weekly { margin-top: 12px; }
+  .ec-defer { contain-intrinsic-size: auto 360px; }
+  .ec-course-section { contain-intrinsic-size: auto 620px; }
+
+  /* compact hero */
+  .ec-hero { min-height: 0; padding: 20px 18px 18px; }
+  .ec-hero::before { display: none; }
+  .ec-hero-orb { animation: none; will-change: auto; }
+  .ec-hero-orb--b { display: none; }
+  .ec-hero-art-bob { animation: none; }
+  .ec-hero-sub { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; font-size: 14px; line-height: 1.55; }
+  .ec-hero-example { display: none; }
+  .ec-hero-actions { flex-wrap: nowrap; gap: 10px; margin: 16px 0; }
+  .ec-hero-actions .ec-btn-primary { flex: 1 1 auto; padding-inline: 18px; }
+  .ec-hero-link { flex: 0 0 auto; white-space: nowrap; min-height: 52px; display: inline-flex; align-items: center; }
+  .ec-hero-continue { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(255,255,255,.12); }
+
+  /* lighter entrances: short fade, no stagger */
+  .ec-anim-in, .ec-category { animation-duration: .35s; animation-delay: 0s !important; }
+
+  /* articles become a swipe row like the other carousels */
+  .ec-article-row {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    gap: 14px;
+    padding: 2px 2px 14px;
+  }
+  .ec-article-row::-webkit-scrollbar { display: none; }
+  .ec-article-card { flex: 0 0 86%; scroll-snap-align: start; }
+  .ec-xp-row, .ec-progress-row, .ec-article-row { scroll-padding-inline: 2px; }
+
+  /* 44px minimum touch targets */
+  .ec-section-link { min-height: 44px; }
+  .ec-calendar-nav button { width: 44px; height: 44px; }
+  .ec-calendar-day { min-height: 52px; }
+  .ec-plan-item { min-height: 56px; }
+  .ec-btn-pill { min-height: 48px; }
+  .ec-mascot-btn { min-width: 44px; min-height: 44px; }
+}
+
+@media (max-width: 480px) {
+  .ec-hero-art { top: 12px; right: 12px; width: 80px; height: 80px; }
+  .ec-hero-art .ec-mascot-svg { width: 80px; height: 80px; }
+  .ec-hero-badges { padding-right: 88px; }
+  .ec-hero-headline { font-size: 24px; margin-bottom: 10px; }
+  .ec-article-card { flex-basis: 90%; }
+  .ec-page-title { font-size: 24px; }
+  .ec-head-chips { width: 100%; }
+}
+
+/* Touch screens: no sticky :hover lifts; give taps a quick press response instead */
+@media (hover: none) {
+  .ec-overview :is(.ec-category, .ec-xp-card, .ec-progress-card, .ec-article-card, .ec-course-card,
+    .ec-hero-continue, .ec-hero-link, .ec-btn-primary, .ec-btn-pill, .ec-plan-item, .ec-section-link,
+    .ec-calendar-nav button):hover { transform: none; }
+  .ec-overview .ec-calendar-day:hover:not(.ec-calendar-day--active) { transform: none; }
+  .ec-overview .ec-xp-card:hover .ec-xp-icon,
+  .ec-overview .ec-category:hover .ec-category-icon,
+  .ec-overview .ec-progress-card:hover .ec-progress-cta,
+  .ec-overview .ec-article-card:hover .ec-article-bookmark { transform: none; }
+  .ec-overview :is(.ec-category, .ec-progress-card, .ec-article-card, .ec-course-card,
+    .ec-hero-continue, .ec-plan-item):active { transform: scale(.98); }
+}
