@@ -1,15 +1,16 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { curriculumApi } from '../api/curriculum';
 import { Icon } from '../components/Icon';
 
 /* ============================================================
    CURRICULUM — Langut-inspired, mobile-first (optimised)
-   1500+ exercises · 28 categories · Lessons + Practice
+   1500+ exercises · 30 categories · Lessons + Practice + Paragraphs + Stories
    Papers: English 2nd Paper + General only.
    (IELTS section removed.)
    ============================================================ */
 
 const CURRICULUM_CSS = `
+@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap');
 .ec-cur{
   --lang-bg:#1E1252;--lang-bg-2:#2A1A6E;--lang-bg-3:#3B2596;
   --lang-lime:#D4F55C;--lang-lime-2:#E4FF5C;--lang-lime-soft:#EDFFB0;--lang-lime-deep:#B8E62E;
@@ -63,11 +64,11 @@ const CURRICULUM_CSS = `
   border:2px solid var(--lang-line);box-shadow:0 3px 0 rgba(0,0,0,.4);
   margin-bottom:14px;max-width:100%;
 }
-.ec-cur-hero h1{
+.ec-cur-hero h2{
   margin:0 0 10px;font-size:clamp(22px,2.4vw + 14px,36px);
   font-weight:900;letter-spacing:-.035em;line-height:1.1;color:#fff;word-break:break-word;
 }
-.ec-cur-hero h1 em{font-style:normal;color:var(--lang-lime)}
+.ec-cur-hero h2 em{font-style:normal;color:var(--lang-lime)}
 .ec-cur-hero p{margin:0 0 18px;font-size:14px;line-height:1.6;opacity:.92;font-weight:500;max-width:52ch}
 .ec-cur-hero-stats{display:flex;gap:10px;flex-wrap:wrap;position:relative;z-index:1}
 .ec-cur-hero-stat{
@@ -350,6 +351,36 @@ const CURRICULUM_CSS = `
 @keyframes ec-shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
 .ec-shake{animation:ec-shake .4s ease}
 
+/* PARAGRAPHS */
+.ec-para-list{display:flex;flex-direction:column;gap:8px}
+.ec-para-item{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:12px 14px;border-radius:14px;border:2px solid var(--lang-line);
+  background:#fff;color:var(--lang-ink);font-size:13px;font-weight:800;text-align:left;width:100%;
+  box-shadow:0 3px 0 var(--lang-line);min-height:var(--tap);
+  transition:transform .15s ease,box-shadow .15s ease,background .15s ease;
+}
+.ec-para-item:hover{background:var(--lang-lime-soft);transform:translateY(-1px);box-shadow:0 4px 0 var(--lang-line)}
+.ec-para-item:active{transform:translateY(1px);box-shadow:0 1px 0 var(--lang-line)}
+.ec-para-item--active{background:var(--lang-ink);color:var(--lang-lime)}
+.ec-para-item--active:hover{background:var(--lang-ink)}
+.ec-para-item-title{flex:1;min-width:0;overflow-wrap:anywhere}
+.ec-para-text{
+  margin:0 0 16px;font-size:15px;line-height:1.85;font-weight:600;color:var(--lang-ink);
+  background:var(--lang-lime-soft);border:2px solid var(--lang-line);border-radius:14px;
+  padding:16px 18px;box-shadow:0 2px 0 var(--lang-line);overflow-wrap:anywhere;
+}
+.ec-para-actions{display:flex;gap:10px;flex-wrap:wrap}
+.ec-passage{
+  margin:0 0 14px;border:2px dashed var(--lang-line);border-radius:14px;
+  background:var(--lang-lime-soft);padding:8px 14px;
+}
+.ec-passage summary{
+  font-size:11.5px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--lang-ink);cursor:pointer;min-height:36px;display:flex;align-items:center;
+}
+.ec-passage p{margin:4px 0 8px;font-size:13.5px;line-height:1.75;font-weight:600;color:var(--lang-ink);overflow-wrap:anywhere}
+
 /* RESPONSIVE */
 @media (max-width:1080px){.ec-cur-grid{grid-template-columns:minmax(0,1fr) 280px;gap:18px}}
 @media (max-width:900px){
@@ -364,7 +395,7 @@ const CURRICULUM_CSS = `
   .ec-cur-head{margin-bottom:12px}
   .ec-cur-eyebrow{font-size:10.5px}
   .ec-cur-hero{padding:20px 18px;border-radius:22px;margin-bottom:16px}
-  .ec-cur-hero h1{font-size:22px}
+  .ec-cur-hero h2{font-size:22px}
   .ec-cur-hero p{font-size:13px;margin-bottom:14px}
   .ec-cur-hero-badge{font-size:9.5px;padding:6px 11px;margin-bottom:12px}
   .ec-cur-hero-stats{gap:8px}
@@ -392,6 +423,8 @@ const CURRICULUM_CSS = `
   .ec-cur-topic-btn{padding:12px;font-size:12.5px;min-height:46px}
   .ec-cur-bank-item{padding:12px 13px;font-size:12.5px;min-height:46px}
   .ec-cur-translation p.bn{font-size:15.5px}
+  .ec-para-text{font-size:14px;padding:14px;line-height:1.8}
+  .ec-para-item{padding:12px;font-size:12.5px;min-height:46px}
   .ec-cur-xp-toast{
     top:auto;bottom:calc(var(--lang-nav-h) + var(--lang-safe) - 80px);
     right:12px;left:12px;text-align:center;padding:11px 18px;font-size:13px;
@@ -399,7 +432,7 @@ const CURRICULUM_CSS = `
   .ec-cur-filter-group{flex:1 1 100%}
 }
 @media (max-width:480px){
-  .ec-cur-hero h1{font-size:20px}
+  .ec-cur-hero h2{font-size:20px}
   .ec-cur-hero p{font-size:12.5px}
   .ec-cur-hero-stat strong{font-size:15px}
   .ec-cur-hero-stat span{font-size:8.5px}
@@ -411,11 +444,80 @@ const CURRICULUM_CSS = `
 @media (max-width:380px){
   .ec-cur-pill{padding:9px 12px;font-size:12px}
   .ec-cur-cat{padding:10px 12px;font-size:12px}
-  .ec-cur-hero h1{font-size:18px}
+  .ec-cur-hero h2{font-size:18px}
   .ec-quiz-option{font-size:13px;padding:12px}
 }
 @media (prefers-reduced-motion: reduce){
   .ec-cur *,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}
+}
+
+/* ============ POLISH LAYER (Bangla typography · translation UI) ============ */
+.ec-bn,.ec-cur p.bn,.ec-lesson-bn,.ec-cur-translation-label{
+  font-family:'Hind Siliguri','Noto Sans Bengali','Kalpurush','SolaimanLipi','Nirmala UI',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+.ec-quiz-question.ec-bn,.ec-cur p.bn,.ec-lesson-bn{letter-spacing:0;line-height:1.6}
+.ec-quiz-option.ec-bn{font-size:15.5px;line-height:1.55}
+
+/* lettered answer chips (A · B · C · D) */
+.ec-quiz-options{counter-reset:ecopt}
+.ec-quiz-option::before{
+  counter-increment:ecopt;content:counter(ecopt,upper-alpha);
+  flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;
+  width:28px;height:28px;margin-right:12px;border-radius:9px;
+  border:2px solid var(--lang-line);background:var(--lang-lime-soft);color:var(--lang-ink);
+  font-family:inherit;font-size:12px;font-weight:900;letter-spacing:0;
+  transition:background .16s ease,transform .16s ease;
+}
+.ec-quiz-option:hover:not(:disabled)::before{background:var(--lang-lime);transform:rotate(-6deg) scale(1.06)}
+.ec-quiz-option--correct::before,.ec-quiz-option--incorrect::before{background:#fff}
+
+/* direction chip above a translation question */
+.ec-quiz-dir{
+  display:inline-flex;align-items:center;gap:6px;margin:0 0 10px;
+  padding:6px 13px;border-radius:999px;border:2px solid var(--lang-line);
+  font-size:11px;font-weight:900;letter-spacing:.04em;color:var(--lang-ink);
+  box-shadow:0 2px 0 var(--lang-line);max-width:100%;
+  font-family:'Hind Siliguri','Noto Sans Bengali','Kalpurush','Nirmala UI',system-ui,sans-serif;
+}
+.ec-quiz-dir--en{background:var(--lang-mint)}
+.ec-quiz-dir--bn{background:var(--lang-pink)}
+
+/* source-sentence card for translation questions */
+.ec-quiz-question--src{
+  position:relative;padding:18px 18px 18px 22px;border-radius:18px;
+  background:linear-gradient(150deg,var(--lang-lime-soft) 0%,#fff 70%);
+  border:2px solid var(--lang-line);box-shadow:0 4px 0 var(--lang-line);
+  font-size:clamp(16px,1vw + 13px,20px);
+}
+.ec-quiz-question--src::before{
+  content:'';position:absolute;left:0;top:14px;bottom:14px;width:6px;border-radius:0 6px 6px 0;
+  background:linear-gradient(180deg,var(--lang-purple-2),var(--lang-pink-2));
+}
+
+/* typed translation practice card */
+.ec-cur-translation{position:relative;overflow:hidden}
+.ec-cur-translation::after{
+  content:'';position:absolute;right:-46px;top:-46px;width:130px;height:130px;border-radius:50%;
+  background:radial-gradient(circle,rgba(155,123,255,.22),transparent 70%);pointer-events:none;
+}
+.ec-cur-translation > *{position:relative;z-index:1}
+.ec-cur-translation-label{margin:0;font-size:12.5px;color:var(--lang-ink-soft);font-weight:700}
+.ec-cur-translation p.bn{
+  padding:16px 18px;border-radius:16px;font-size:19px;font-weight:800;
+  background:linear-gradient(150deg,var(--lang-lime-soft) 0%,#fff 75%);
+  border:2px solid var(--lang-line);box-shadow:0 4px 0 var(--lang-line);
+}
+.ec-cur-translation-feedback{animation:ec-cur-pop-in .28s cubic-bezier(.22,1,.36,1) both}
+@keyframes ec-cur-pop-in{from{opacity:0;transform:translateY(6px) scale(.98)}to{opacity:1;transform:none}}
+
+/* lesson Bangla note */
+.ec-lesson-bn{font-size:13.5px;font-weight:700;line-height:1.75}
+
+@media (max-width:720px){
+  .ec-cur-translation p.bn{font-size:16px;padding:14px 15px}
+  .ec-quiz-question--src{padding:15px 15px 15px 19px}
+  .ec-quiz-option::before{width:26px;height:26px;margin-right:10px}
+  .ec-quiz-option.ec-bn{font-size:14.5px}
 }
 `;
 
@@ -858,7 +960,7 @@ const QUESTION_BANK = {
       { p:'As long as you work hard, ___', o:['you will succeed.','you will fail.','you failed.','you are failing.'], a:'you will succeed.', e:'Condition → result.', b:'শর্ত → ফলাফল।' },
       { p:'Whether you come or not, ___', o:['the meeting will start.','the meeting starts tomorrow.','the meeting started.','the meeting is starting.'], a:'the meeting will start.', e:'Regardless.', b:'যাই হোক।' },
       { p:'In case of rain, ___', o:['we will stay home.','we stayed home.','we stay at home last week.','we would stay.'], a:'we will stay home.', e:'Precaution.', b:'সতর্কতা।' },
-      { p:'He is too weak ___', o:['to walk.','to walking.','walk.','for walk.'], a:'to walk', e:'Too + adj + to + base.', b:'Too + adj + to + base।' },
+      { p:'He is too weak ___', o:['to walk.','to walking.','walk.','for walk.'], a:'to walk.', e:'Too + adj + to + base.', b:'Too + adj + to + base।' },
       { p:'I would rather walk ___', o:['than take a bus.','than taking a bus.','than took a bus.','then take a bus.'], a:'than take a bus.', e:'Would rather…than.', b:'Would rather…than।' },
       { p:'If you do not hurry, ___', o:['you will miss the bus.','you will catch the bus.','you missed the bus.','you miss the bus.'], a:'you will miss the bus.', e:'First conditional.', b:'First conditional।' },
       { p:'If she had known, ___', o:['she would have come.','she would come.','she will come.','she came.'], a:'she would have come.', e:'Third conditional.', b:'Third conditional।' },
@@ -1146,6 +1248,26 @@ const QUESTION_BANK = {
       { p:'Synonym of "strong"?', o:['robust','weak','frail','feeble'], a:'robust', e:'= robust.', b:'= শক্তিশালী।' },
       { p:'Synonym of "tired"?', o:['exhausted','fresh','energetic','lively'], a:'exhausted', e:'= exhausted.', b:'= ক্লান্ত।' },
       { p:'Synonym of "dangerous"?', o:['perilous','safe','harmless','secure'], a:'perilous', e:'= perilous.', b:'= বিপজ্জনক।' },
+      { p:'Synonym of "enormous"?', o:['gigantic','tiny','narrow','weak'], a:'gigantic', e:'= gigantic.', b:'= বিশাল।' },
+      { p:'Synonym of "assist"?', o:['aid','hinder','ignore','block'], a:'aid', e:'= aid.', b:'= সাহায্য করা।' },
+      { p:'Synonym of "purchase"?', o:['acquire','sell','lose','refuse'], a:'acquire', e:'= acquire.', b:'= কেনা।' },
+      { p:'Synonym of "reply"?', o:['respond','ask','ignore','question'], a:'respond', e:'= respond.', b:'= উত্তর দেওয়া।' },
+      { p:'Synonym of "silent"?', o:['quiet','noisy','loud','talkative'], a:'quiet', e:'= quiet.', b:'= নীরব।' },
+      { p:'Synonym of "vanish"?', o:['disappear','appear','arrive','grow'], a:'disappear', e:'= disappear.', b:'= অদৃশ্য হওয়া।' },
+      { p:'Synonym of "observe"?', o:['watch','ignore','forget','hide'], a:'watch', e:'= watch.', b:'= পর্যবেক্ষণ করা।' },
+      { p:'Synonym of "rescue"?', o:['save','harm','trap','abandon'], a:'save', e:'= save.', b:'= উদ্ধার করা।' },
+      { p:'Synonym of "costly"?', o:['expensive','cheap','free','useless'], a:'expensive', e:'= expensive.', b:'= দামি।' },
+      { p:'Synonym of "gather"?', o:['collect','scatter','spend','waste'], a:'collect', e:'= collect.', b:'= জড়ো করা।' },
+      { p:'Synonym of "brief"?', o:['short','long','endless','tall'], a:'short', e:'= short.', b:'= সংক্ষিপ্ত।' },
+      { p:'Synonym of "ill"?', o:['sick','healthy','fit','well'], a:'sick', e:'= sick.', b:'= অসুস্থ।' },
+      { p:'Synonym of "honest"?', o:['truthful','dishonest','cunning','false'], a:'truthful', e:'= truthful.', b:'= সৎ।' },
+      { p:'Synonym of "error"?', o:['mistake','accuracy','truth','success'], a:'mistake', e:'= mistake.', b:'= ভুল।' },
+      { p:'Synonym of "anger"?', o:['rage','joy','calm','peace'], a:'rage', e:'= rage.', b:'= ক্রোধ।' },
+      { p:'Synonym of "ancient"?', o:['old','modern','fresh','new'], a:'old', e:'= old.', b:'= প্রাচীন।' },
+      { p:'Synonym of "permit"?', o:['allow','forbid','refuse','stop'], a:'allow', e:'= allow.', b:'= অনুমতি দেওয়া।' },
+      { p:'Synonym of "peaceful"?', o:['calm','violent','noisy','stormy'], a:'calm', e:'= calm.', b:'= শান্তিপূর্ণ।' },
+      { p:'Synonym of "strange"?', o:['odd','normal','usual','common'], a:'odd', e:'= odd.', b:'= অদ্ভুত।' },
+      { p:'Synonym of "depart"?', o:['leave','arrive','stay','enter'], a:'leave', e:'= leave.', b:'= প্রস্থান করা।' },
     ],
   },
 
@@ -1195,6 +1317,26 @@ const QUESTION_BANK = {
       { p:'Antonym of "construct"?', o:['demolish','build','create','make'], a:'demolish', e:'Construct → demolish.', b:'Construct → demolish।' },
       { p:'Antonym of "increase"?', o:['decrease','raise','grow','expand'], a:'decrease', e:'Increase → decrease.', b:'Increase → decrease।' },
       { p:'Antonym of "polite"?', o:['rude','courteous','kind','gracious'], a:'rude', e:'Polite → rude.', b:'Polite → rude।' },
+      { p:'Antonym of "ancient"?', o:['modern','old','historic','aged'], a:'modern', e:'Ancient → modern.', b:'প্রাচীন → আধুনিক।' },
+      { p:'Antonym of "generous"?', o:['selfish','kind','giving','charitable'], a:'selfish', e:'Generous → selfish.', b:'উদার → স্বার্থপর।' },
+      { p:'Antonym of "victory"?', o:['defeat','triumph','success','conquest'], a:'defeat', e:'Victory → defeat.', b:'বিজয় → পরাজয়।' },
+      { p:'Antonym of "expand"?', o:['shrink','grow','spread','widen'], a:'shrink', e:'Expand → shrink.', b:'বাড়ানো → সংকুচিত করা।' },
+      { p:'Antonym of "permanent"?', o:['temporary','lasting','fixed','eternal'], a:'temporary', e:'Permanent → temporary.', b:'স্থায়ী → অস্থায়ী।' },
+      { p:'Antonym of "success"?', o:['failure','victory','triumph','progress'], a:'failure', e:'Success → failure.', b:'সফলতা → ব্যর্থতা।' },
+      { p:'Antonym of "friend"?', o:['enemy','pal','mate','companion'], a:'enemy', e:'Friend → enemy.', b:'বন্ধু → শত্রু।' },
+      { p:'Antonym of "encourage"?', o:['discourage','inspire','support','cheer'], a:'discourage', e:'Encourage → discourage.', b:'উৎসাহ দেওয়া → নিরুৎসাহ করা।' },
+      { p:'Antonym of "include"?', o:['exclude','contain','add','involve'], a:'exclude', e:'Include → exclude.', b:'অন্তর্ভুক্ত করা → বাদ দেওয়া।' },
+      { p:'Antonym of "ascend"?', o:['descend','climb','rise','mount'], a:'descend', e:'Ascend → descend.', b:'ওঠা → নামা।' },
+      { p:'Antonym of "optimist"?', o:['pessimist','dreamer','hopeful','believer'], a:'pessimist', e:'Optimist → pessimist.', b:'আশাবাদী → নিরাশাবাদী।' },
+      { p:'Antonym of "knowledge"?', o:['ignorance','wisdom','learning','skill'], a:'ignorance', e:'Knowledge → ignorance.', b:'জ্ঞান → অজ্ঞতা।' },
+      { p:'Antonym of "visible"?', o:['invisible','clear','obvious','seen'], a:'invisible', e:'Visible → invisible.', b:'দৃশ্যমান → অদৃশ্য।' },
+      { p:'Antonym of "cheap"?', o:['expensive','low-priced','affordable','economical'], a:'expensive', e:'Cheap → expensive.', b:'সস্তা → দামি।' },
+      { p:'Antonym of "clean"?', o:['dirty','pure','tidy','neat'], a:'dirty', e:'Clean → dirty.', b:'পরিষ্কার → নোংরা।' },
+      { p:'Antonym of "early"?', o:['late','soon','quick','prompt'], a:'late', e:'Early → late.', b:'আগে → দেরিতে।' },
+      { p:'Antonym of "wise"?', o:['foolish','clever','sensible','smart'], a:'foolish', e:'Wise → foolish.', b:'জ্ঞানী → বোকা।' },
+      { p:'Antonym of "freedom"?', o:['slavery','liberty','independence','release'], a:'slavery', e:'Freedom → slavery.', b:'স্বাধীনতা → দাসত্ব।' },
+      { p:'Antonym of "depart"?', o:['arrive','leave','exit','go'], a:'arrive', e:'Depart → arrive.', b:'প্রস্থান → আগমন।' },
+      { p:'Antonym of "major"?', o:['minor','main','chief','big'], a:'minor', e:'Major → minor.', b:'প্রধান → গৌণ।' },
     ],
   },
 
@@ -1482,12 +1624,19 @@ const QUESTION_BANK = {
         'Subject-verb agreement matters.',
         'Use correct articles (a/an/the) and prepositions.',
         'Present simple for habits; present continuous for ongoing.',
+        'English → Bangla: find the tense first, then pick the matching verb ending (<code>-ি</code>, <code>-ছি</code>, <code>-েছি</code>, <code>-ব</code>).',
+        'Bangla puts the <strong>verb at the end</strong> — keep the subject, time and place words in order.',
+        'Passive → <code>করা হয় / হয়েছিল / হবে</code>; conditions end in <code>-লে</code>; comparison uses <code>-র চেয়ে</code>.',
+        'Proverbs and fixed phrases are translated by meaning, not word by word.',
       ],
       examples: [
         'সে প্রতিদিন স্কুলে যায় → He <strong>goes</strong> to school every day.',
         'আমি ভাত খাই → I <strong>eat</strong> rice.',
+        'He reads a book every day → সে প্রতিদিন একটি বই পড়<strong>ে</strong>।',
+        'I am writing a letter → আমি একটি চিঠি লিখ<strong>ছি</strong>।',
+        'If it rains, we will stay at home → বৃষ্টি হ<strong>লে</strong> আমরা বাড়িতে থাক<strong>ব</strong>।',
       ],
-      bangla: 'বাংলা থেকে ইংরেজি অনুবাদে tense, subject-verb agreement, article ও preposition সঠিক রাখতে হয়।',
+      bangla: 'বাংলা থেকে ইংরেজি অনুবাদে tense, subject-verb agreement, article ও preposition সঠিক রাখতে হয়। ইংরেজি থেকে বাংলা অনুবাদে আগে tense চিনে নাও, তারপর ক্রিয়ার সঠিক রূপ (-ি, -ছি, -েছি, -ব) বসাও এবং ক্রিয়া বাক্যের শেষে রাখো।',
     },
     questions: [
       { p:'সে প্রতিদিন স্কুলে যায়।', o:['He goes to school every day.','He go to school every day.','He going to school every day.','He went to school every day.'], a:'He goes to school every day.', e:'Habit → present simple.', b:'অভ্যাস → present simple।' },
@@ -1541,6 +1690,139 @@ const QUESTION_BANK = {
       { p:'আমি আজ স্কুলে যাব না।', o:['I will not go to school today.','I not go to school today.','I do not go to school today.','I am not go to school today.'], a:'I will not go to school today.', e:'Future negative.', b:'Future negative।' },
       { p:'সে আমার বন্ধু নয়।', o:['He is not my friend.','He not is my friend.','He is my friend not.','He no my friend.'], a:'He is not my friend.', e:'Negative be.', b:'Negative be।' },
       { p:'আমরা সপ্তাহে একদিন সিনেমা দেখি।', o:['We watch a movie once a week.','We watches a movie once a week.','We watching a movie once a week.','We watch a movie one week.'], a:'We watch a movie once a week.', e:'Habit.', b:'Habit।' },
+      /* ---- English → Bangla (বাংলায় অনুবাদ) ---- */
+      { p:'He reads a book every day.', o:['সে প্রতিদিন একটি বই পড়ে।', 'সে প্রতিদিন একটি বই পড়ছে।', 'সে প্রতিদিন একটি বই পড়েছিল।', 'সে প্রতিদিন একটি বই পড়বে।'], a:'সে প্রতিদিন একটি বই পড়ে।', e:'Habit or general fact → simple present tense in Bangla.', b:'অভ্যাস বা চিরন্তন সত্য বোঝাতে simple present (যেমন: পড়ে, খাই, যায়)।' },
+      { p:'I drink tea every morning.', o:['আমি প্রতিদিন সকালে চা খাই।', 'আমি প্রতিদিন সকালে চা খাচ্ছি।', 'আমি গতকাল সকালে চা খেয়েছিলাম।', 'আমি প্রতিদিন সকালে চা খাব।'], a:'আমি প্রতিদিন সকালে চা খাই।', e:'Habit or general fact → simple present tense in Bangla.', b:'অভ্যাস বা চিরন্তন সত্য বোঝাতে simple present (যেমন: পড়ে, খাই, যায়)।' },
+      { p:'They play football in the evening.', o:['তারা বিকেলে ফুটবল খেলে।', 'তারা বিকেলে ফুটবল খেলছে।', 'তারা বিকেলে ফুটবল খেলেছিল।', 'তারা বিকেলে ফুটবল খেলবে।'], a:'তারা বিকেলে ফুটবল খেলে।', e:'Habit or general fact → simple present tense in Bangla.', b:'অভ্যাস বা চিরন্তন সত্য বোঝাতে simple present (যেমন: পড়ে, খাই, যায়)।' },
+      { p:'My mother cooks delicious food.', o:['আমার মা সুস্বাদু খাবার রান্না করেন।', 'আমার মা সুস্বাদু খাবার রান্না করছেন।', 'আমার মা সুস্বাদু খাবার রান্না করেছিলেন।', 'আমার মা সুস্বাদু খাবার রান্না করবেন।'], a:'আমার মা সুস্বাদু খাবার রান্না করেন।', e:'Habit or general fact → simple present tense in Bangla.', b:'অভ্যাস বা চিরন্তন সত্য বোঝাতে simple present (যেমন: পড়ে, খাই, যায়)।' },
+      { p:'She sings very well.', o:['সে খুব ভালো গান গায়।', 'সে খুব ভালো গান গাইছে।', 'সে খুব ভালো গান গেয়েছিল।', 'সে খুব ভালো গান গাইবে।'], a:'সে খুব ভালো গান গায়।', e:'Habit or general fact → simple present tense in Bangla.', b:'অভ্যাস বা চিরন্তন সত্য বোঝাতে simple present (যেমন: পড়ে, খাই, যায়)।' },
+      { p:'We go to the mosque on Fridays.', o:['আমরা শুক্রবারে মসজিদে যাই।', 'আমরা শুক্রবারে মসজিদে যাচ্ছি।', 'আমরা শুক্রবারে মসজিদে গিয়েছিলাম।', 'তারা শুক্রবারে মসজিদে যায়।'], a:'আমরা শুক্রবারে মসজিদে যাই।', e:'Habit or general fact → simple present tense in Bangla.', b:'অভ্যাস বা চিরন্তন সত্য বোঝাতে simple present (যেমন: পড়ে, খাই, যায়)।' },
+      { p:'The teacher teaches us English.', o:['শিক্ষক আমাদের ইংরেজি পড়ান।', 'শিক্ষক আমাদের ইংরেজি পড়াচ্ছেন।', 'শিক্ষক আমাদের ইংরেজি পড়েছিলেন।', 'শিক্ষক আমাদের গণিত পড়ান।'], a:'শিক্ষক আমাদের ইংরেজি পড়ান।', e:'Habit or general fact → simple present tense in Bangla.', b:'অভ্যাস বা চিরন্তন সত্য বোঝাতে simple present (যেমন: পড়ে, খাই, যায়)।' },
+      { p:'Fish live in water.', o:['মাছ পানিতে বাস করে।', 'মাছ পানিতে বাস করছে।', 'মাছ ডাঙায় বাস করে।', 'মাছ পানিতে বাস করবে।'], a:'মাছ পানিতে বাস করে।', e:'Habit or general fact → simple present tense in Bangla.', b:'অভ্যাস বা চিরন্তন সত্য বোঝাতে simple present (যেমন: পড়ে, খাই, যায়)।' },
+      { p:'The sun rises in the east.', o:['সূর্য পূর্ব দিকে ওঠে।', 'সূর্য পূর্ব দিকে উঠছে।', 'সূর্য পশ্চিম দিকে ওঠে।', 'সূর্য পূর্ব দিকে উঠবে।'], a:'সূর্য পূর্ব দিকে ওঠে।', e:'Habit or general fact → simple present tense in Bangla.', b:'অভ্যাস বা চিরন্তন সত্য বোঝাতে simple present (যেমন: পড়ে, খাই, যায়)।' },
+      { p:'My father works in a bank.', o:['আমার বাবা ব্যাংকে কাজ করেন।', 'আমার বাবা ব্যাংকে কাজ করছেন।', 'আমার বাবা ব্যাংকে কাজ করবেন।', 'আমার বাবা স্কুলে কাজ করেন।'], a:'আমার বাবা ব্যাংকে কাজ করেন।', e:'Habit or general fact → simple present tense in Bangla.', b:'অভ্যাস বা চিরন্তন সত্য বোঝাতে simple present (যেমন: পড়ে, খাই, যায়)।' },
+      { p:'Rahim goes to college by bus.', o:['রহিম বাসে কলেজে যায়।', 'রহিম বাসে কলেজে যাচ্ছে।', 'রহিম বাসে কলেজে গিয়েছিল।', 'রহিম ট্রেনে কলেজে যায়।'], a:'রহিম বাসে কলেজে যায়।', e:'Habit or general fact → simple present tense in Bangla.', b:'অভ্যাস বা চিরন্তন সত্য বোঝাতে simple present (যেমন: পড়ে, খাই, যায়)।' },
+      { p:'I wake up early in the morning.', o:['আমি খুব সকালে ঘুম থেকে উঠি।', 'আমি খুব সকালে ঘুম থেকে উঠছি।', 'আমি খুব সকালে ঘুম থেকে উঠেছিলাম।', 'আমি খুব সকালে ঘুমাই।'], a:'আমি খুব সকালে ঘুম থেকে উঠি।', e:'Habit or general fact → simple present tense in Bangla.', b:'অভ্যাস বা চিরন্তন সত্য বোঝাতে simple present (যেমন: পড়ে, খাই, যায়)।' },
+      { p:'She does not eat meat.', o:['সে মাংস খায় না।', 'সে মাংস খাচ্ছে না।', 'সে মাংস খায়নি।', 'সে মাংস খাবে না।'], a:'সে মাংস খায় না।', e:'Habit or general fact → simple present tense in Bangla.', b:'অভ্যাস বা চিরন্তন সত্য বোঝাতে simple present (যেমন: পড়ে, খাই, যায়)।' },
+      { p:'Do you like mangoes?', o:['তুমি কি আম পছন্দ করো?', 'তুমি কি আম পছন্দ করছ?', 'তুমি কি আম পছন্দ করেছিলে?', 'তুমি কি আম পছন্দ করবে?'], a:'তুমি কি আম পছন্দ করো?', e:'Habit or general fact → simple present tense in Bangla.', b:'অভ্যাস বা চিরন্তন সত্য বোঝাতে simple present (যেমন: পড়ে, খাই, যায়)।' },
+      { p:'I am writing a letter.', o:['আমি একটি চিঠি লিখছি।', 'আমি একটি চিঠি লিখি।', 'আমি একটি চিঠি লিখেছি।', 'আমি একটি চিঠি লিখব।'], a:'আমি একটি চিঠি লিখছি।', e:'Ongoing action → verb ends in -ছি / -ছ / -ছে.', b:'চলমান কাজ বোঝাতে ক্রিয়ার সাথে -ছি / -ছ / -ছে যোগ হয়।' },
+      { p:'They are playing in the field.', o:['তারা মাঠে খেলছে।', 'তারা মাঠে খেলে।', 'তারা মাঠে খেলেছে।', 'তারা মাঠে খেলবে।'], a:'তারা মাঠে খেলছে।', e:'Ongoing action → verb ends in -ছি / -ছ / -ছে.', b:'চলমান কাজ বোঝাতে ক্রিয়ার সাথে -ছি / -ছ / -ছে যোগ হয়।' },
+      { p:'The baby is sleeping.', o:['শিশুটি ঘুমাচ্ছে।', 'শিশুটি ঘুমায়।', 'শিশুটি ঘুমিয়েছে।', 'শিশুটি ঘুমাবে।'], a:'শিশুটি ঘুমাচ্ছে।', e:'Ongoing action → verb ends in -ছি / -ছ / -ছে.', b:'চলমান কাজ বোঝাতে ক্রিয়ার সাথে -ছি / -ছ / -ছে যোগ হয়।' },
+      { p:'It is raining heavily.', o:['মুষলধারে বৃষ্টি হচ্ছে।', 'মুষলধারে বৃষ্টি হয়।', 'মুষলধারে বৃষ্টি হয়েছিল।', 'মুষলধারে বৃষ্টি হবে।'], a:'মুষলধারে বৃষ্টি হচ্ছে।', e:'Ongoing action → verb ends in -ছি / -ছ / -ছে.', b:'চলমান কাজ বোঝাতে ক্রিয়ার সাথে -ছি / -ছ / -ছে যোগ হয়।' },
+      { p:'What are you reading?', o:['তুমি কী পড়ছ?', 'তুমি কী পড়ো?', 'তুমি কী পড়েছ?', 'তুমি কী পড়বে?'], a:'তুমি কী পড়ছ?', e:'Ongoing action → verb ends in -ছি / -ছ / -ছে.', b:'চলমান কাজ বোঝাতে ক্রিয়ার সাথে -ছি / -ছ / -ছে যোগ হয়।' },
+      { p:'She is cooking in the kitchen.', o:['সে রান্নাঘরে রান্না করছে।', 'সে রান্নাঘরে রান্না করে।', 'সে রান্নাঘরে রান্না করেছিল।', 'সে রান্নাঘরে রান্না করবে।'], a:'সে রান্নাঘরে রান্না করছে।', e:'Ongoing action → verb ends in -ছি / -ছ / -ছে.', b:'চলমান কাজ বোঝাতে ক্রিয়ার সাথে -ছি / -ছ / -ছে যোগ হয়।' },
+      { p:'We are waiting for the bus.', o:['আমরা বাসের জন্য অপেক্ষা করছি।', 'আমরা বাসের জন্য অপেক্ষা করি।', 'আমরা বাসের জন্য অপেক্ষা করেছিলাম।', 'আমরা বাসের জন্য অপেক্ষা করব।'], a:'আমরা বাসের জন্য অপেক্ষা করছি।', e:'Ongoing action → verb ends in -ছি / -ছ / -ছে.', b:'চলমান কাজ বোঝাতে ক্রিয়ার সাথে -ছি / -ছ / -ছে যোগ হয়।' },
+      { p:'The students are listening to the teacher.', o:['ছাত্রছাত্রীরা শিক্ষকের কথা শুনছে।', 'ছাত্রছাত্রীরা শিক্ষকের কথা শোনে।', 'ছাত্রছাত্রীরা শিক্ষকের কথা শুনেছিল।', 'ছাত্রছাত্রীরা শিক্ষকের কথা শুনবে।'], a:'ছাত্রছাত্রীরা শিক্ষকের কথা শুনছে।', e:'Ongoing action → verb ends in -ছি / -ছ / -ছে.', b:'চলমান কাজ বোঝাতে ক্রিয়ার সাথে -ছি / -ছ / -ছে যোগ হয়।' },
+      { p:'He is not watching television now.', o:['সে এখন টেলিভিশন দেখছে না।', 'সে এখন টেলিভিশন দেখে না।', 'সে এখন টেলিভিশন দেখেনি।', 'সে এখন টেলিভিশন দেখবে না।'], a:'সে এখন টেলিভিশন দেখছে না।', e:'Ongoing action → verb ends in -ছি / -ছ / -ছে.', b:'চলমান কাজ বোঝাতে ক্রিয়ার সাথে -ছি / -ছ / -ছে যোগ হয়।' },
+      { p:'Why are you crying?', o:['তুমি কেন কাঁদছ?', 'তুমি কেন কাঁদো?', 'তুমি কেন কেঁদেছিলে?', 'তুমি কেন কাঁদবে?'], a:'তুমি কেন কাঁদছ?', e:'Ongoing action → verb ends in -ছি / -ছ / -ছে.', b:'চলমান কাজ বোঝাতে ক্রিয়ার সাথে -ছি / -ছ / -ছে যোগ হয়।' },
+      { p:'I met my friend yesterday.', o:['আমি গতকাল আমার বন্ধুর সাথে দেখা করেছিলাম।', 'আমি গতকাল আমার বন্ধুর সাথে দেখা করি।', 'আমি গতকাল আমার বন্ধুর সাথে দেখা করছি।', 'আমি গতকাল আমার বন্ধুর সাথে দেখা করব।'], a:'আমি গতকাল আমার বন্ধুর সাথে দেখা করেছিলাম।', e:'Finished past action → past form (-লাম / -ল / -েছিল).', b:'সমাপ্ত অতীত কাজ বোঝাতে -ল / -লাম / -েছিল ব্যবহার হয়।' },
+      { p:'She bought a new dress.', o:['সে একটি নতুন জামা কিনেছিল।', 'সে একটি নতুন জামা কেনে।', 'সে একটি নতুন জামা কিনছে।', 'সে একটি নতুন জামা কিনবে।'], a:'সে একটি নতুন জামা কিনেছিল।', e:'Finished past action → past form (-লাম / -ল / -েছিল).', b:'সমাপ্ত অতীত কাজ বোঝাতে -ল / -লাম / -েছিল ব্যবহার হয়।' },
+      { p:'We visited Sylhet last year.', o:['আমরা গত বছর সিলেটে বেড়াতে গিয়েছিলাম।', 'আমরা প্রতি বছর সিলেটে বেড়াতে যাই।', 'আমরা আগামী বছর সিলেটে বেড়াতে যাব।', 'আমরা এখন সিলেটে বেড়াতে যাচ্ছি।'], a:'আমরা গত বছর সিলেটে বেড়াতে গিয়েছিলাম।', e:'Finished past action → past form (-লাম / -ল / -েছিল).', b:'সমাপ্ত অতীত কাজ বোঝাতে -ল / -লাম / -েছিল ব্যবহার হয়।' },
+      { p:'The train arrived late.', o:['ট্রেনটি দেরিতে পৌঁছেছিল।', 'ট্রেনটি দেরিতে পৌঁছায়।', 'ট্রেনটি দেরিতে পৌঁছাচ্ছে।', 'ট্রেনটি দেরিতে পৌঁছাবে।'], a:'ট্রেনটি দেরিতে পৌঁছেছিল।', e:'Finished past action → past form (-লাম / -ল / -েছিল).', b:'সমাপ্ত অতীত কাজ বোঝাতে -ল / -লাম / -েছিল ব্যবহার হয়।' },
+      { p:'I did not go to the market.', o:['আমি বাজারে যাইনি।', 'আমি বাজারে যাই না।', 'আমি বাজারে যাব না।', 'আমি বাজারে যাচ্ছি না।'], a:'আমি বাজারে যাইনি।', e:'Finished past action → past form (-লাম / -ল / -েছিল).', b:'সমাপ্ত অতীত কাজ বোঝাতে -ল / -লাম / -েছিল ব্যবহার হয়।' },
+      { p:'Did you finish your homework?', o:['তুমি কি তোমার বাড়ির কাজ শেষ করেছ?', 'তুমি কি তোমার বাড়ির কাজ শেষ করছ?', 'তুমি কি তোমার বাড়ির কাজ শেষ করবে?', 'তুমি কি তোমার বাড়ির কাজ শেষ করো?'], a:'তুমি কি তোমার বাড়ির কাজ শেষ করেছ?', e:'Finished past action → past form (-লাম / -ল / -েছিল).', b:'সমাপ্ত অতীত কাজ বোঝাতে -ল / -লাম / -েছিল ব্যবহার হয়।' },
+      { p:'My grandfather told us a story.', o:['আমার দাদা আমাদের একটি গল্প বলেছিলেন।', 'আমার দাদা আমাদের একটি গল্প বলেন।', 'আমার দাদা আমাদের একটি গল্প বলছেন।', 'আমার দাদা আমাদের একটি গল্প বলবেন।'], a:'আমার দাদা আমাদের একটি গল্প বলেছিলেন।', e:'Finished past action → past form (-লাম / -ল / -েছিল).', b:'সমাপ্ত অতীত কাজ বোঝাতে -ল / -লাম / -েছিল ব্যবহার হয়।' },
+      { p:'They won the match.', o:['তারা ম্যাচটি জিতেছিল।', 'তারা ম্যাচটি জেতে।', 'তারা ম্যাচটি জিতছে।', 'তারা ম্যাচটি জিতবে।'], a:'তারা ম্যাচটি জিতেছিল।', e:'Finished past action → past form (-লাম / -ল / -েছিল).', b:'সমাপ্ত অতীত কাজ বোঝাতে -ল / -লাম / -েছিল ব্যবহার হয়।' },
+      { p:'It was a cold night.', o:['রাতটি ছিল ঠান্ডা।', 'রাতটি হবে ঠান্ডা।', 'রাতটি ছিল গরম।', 'রাতটি ঠান্ডা নয়।'], a:'রাতটি ছিল ঠান্ডা।', e:'Finished past action → past form (-লাম / -ল / -েছিল).', b:'সমাপ্ত অতীত কাজ বোঝাতে -ল / -লাম / -েছিল ব্যবহার হয়।' },
+      { p:'She lost her pen yesterday.', o:['সে গতকাল তার কলমটি হারিয়েছিল।', 'সে গতকাল তার কলমটি হারায়।', 'সে গতকাল তার কলমটি হারাচ্ছে।', 'সে গতকাল তার কলমটি হারাবে।'], a:'সে গতকাল তার কলমটি হারিয়েছিল।', e:'Finished past action → past form (-লাম / -ল / -েছিল).', b:'সমাপ্ত অতীত কাজ বোঝাতে -ল / -লাম / -েছিল ব্যবহার হয়।' },
+      { p:'The children were playing in the park.', o:['ছেলেমেয়েরা পার্কে খেলছিল।', 'ছেলেমেয়েরা পার্কে খেলছে।', 'ছেলেমেয়েরা পার্কে খেলে।', 'ছেলেমেয়েরা পার্কে খেলবে।'], a:'ছেলেমেয়েরা পার্কে খেলছিল।', e:'Past continuous → -ছিল / -ছিলাম.', b:'অতীতে চলমান কাজ বোঝাতে -ছিল / -ছিলাম হয়।' },
+      { p:'I was reading when he came.', o:['সে যখন এল, আমি তখন পড়ছিলাম।', 'সে যখন এল, আমি তখন পড়ছি।', 'সে যখন আসবে, আমি তখন পড়ছিলাম।', 'সে যখন এল, আমি তখন পড়ব।'], a:'সে যখন এল, আমি তখন পড়ছিলাম।', e:'Past continuous → -ছিল / -ছিলাম.', b:'অতীতে চলমান কাজ বোঝাতে -ছিল / -ছিলাম হয়।' },
+      { p:'I will call you tomorrow.', o:['আমি তোমাকে আগামীকাল ফোন করব।', 'আমি তোমাকে আগামীকাল ফোন করি।', 'আমি তোমাকে আগামীকাল ফোন করছি।', 'আমি তোমাকে গতকাল ফোন করেছিলাম।'], a:'আমি তোমাকে আগামীকাল ফোন করব।', e:'Future action → -ব / -বে / -বেন ending.', b:'ভবিষ্যৎ কাজ বোঝাতে ক্রিয়ার শেষে -ব / -বে / -বেন হয়।' },
+      { p:'They will arrive next week.', o:['তারা আগামী সপ্তাহে পৌঁছাবে।', 'তারা আগামী সপ্তাহে পৌঁছায়।', 'তারা আগামী সপ্তাহে পৌঁছেছে।', 'তারা গত সপ্তাহে পৌঁছেছিল।'], a:'তারা আগামী সপ্তাহে পৌঁছাবে।', e:'Future action → -ব / -বে / -বেন ending.', b:'ভবিষ্যৎ কাজ বোঝাতে ক্রিয়ার শেষে -ব / -বে / -বেন হয়।' },
+      { p:'It will rain tomorrow.', o:['আগামীকাল বৃষ্টি হবে।', 'আগামীকাল বৃষ্টি হয়।', 'গতকাল বৃষ্টি হয়েছিল।', 'আগামীকাল বৃষ্টি হচ্ছে।'], a:'আগামীকাল বৃষ্টি হবে।', e:'Future action → -ব / -বে / -বেন ending.', b:'ভবিষ্যৎ কাজ বোঝাতে ক্রিয়ার শেষে -ব / -বে / -বেন হয়।' },
+      { p:'We shall win the game.', o:['আমরা খেলায় জিতব।', 'আমরা খেলায় জিতি।', 'আমরা খেলায় জিতেছিলাম।', 'আমরা খেলায় জিতছি।'], a:'আমরা খেলায় জিতব।', e:'Future action → -ব / -বে / -বেন ending.', b:'ভবিষ্যৎ কাজ বোঝাতে ক্রিয়ার শেষে -ব / -বে / -বেন হয়।' },
+      { p:'She will not come to the party.', o:['সে পার্টিতে আসবে না।', 'সে পার্টিতে আসে না।', 'সে পার্টিতে আসেনি।', 'সে পার্টিতে আসছে না।'], a:'সে পার্টিতে আসবে না।', e:'Future action → -ব / -বে / -বেন ending.', b:'ভবিষ্যৎ কাজ বোঝাতে ক্রিয়ার শেষে -ব / -বে / -বেন হয়।' },
+      { p:'Will you help me?', o:['তুমি কি আমাকে সাহায্য করবে?', 'তুমি কি আমাকে সাহায্য করো?', 'তুমি কি আমাকে সাহায্য করেছ?', 'তুমি কি আমাকে সাহায্য করছ?'], a:'তুমি কি আমাকে সাহায্য করবে?', e:'Future action → -ব / -বে / -বেন ending.', b:'ভবিষ্যৎ কাজ বোঝাতে ক্রিয়ার শেষে -ব / -বে / -বেন হয়।' },
+      { p:'He will become a doctor.', o:['সে ডাক্তার হবে।', 'সে ডাক্তার হয়।', 'সে ডাক্তার হয়েছিল।', 'সে ডাক্তার হচ্ছে।'], a:'সে ডাক্তার হবে।', e:'Future action → -ব / -বে / -বেন ending.', b:'ভবিষ্যৎ কাজ বোঝাতে ক্রিয়ার শেষে -ব / -বে / -বেন হয়।' },
+      { p:'The exam will begin at ten o\'clock.', o:['পরীক্ষা দশটায় শুরু হবে।', 'পরীক্ষা দশটায় শুরু হয়।', 'পরীক্ষা দশটায় শুরু হয়েছিল।', 'পরীক্ষা দশটায় শুরু হচ্ছে।'], a:'পরীক্ষা দশটায় শুরু হবে।', e:'Future action → -ব / -বে / -বেন ending.', b:'ভবিষ্যৎ কাজ বোঝাতে ক্রিয়ার শেষে -ব / -বে / -বেন হয়।' },
+      { p:'I will meet my teacher next Friday.', o:['আমি আগামী শুক্রবার আমার শিক্ষকের সাথে দেখা করব।', 'আমি আগামী শুক্রবার আমার শিক্ষকের সাথে দেখা করি।', 'আমি আগামী শুক্রবার আমার শিক্ষকের সাথে দেখা করেছিলাম।', 'আমি গত শুক্রবার আমার শিক্ষকের সাথে দেখা করব।'], a:'আমি আগামী শুক্রবার আমার শিক্ষকের সাথে দেখা করব।', e:'Future action → -ব / -বে / -বেন ending.', b:'ভবিষ্যৎ কাজ বোঝাতে ক্রিয়ার শেষে -ব / -বে / -বেন হয়।' },
+      { p:'What will you do after the exam?', o:['পরীক্ষার পর তুমি কী করবে?', 'পরীক্ষার পর তুমি কী করো?', 'পরীক্ষার পর তুমি কী করেছ?', 'পরীক্ষার পর তুমি কী করছ?'], a:'পরীক্ষার পর তুমি কী করবে?', e:'Future action → -ব / -বে / -বেন ending.', b:'ভবিষ্যৎ কাজ বোঝাতে ক্রিয়ার শেষে -ব / -বে / -বেন হয়।' },
+      { p:'I have finished my work.', o:['আমি আমার কাজ শেষ করেছি।', 'আমি আমার কাজ শেষ করি।', 'আমি আমার কাজ শেষ করছি।', 'আমি আমার কাজ শেষ করব।'], a:'আমি আমার কাজ শেষ করেছি।', e:'Result or experience up to now → -েছি / -েছে.', b:'বর্তমানে সম্পন্ন কাজ বোঝাতে -েছি / -েছ / -েছে হয়।' },
+      { p:'She has gone to school.', o:['সে স্কুলে গেছে।', 'সে স্কুলে যায়।', 'সে স্কুলে যাচ্ছে।', 'সে স্কুলে যাবে।'], a:'সে স্কুলে গেছে।', e:'Result or experience up to now → -েছি / -েছে.', b:'বর্তমানে সম্পন্ন কাজ বোঝাতে -েছি / -েছ / -েছে হয়।' },
+      { p:'We have lived here for ten years.', o:['আমরা দশ বছর ধরে এখানে বাস করছি।', 'আমরা দশ বছর ধরে এখানে বাস করি।', 'আমরা দশ বছর আগে এখানে বাস করেছিলাম।', 'আমরা দশ বছর ধরে এখানে বাস করব।'], a:'আমরা দশ বছর ধরে এখানে বাস করছি।', e:'Result or experience up to now → -েছি / -েছে.', b:'বর্তমানে সম্পন্ন কাজ বোঝাতে -েছি / -েছ / -েছে হয়।' },
+      { p:'He has been ill since Monday.', o:['সে সোমবার থেকে অসুস্থ।', 'সে সোমবার পর্যন্ত অসুস্থ ছিল।', 'সে সোমবার থেকে অসুস্থ হবে।', 'সে সোমবার থেকে সুস্থ।'], a:'সে সোমবার থেকে অসুস্থ।', e:'Result or experience up to now → -েছি / -েছে.', b:'বর্তমানে সম্পন্ন কাজ বোঝাতে -েছি / -েছ / -েছে হয়।' },
+      { p:'Have you ever visited Dhaka?', o:['তুমি কি কখনো ঢাকায় গিয়েছ?', 'তুমি কি কখনো ঢাকায় যাও?', 'তুমি কি কখনো ঢাকায় যাবে?', 'তুমি কি কখনো ঢাকায় যাচ্ছ?'], a:'তুমি কি কখনো ঢাকায় গিয়েছ?', e:'Result or experience up to now → -েছি / -েছে.', b:'বর্তমানে সম্পন্ন কাজ বোঝাতে -েছি / -েছ / -েছে হয়।' },
+      { p:'I have never told a lie.', o:['আমি কখনো মিথ্যা বলিনি।', 'আমি কখনো মিথ্যা বলি না।', 'আমি কখনো মিথ্যা বলব না।', 'আমি কখনো মিথ্যা বলছি না।'], a:'আমি কখনো মিথ্যা বলিনি।', e:'Result or experience up to now → -েছি / -েছে.', b:'বর্তমানে সম্পন্ন কাজ বোঝাতে -েছি / -েছ / -েছে হয়।' },
+      { p:'The bus has already left.', o:['বাসটি ইতোমধ্যে ছেড়ে গেছে।', 'বাসটি ইতোমধ্যে ছেড়ে যায়।', 'বাসটি ইতোমধ্যে ছেড়ে যাবে।', 'বাসটি ইতোমধ্যে ছেড়ে যাচ্ছে।'], a:'বাসটি ইতোমধ্যে ছেড়ে গেছে।', e:'Result or experience up to now → -েছি / -েছে.', b:'বর্তমানে সম্পন্ন কাজ বোঝাতে -েছি / -েছ / -েছে হয়।' },
+      { p:'They have just arrived.', o:['তারা এইমাত্র পৌঁছেছে।', 'তারা এইমাত্র পৌঁছায়।', 'তারা এইমাত্র পৌঁছাবে।', 'তারা এইমাত্র পৌঁছাচ্ছে।'], a:'তারা এইমাত্র পৌঁছেছে।', e:'Result or experience up to now → -েছি / -েছে.', b:'বর্তমানে সম্পন্ন কাজ বোঝাতে -েছি / -েছ / -েছে হয়।' },
+      { p:'She has not eaten anything today.', o:['সে আজ কিছু খায়নি।', 'সে আজ কিছু খায় না।', 'সে আজ কিছু খাবে না।', 'সে আজ কিছু খাচ্ছে না।'], a:'সে আজ কিছু খায়নি।', e:'Result or experience up to now → -েছি / -েছে.', b:'বর্তমানে সম্পন্ন কাজ বোঝাতে -েছি / -েছ / -েছে হয়।' },
+      { p:'I have known him for five years.', o:['আমি তাকে পাঁচ বছর ধরে চিনি।', 'আমি তাকে পাঁচ বছর আগে চিনতাম।', 'আমি তাকে পাঁচ বছর ধরে চিনব।', 'আমি তাকে পাঁচ বছর ধরে চিনছি।'], a:'আমি তাকে পাঁচ বছর ধরে চিনি।', e:'Result or experience up to now → -েছি / -েছে.', b:'বর্তমানে সম্পন্ন কাজ বোঝাতে -েছি / -েছ / -েছে হয়।' },
+      { p:'You must obey your parents.', o:['তোমাকে অবশ্যই তোমার বাবা-মায়ের কথা মানতে হবে।', 'তুমি তোমার বাবা-মায়ের কথা মানতে পারো।', 'তোমার বাবা-মায়ের কথা মানার দরকার নেই।', 'তুমি তোমার বাবা-মায়ের কথা মানছ।'], a:'তোমাকে অবশ্যই তোমার বাবা-মায়ের কথা মানতে হবে।', e:'Modal verbs have set Bangla patterns (পারি, উচিত, হয়তো, হবে).', b:'Modal verb এর বাংলা রূপ নির্দিষ্ট: পারি, উচিত, হয়তো, অবশ্যই ... হবে।' },
+      { p:'I can swim.', o:['আমি সাঁতার কাটতে পারি।', 'আমি সাঁতার কাটতে চাই।', 'আমি সাঁতার কাটব।', 'আমি সাঁতার কাটছি।'], a:'আমি সাঁতার কাটতে পারি।', e:'Modal verbs have set Bangla patterns (পারি, উচিত, হয়তো, হবে).', b:'Modal verb এর বাংলা রূপ নির্দিষ্ট: পারি, উচিত, হয়তো, অবশ্যই ... হবে।' },
+      { p:'She could not solve the problem.', o:['সে সমস্যাটি সমাধান করতে পারেনি।', 'সে সমস্যাটি সমাধান করতে পারবে।', 'সে সমস্যাটি সমাধান করেছিল।', 'সে সমস্যাটি সমাধান করতে চায়নি।'], a:'সে সমস্যাটি সমাধান করতে পারেনি।', e:'Modal verbs have set Bangla patterns (পারি, উচিত, হয়তো, হবে).', b:'Modal verb এর বাংলা রূপ নির্দিষ্ট: পারি, উচিত, হয়তো, অবশ্যই ... হবে।' },
+      { p:'May I come in?', o:['আমি কি ভেতরে আসতে পারি?', 'আমি কি ভেতরে এসেছি?', 'আমি ভেতরে আসছি।', 'আমি কি ভেতরে যেতে চাই?'], a:'আমি কি ভেতরে আসতে পারি?', e:'Modal verbs have set Bangla patterns (পারি, উচিত, হয়তো, হবে).', b:'Modal verb এর বাংলা রূপ নির্দিষ্ট: পারি, উচিত, হয়তো, অবশ্যই ... হবে।' },
+      { p:'You should respect your elders.', o:['তোমার বড়দের সম্মান করা উচিত।', 'তুমি বড়দের সম্মান করেছ।', 'তোমার বড়দের সম্মান করা উচিত নয়।', 'তুমি বড়দের সম্মান করবে না।'], a:'তোমার বড়দের সম্মান করা উচিত।', e:'Modal verbs have set Bangla patterns (পারি, উচিত, হয়তো, হবে).', b:'Modal verb এর বাংলা রূপ নির্দিষ্ট: পারি, উচিত, হয়তো, অবশ্যই ... হবে।' },
+      { p:'We ought to help the poor.', o:['আমাদের গরিবদের সাহায্য করা উচিত।', 'আমাদের গরিবদের সাহায্য করা উচিত নয়।', 'আমরা গরিবদের সাহায্য করেছি।', 'আমরা গরিবদের সাহায্য করি না।'], a:'আমাদের গরিবদের সাহায্য করা উচিত।', e:'Modal verbs have set Bangla patterns (পারি, উচিত, হয়তো, হবে).', b:'Modal verb এর বাংলা রূপ নির্দিষ্ট: পারি, উচিত, হয়তো, অবশ্যই ... হবে।' },
+      { p:'He may come tomorrow.', o:['সে হয়তো আগামীকাল আসবে।', 'সে অবশ্যই আগামীকাল আসবে।', 'সে গতকাল এসেছিল।', 'সে আগামীকাল আসে না।'], a:'সে হয়তো আগামীকাল আসবে।', e:'Modal verbs have set Bangla patterns (পারি, উচিত, হয়তো, হবে).', b:'Modal verb এর বাংলা রূপ নির্দিষ্ট: পারি, উচিত, হয়তো, অবশ্যই ... হবে।' },
+      { p:'You need not go there.', o:['তোমার সেখানে যাওয়ার দরকার নেই।', 'তোমাকে সেখানে যেতেই হবে।', 'তুমি সেখানে যাচ্ছ।', 'তুমি সেখানে গিয়েছিলে।'], a:'তোমার সেখানে যাওয়ার দরকার নেই।', e:'Modal verbs have set Bangla patterns (পারি, উচিত, হয়তো, হবে).', b:'Modal verb এর বাংলা রূপ নির্দিষ্ট: পারি, উচিত, হয়তো, অবশ্যই ... হবে।' },
+      { p:'Can you speak English?', o:['তুমি কি ইংরেজি বলতে পারো?', 'তুমি কি ইংরেজি বলছ?', 'তুমি কি ইংরেজি বলেছিলে?', 'তুমি কি ইংরেজি বলবে?'], a:'তুমি কি ইংরেজি বলতে পারো?', e:'Modal verbs have set Bangla patterns (পারি, উচিত, হয়তো, হবে).', b:'Modal verb এর বাংলা রূপ নির্দিষ্ট: পারি, উচিত, হয়তো, অবশ্যই ... হবে।' },
+      { p:'He used to play cricket.', o:['সে আগে ক্রিকেট খেলত।', 'সে এখন ক্রিকেট খেলে।', 'সে আগামীকাল ক্রিকেট খেলবে।', 'সে ক্রিকেট খেলছে।'], a:'সে আগে ক্রিকেট খেলত।', e:'Modal verbs have set Bangla patterns (পারি, উচিত, হয়তো, হবে).', b:'Modal verb এর বাংলা রূপ নির্দিষ্ট: পারি, উচিত, হয়তো, অবশ্যই ... হবে।' },
+      { p:'I would like a cup of tea.', o:['আমি এক কাপ চা খেতে চাই।', 'আমি এক কাপ চা খেয়েছি।', 'আমি এক কাপ চা খাচ্ছি।', 'আমি এক কাপ চা খাই না।'], a:'আমি এক কাপ চা খেতে চাই।', e:'Modal verbs have set Bangla patterns (পারি, উচিত, হয়তো, হবে).', b:'Modal verb এর বাংলা রূপ নির্দিষ্ট: পারি, উচিত, হয়তো, অবশ্যই ... হবে।' },
+      { p:'Please open the door.', o:['দয়া করে দরজাটি খুলুন।', 'দয়া করে দরজাটি বন্ধ করুন।', 'দরজাটি খুলে গেছে।', 'দয়া করে জানালাটি খুলুন।'], a:'দয়া করে দরজাটি খুলুন।', e:'Modal verbs have set Bangla patterns (পারি, উচিত, হয়তো, হবে).', b:'Modal verb এর বাংলা রূপ নির্দিষ্ট: পারি, উচিত, হয়তো, অবশ্যই ... হবে।' },
+      { p:'If it rains, we will stay at home.', o:['বৃষ্টি হলে আমরা বাড়িতে থাকব।', 'বৃষ্টি হলে আমরা বাইরে যাব।', 'বৃষ্টি হয়েছিল বলে আমরা বাড়িতে ছিলাম।', 'বৃষ্টি না হলে আমরা বাড়িতে থাকব।'], a:'বৃষ্টি হলে আমরা বাড়িতে থাকব।', e:'A condition clause ends in -লে.', b:'শর্ত বোঝাতে ক্রিয়ার সাথে -লে যোগ হয়।' },
+      { p:'If you study well, you will pass.', o:['তুমি মন দিয়ে পড়লে পাস করবে।', 'তুমি মন দিয়ে না পড়লে পাস করবে।', 'তুমি মন দিয়ে পড়লে ফেল করবে।', 'তুমি মন দিয়ে পড়েছিলে বলে পাস করেছিলে।'], a:'তুমি মন দিয়ে পড়লে পাস করবে।', e:'A condition clause ends in -লে.', b:'শর্ত বোঝাতে ক্রিয়ার সাথে -লে যোগ হয়।' },
+      { p:'I would help you if I could.', o:['পারলে আমি তোমাকে সাহায্য করতাম।', 'পারলে আমি তোমাকে সাহায্য করব।', 'পারলে আমি তোমাকে সাহায্য করেছি।', 'না পারলে আমি তোমাকে সাহায্য করতাম।'], a:'পারলে আমি তোমাকে সাহায্য করতাম।', e:'A condition clause ends in -লে.', b:'শর্ত বোঝাতে ক্রিয়ার সাথে -লে যোগ হয়।' },
+      { p:'If I were rich, I would help the poor.', o:['আমি ধনী হলে গরিবদের সাহায্য করতাম।', 'আমি ধনী হলে গরিবদের সাহায্য করব।', 'আমি ধনী হয়েছি বলে গরিবদের সাহায্য করি।', 'আমি গরিব হলে ধনীদের সাহায্য করতাম।'], a:'আমি ধনী হলে গরিবদের সাহায্য করতাম।', e:'A condition clause ends in -লে.', b:'শর্ত বোঝাতে ক্রিয়ার সাথে -লে যোগ হয়।' },
+      { p:'Although he is poor, he is honest.', o:['সে গরিব হলেও সৎ।', 'সে গরিব বলে সৎ।', 'সে ধনী হলেও সৎ।', 'সে গরিব এবং অসৎ।'], a:'সে গরিব হলেও সৎ।', e:'A condition clause ends in -লে.', b:'শর্ত বোঝাতে ক্রিয়ার সাথে -লে যোগ হয়।' },
+      { p:'He is so weak that he cannot walk.', o:['সে এত দুর্বল যে হাঁটতে পারে না।', 'সে এত দুর্বল যে হাঁটতে পারে।', 'সে এত শক্তিশালী যে হাঁটতে পারে না।', 'সে দুর্বল বলে হাঁটতে চায় না।'], a:'সে এত দুর্বল যে হাঁটতে পারে না।', e:'A condition clause ends in -লে.', b:'শর্ত বোঝাতে ক্রিয়ার সাথে -লে যোগ হয়।' },
+      { p:'I know that he is honest.', o:['আমি জানি যে সে সৎ।', 'আমি জানি না যে সে সৎ।', 'আমি জানতাম যে সে সৎ নয়।', 'আমি জানব যে সে সৎ।'], a:'আমি জানি যে সে সৎ।', e:'A condition clause ends in -লে.', b:'শর্ত বোঝাতে ক্রিয়ার সাথে -লে যোগ হয়।' },
+      { p:'She said that she was happy.', o:['সে বলল যে সে খুশি।', 'সে বলল যে সে খুশি নয়।', 'সে বলবে যে সে খুশি।', 'সে বলল যে সে দুঃখিত।'], a:'সে বলল যে সে খুশি।', e:'A condition clause ends in -লে.', b:'শর্ত বোঝাতে ক্রিয়ার সাথে -লে যোগ হয়।' },
+      { p:'He asked me where I lived.', o:['সে আমাকে জিজ্ঞাসা করল আমি কোথায় থাকি।', 'সে আমাকে জিজ্ঞাসা করল আমি কোথায় যাব।', 'সে আমাকে জিজ্ঞাসা করবে আমি কোথায় থাকি।', 'আমি তাকে জিজ্ঞাসা করলাম সে কোথায় থাকে।'], a:'সে আমাকে জিজ্ঞাসা করল আমি কোথায় থাকি।', e:'A condition clause ends in -লে.', b:'শর্ত বোঝাতে ক্রিয়ার সাথে -লে যোগ হয়।' },
+      { p:'Because he was ill, he did not come.', o:['অসুস্থ ছিল বলে সে আসেনি।', 'অসুস্থ ছিল বলে সে এসেছে।', 'অসুস্থ হলে সে আসবে না।', 'সে অসুস্থ ছিল, তাই সে এসেছিল।'], a:'অসুস্থ ছিল বলে সে আসেনি।', e:'A condition clause ends in -লে.', b:'শর্ত বোঝাতে ক্রিয়ার সাথে -লে যোগ হয়।' },
+      { p:'Dhaka is bigger than Chattogram.', o:['ঢাকা চট্টগ্রামের চেয়ে বড়।', 'চট্টগ্রাম ঢাকার চেয়ে বড়।', 'ঢাকা চট্টগ্রামের মতো বড়।', 'ঢাকা চট্টগ্রামের চেয়ে ছোট।'], a:'ঢাকা চট্টগ্রামের চেয়ে বড়।', e:'Comparison uses "-র চেয়ে"; superlative uses "সবচেয়ে".', b:'তুলনায় "-র চেয়ে", সর্বোচ্চ মাত্রায় "সবচেয়ে" বসে।' },
+      { p:'He is the tallest boy in the class.', o:['সে ক্লাসের সবচেয়ে লম্বা ছেলে।', 'সে ক্লাসের সবচেয়ে ছোট ছেলে।', 'সে ক্লাসের একটি লম্বা ছেলে।', 'সে ক্লাসের সবচেয়ে লম্বা মেয়ে।'], a:'সে ক্লাসের সবচেয়ে লম্বা ছেলে।', e:'Comparison uses "-র চেয়ে"; superlative uses "সবচেয়ে".', b:'তুলনায় "-র চেয়ে", সর্বোচ্চ মাত্রায় "সবচেয়ে" বসে।' },
+      { p:'Gold is more valuable than silver.', o:['সোনা রুপার চেয়ে বেশি মূল্যবান।', 'রুপা সোনার চেয়ে বেশি মূল্যবান।', 'সোনা রুপার মতো মূল্যবান।', 'সোনা রুপার চেয়ে কম মূল্যবান।'], a:'সোনা রুপার চেয়ে বেশি মূল্যবান।', e:'Comparison uses "-র চেয়ে"; superlative uses "সবচেয়ে".', b:'তুলনায় "-র চেয়ে", সর্বোচ্চ মাত্রায় "সবচেয়ে" বসে।' },
+      { p:'She is as clever as her sister.', o:['সে তার বোনের মতোই বুদ্ধিমতী।', 'সে তার বোনের চেয়ে বেশি বুদ্ধিমতী।', 'সে তার বোনের চেয়ে কম বুদ্ধিমতী।', 'সে তার ভাইয়ের চেয়ে বেশি বুদ্ধিমান।'], a:'সে তার বোনের মতোই বুদ্ধিমতী।', e:'Comparison uses "-র চেয়ে"; superlative uses "সবচেয়ে".', b:'তুলনায় "-র চেয়ে", সর্বোচ্চ মাত্রায় "সবচেয়ে" বসে।' },
+      { p:'Honesty is the best policy.', o:['সততাই সর্বোৎকৃষ্ট পন্থা।', 'সততা একটি খারাপ নীতি।', 'মিথ্যাই সর্বোৎকৃষ্ট পন্থা।', 'সততা কখনো কাজে আসে না।'], a:'সততাই সর্বোৎকৃষ্ট পন্থা।', e:'Comparison uses "-র চেয়ে"; superlative uses "সবচেয়ে".', b:'তুলনায় "-র চেয়ে", সর্বোচ্চ মাত্রায় "সবচেয়ে" বসে।' },
+      { p:'This is the most beautiful place I have ever seen.', o:['এটি আমার দেখা সবচেয়ে সুন্দর জায়গা।', 'এটি আমার দেখা সবচেয়ে কুৎসিত জায়গা।', 'এটি আমার দেখা একটি সুন্দর জায়গা।', 'ওটি আমি দেখব এমন সবচেয়ে সুন্দর জায়গা।'], a:'এটি আমার দেখা সবচেয়ে সুন্দর জায়গা।', e:'Comparison uses "-র চেয়ে"; superlative uses "সবচেয়ে".', b:'তুলনায় "-র চেয়ে", সর্বোচ্চ মাত্রায় "সবচেয়ে" বসে।' },
+      { p:'The Padma is longer than the Karnaphuli.', o:['পদ্মা কর্ণফুলীর চেয়ে দীর্ঘ।', 'কর্ণফুলী পদ্মার চেয়ে দীর্ঘ।', 'পদ্মা কর্ণফুলীর চেয়ে ছোট।', 'পদ্মা কর্ণফুলীর মতো দীর্ঘ।'], a:'পদ্মা কর্ণফুলীর চেয়ে দীর্ঘ।', e:'Comparison uses "-র চেয়ে"; superlative uses "সবচেয়ে".', b:'তুলনায় "-র চেয়ে", সর্বোচ্চ মাত্রায় "সবচেয়ে" বসে।' },
+      { p:'The letter was written by him.', o:['চিঠিটি তার দ্বারা লেখা হয়েছিল।', 'চিঠিটি তার দ্বারা লেখা হবে।', 'চিঠিটি তার দ্বারা লেখা হচ্ছে।', 'চিঠিটি তাকে লেখা হয়েছিল।'], a:'চিঠিটি তার দ্বারা লেখা হয়েছিল।', e:'Passive voice → "-া হয় / -া হয়েছিল / -া হবে".', b:'Passive voice এ "করা হয় / করা হয়েছিল / করা হবে" ব্যবহার হয়।' },
+      { p:'The door was opened by the boy.', o:['দরজাটি ছেলেটির দ্বারা খোলা হয়েছিল।', 'দরজাটি ছেলেটির দ্বারা খোলা হবে।', 'দরজাটি ছেলেটির দ্বারা খোলা হয়।', 'দরজাটি ছেলেটিকে খোলা হয়েছিল।'], a:'দরজাটি ছেলেটির দ্বারা খোলা হয়েছিল।', e:'Passive voice → "-া হয় / -া হয়েছিল / -া হবে".', b:'Passive voice এ "করা হয় / করা হয়েছিল / করা হবে" ব্যবহার হয়।' },
+      { p:'English is spoken all over the world.', o:['ইংরেজি সারা বিশ্বে বলা হয়।', 'ইংরেজি সারা বিশ্বে বলা হয়েছিল।', 'ইংরেজি সারা বিশ্বে বলা হবে।', 'ইংরেজি শুধু বাংলাদেশে বলা হয়।'], a:'ইংরেজি সারা বিশ্বে বলা হয়।', e:'Passive voice → "-া হয় / -া হয়েছিল / -া হবে".', b:'Passive voice এ "করা হয় / করা হয়েছিল / করা হবে" ব্যবহার হয়।' },
+      { p:'The work will be finished tomorrow.', o:['কাজটি আগামীকাল শেষ করা হবে।', 'কাজটি গতকাল শেষ করা হয়েছিল।', 'কাজটি আগামীকাল শেষ করা হয়।', 'কাজটি আগামীকাল শেষ করা হচ্ছে।'], a:'কাজটি আগামীকাল শেষ করা হবে।', e:'Passive voice → "-া হয় / -া হয়েছিল / -া হবে".', b:'Passive voice এ "করা হয় / করা হয়েছিল / করা হবে" ব্যবহার হয়।' },
+      { p:'A new bridge is being built.', o:['একটি নতুন সেতু নির্মাণ করা হচ্ছে।', 'একটি নতুন সেতু নির্মাণ করা হবে।', 'একটি নতুন সেতু নির্মাণ করা হয়েছিল।', 'একটি নতুন সেতু নির্মাণ করা হয়।'], a:'একটি নতুন সেতু নির্মাণ করা হচ্ছে।', e:'Passive voice → "-া হয় / -া হয়েছিল / -া হবে".', b:'Passive voice এ "করা হয় / করা হয়েছিল / করা হবে" ব্যবহার হয়।' },
+      { p:'Rice is grown in Bangladesh.', o:['বাংলাদেশে ধান চাষ করা হয়।', 'বাংলাদেশে ধান চাষ করা হয়েছিল।', 'বাংলাদেশে ধান চাষ করা হচ্ছে।', 'বাংলাদেশে গম চাষ করা হয়।'], a:'বাংলাদেশে ধান চাষ করা হয়।', e:'Passive voice → "-া হয় / -া হয়েছিল / -া হবে".', b:'Passive voice এ "করা হয় / করা হয়েছিল / করা হবে" ব্যবহার হয়।' },
+      { p:'The thief was caught by the police.', o:['চোরটি পুলিশের হাতে ধরা পড়ল।', 'চোরটি পুলিশকে ধরল।', 'চোরটি পুলিশের হাতে ধরা পড়বে।', 'চোরটি পুলিশের হাতে ধরা পড়ে।'], a:'চোরটি পুলিশের হাতে ধরা পড়ল।', e:'Passive voice → "-া হয় / -া হয়েছিল / -া হবে".', b:'Passive voice এ "করা হয় / করা হয়েছিল / করা হবে" ব্যবহার হয়।' },
+      { p:'The match has been cancelled.', o:['খেলাটি বাতিল করা হয়েছে।', 'খেলাটি বাতিল করা হবে।', 'খেলাটি বাতিল করা হয়।', 'খেলাটি শুরু করা হয়েছে।'], a:'খেলাটি বাতিল করা হয়েছে।', e:'Passive voice → "-া হয় / -া হয়েছিল / -া হবে".', b:'Passive voice এ "করা হয় / করা হয়েছিল / করা হবে" ব্যবহার হয়।' },
+      { p:'What is your name?', o:['তোমার নাম কী?', 'তোমার বাড়ি কোথায়?', 'তোমার বয়স কত?', 'তোমার নাম কে?'], a:'তোমার নাম কী?', e:'Fixed expression — learn it as a whole phrase.', b:'প্রচলিত বাক্যাংশ — পুরোটা একসাথে মনে রাখো।' },
+      { p:'How are you?', o:['তুমি কেমন আছ?', 'তুমি কোথায় আছ?', 'তুমি কী করছ?', 'তুমি কেন আছ?'], a:'তুমি কেমন আছ?', e:'Fixed expression — learn it as a whole phrase.', b:'প্রচলিত বাক্যাংশ — পুরোটা একসাথে মনে রাখো।' },
+      { p:'I live in Chattogram.', o:['আমি চট্টগ্রামে থাকি।', 'আমি ঢাকায় থাকি।', 'আমি চট্টগ্রামে থাকব।', 'আমি চট্টগ্রামে ছিলাম।'], a:'আমি চট্টগ্রামে থাকি।', e:'Fixed expression — learn it as a whole phrase.', b:'প্রচলিত বাক্যাংশ — পুরোটা একসাথে মনে রাখো।' },
+      { p:'How old are you?', o:['তোমার বয়স কত?', 'তোমার নাম কী?', 'তোমার ওজন কত?', 'তোমার উচ্চতা কত?'], a:'তোমার বয়স কত?', e:'Fixed expression — learn it as a whole phrase.', b:'প্রচলিত বাক্যাংশ — পুরোটা একসাথে মনে রাখো।' },
+      { p:'What time is it?', o:['এখন কয়টা বাজে?', 'আজ কত তারিখ?', 'এখন কোথায় বাজে?', 'কয়টা বাজবে?'], a:'এখন কয়টা বাজে?', e:'Fixed expression — learn it as a whole phrase.', b:'প্রচলিত বাক্যাংশ — পুরোটা একসাথে মনে রাখো।' },
+      { p:'Thank you very much.', o:['আপনাকে অনেক ধন্যবাদ।', 'আপনাকে অনেক স্বাগতম।', 'আপনাকে অনেক দুঃখিত।', 'আমাকে অনেক ধন্যবাদ।'], a:'আপনাকে অনেক ধন্যবাদ।', e:'Fixed expression — learn it as a whole phrase.', b:'প্রচলিত বাক্যাংশ — পুরোটা একসাথে মনে রাখো।' },
+      { p:'I am sorry for being late.', o:['দেরি করার জন্য আমি দুঃখিত।', 'দেরি করার জন্য আমি খুশি।', 'দেরি হওয়ার জন্য ধন্যবাদ।', 'দেরি করার জন্য আমি ধন্যবাদ জানাই।'], a:'দেরি করার জন্য আমি দুঃখিত।', e:'Fixed expression — learn it as a whole phrase.', b:'প্রচলিত বাক্যাংশ — পুরোটা একসাথে মনে রাখো।' },
+      { p:'Excuse me, where is the post office?', o:['মাফ করবেন, ডাকঘর কোথায়?', 'মাফ করবেন, ব্যাংক কোথায়?', 'মাফ করবেন, ডাকঘর কখন?', 'ধন্যবাদ, ডাকঘর কোথায়?'], a:'মাফ করবেন, ডাকঘর কোথায়?', e:'Fixed expression — learn it as a whole phrase.', b:'প্রচলিত বাক্যাংশ — পুরোটা একসাথে মনে রাখো।' },
+      { p:'Can you help me, please?', o:['দয়া করে আমাকে একটু সাহায্য করবেন?', 'দয়া করে আমাকে একটু অপেক্ষা করবেন?', 'আমি কি আপনাকে সাহায্য করব?', 'আমাকে সাহায্য করো না।'], a:'দয়া করে আমাকে একটু সাহায্য করবেন?', e:'Fixed expression — learn it as a whole phrase.', b:'প্রচলিত বাক্যাংশ — পুরোটা একসাথে মনে রাখো।' },
+      { p:'I do not understand.', o:['আমি বুঝতে পারছি না।', 'আমি বুঝতে পেরেছি।', 'আমি বুঝব না।', 'আমি জানতে চাই।'], a:'আমি বুঝতে পারছি না।', e:'Fixed expression — learn it as a whole phrase.', b:'প্রচলিত বাক্যাংশ — পুরোটা একসাথে মনে রাখো।' },
+      { p:'Please speak slowly.', o:['দয়া করে আস্তে কথা বলুন।', 'দয়া করে জোরে কথা বলুন।', 'দয়া করে কথা বলা বন্ধ করুন।', 'দয়া করে আস্তে চলুন।'], a:'দয়া করে আস্তে কথা বলুন।', e:'Fixed expression — learn it as a whole phrase.', b:'প্রচলিত বাক্যাংশ — পুরোটা একসাথে মনে রাখো।' },
+      { p:'Good morning!', o:['সুপ্রভাত!', 'শুভ রাত্রি!', 'শুভ সন্ধ্যা!', 'বিদায়!'], a:'সুপ্রভাত!', e:'Fixed expression — learn it as a whole phrase.', b:'প্রচলিত বাক্যাংশ — পুরোটা একসাথে মনে রাখো।' },
+      { p:'Happy birthday to you!', o:['তোমাকে জন্মদিনের শুভেচ্ছা!', 'তোমাকে নববর্ষের শুভেচ্ছা!', 'তোমাকে ঈদের শুভেচ্ছা!', 'তোমাকে বিদায়ের শুভেচ্ছা!'], a:'তোমাকে জন্মদিনের শুভেচ্ছা!', e:'Fixed expression — learn it as a whole phrase.', b:'প্রচলিত বাক্যাংশ — পুরোটা একসাথে মনে রাখো।' },
+      { p:'I am hungry.', o:['আমার খিদে পেয়েছে।', 'আমার ঘুম পেয়েছে।', 'আমার পিপাসা পেয়েছে।', 'আমার খিদে পাবে।'], a:'আমার খিদে পেয়েছে।', e:'Fixed expression — learn it as a whole phrase.', b:'প্রচলিত বাক্যাংশ — পুরোটা একসাথে মনে রাখো।' },
+      { p:'I am very tired.', o:['আমি খুব ক্লান্ত।', 'আমি খুব খুশি।', 'আমি খুব ব্যস্ত।', 'আমি খুব ক্ষুধার্ত।'], a:'আমি খুব ক্লান্ত।', e:'Fixed expression — learn it as a whole phrase.', b:'প্রচলিত বাক্যাংশ — পুরোটা একসাথে মনে রাখো।' },
+      { p:'It is very hot today.', o:['আজ খুব গরম পড়েছে।', 'আজ খুব ঠান্ডা পড়েছে।', 'আগামীকাল খুব গরম পড়বে।', 'আজ খুব বৃষ্টি হচ্ছে।'], a:'আজ খুব গরম পড়েছে।', e:'Fixed expression — learn it as a whole phrase.', b:'প্রচলিত বাক্যাংশ — পুরোটা একসাথে মনে রাখো।' },
+      { p:'Please come here.', o:['দয়া করে এখানে আসুন।', 'দয়া করে ওখানে যান।', 'দয়া করে এখানে বসুন।', 'আমি এখানে আসব।'], a:'দয়া করে এখানে আসুন।', e:'Fixed expression — learn it as a whole phrase.', b:'প্রচলিত বাক্যাংশ — পুরোটা একসাথে মনে রাখো।' },
+      { p:'Please give me a glass of water.', o:['দয়া করে আমাকে এক গ্লাস পানি দিন।', 'দয়া করে আমাকে এক কাপ চা দিন।', 'দয়া করে আমাকে এক গ্লাস পানি নিন।', 'আমি তোমাকে এক গ্লাস পানি দিলাম।'], a:'দয়া করে আমাকে এক গ্লাস পানি দিন।', e:'Fixed expression — learn it as a whole phrase.', b:'প্রচলিত বাক্যাংশ — পুরোটা একসাথে মনে রাখো।' },
+      { p:'Time and tide wait for none.', o:['সময় ও স্রোত কারো জন্য অপেক্ষা করে না।', 'সময় ও স্রোত সবার জন্য অপেক্ষা করে।', 'সময় সবকিছু ভুলিয়ে দেয়।', 'সময় ও স্রোত কারো জন্য অপেক্ষা করেছিল।'], a:'সময় ও স্রোত কারো জন্য অপেক্ষা করে না।', e:'Proverbs are translated by meaning, not word by word.', b:'প্রবাদ শব্দে শব্দে নয়, ভাবানুবাদ করতে হয়।' },
+      { p:'Practice makes a man perfect.', o:['অনুশীলন মানুষকে নিখুঁত করে তোলে।', 'অনুশীলন মানুষকে অলস করে তোলে।', 'অনুশীলন মানুষকে নিখুঁত করেছিল।', 'অনুশীলন ছাড়াই মানুষ নিখুঁত হয়।'], a:'অনুশীলন মানুষকে নিখুঁত করে তোলে।', e:'Proverbs are translated by meaning, not word by word.', b:'প্রবাদ শব্দে শব্দে নয়, ভাবানুবাদ করতে হয়।' },
+      { p:'Health is wealth.', o:['স্বাস্থ্যই সম্পদ।', 'সম্পদই স্বাস্থ্য।', 'স্বাস্থ্য একটি রোগ।', 'স্বাস্থ্য সম্পদের চেয়ে কম মূল্যবান।'], a:'স্বাস্থ্যই সম্পদ।', e:'Proverbs are translated by meaning, not word by word.', b:'প্রবাদ শব্দে শব্দে নয়, ভাবানুবাদ করতে হয়।' },
+      { p:'Early to bed and early to rise makes a man healthy.', o:['তাড়াতাড়ি ঘুমানো ও তাড়াতাড়ি ওঠা মানুষকে সুস্থ রাখে।', 'দেরিতে ঘুমানো ও দেরিতে ওঠা মানুষকে সুস্থ রাখে।', 'তাড়াতাড়ি ঘুমানো ও তাড়াতাড়ি ওঠা মানুষকে অসুস্থ করে।', 'তাড়াতাড়ি ঘুমালে মানুষ সুস্থ ছিল।'], a:'তাড়াতাড়ি ঘুমানো ও তাড়াতাড়ি ওঠা মানুষকে সুস্থ রাখে।', e:'Proverbs are translated by meaning, not word by word.', b:'প্রবাদ শব্দে শব্দে নয়, ভাবানুবাদ করতে হয়।' },
+      { p:'Knowledge is power.', o:['জ্ঞানই শক্তি।', 'শক্তিই জ্ঞান।', 'জ্ঞান একটি বোঝা।', 'অজ্ঞতাই শক্তি।'], a:'জ্ঞানই শক্তি।', e:'Proverbs are translated by meaning, not word by word.', b:'প্রবাদ শব্দে শব্দে নয়, ভাবানুবাদ করতে হয়।' },
+      { p:'A friend in need is a friend indeed.', o:['বিপদের বন্ধুই প্রকৃত বন্ধু।', 'সুখের বন্ধুই প্রকৃত বন্ধু।', 'বন্ধু মানেই বিপদ।', 'প্রকৃত বন্ধু কখনো সাহায্য করে না।'], a:'বিপদের বন্ধুই প্রকৃত বন্ধু।', e:'Proverbs are translated by meaning, not word by word.', b:'প্রবাদ শব্দে শব্দে নয়, ভাবানুবাদ করতে হয়।' },
+      { p:'Many hands make light work.', o:['অনেক হাত মিললে কাজ সহজ হয়।', 'অনেক হাত থাকলে কাজ কঠিন হয়।', 'এক হাতেই সব কাজ সহজ হয়।', 'অনেক হাত মিললে কাজ সহজ হয়েছিল।'], a:'অনেক হাত মিললে কাজ সহজ হয়।', e:'Proverbs are translated by meaning, not word by word.', b:'প্রবাদ শব্দে শব্দে নয়, ভাবানুবাদ করতে হয়।' },
+      { p:'Prevention is better than cure.', o:['প্রতিকারের চেয়ে প্রতিরোধ ভালো।', 'প্রতিরোধের চেয়ে প্রতিকার ভালো।', 'প্রতিকার ও প্রতিরোধ একই।', 'প্রতিকারের চেয়ে প্রতিরোধ কঠিন।'], a:'প্রতিকারের চেয়ে প্রতিরোধ ভালো।', e:'Proverbs are translated by meaning, not word by word.', b:'প্রবাদ শব্দে শব্দে নয়, ভাবানুবাদ করতে হয়।' },
+      { p:'Bangladesh is a beautiful country.', o:['বাংলাদেশ একটি সুন্দর দেশ।', 'বাংলাদেশ একটি ছোট দেশ।', 'বাংলাদেশ একটি সুন্দর শহর।', 'ভারত একটি সুন্দর দেশ।'], a:'বাংলাদেশ একটি সুন্দর দেশ।', e:'Match the nouns, place words and tense carefully.', b:'noun, স্থানবাচক শব্দ ও tense মিলিয়ে অনুবাদ করো।' },
+      { p:'Dhaka is the capital of Bangladesh.', o:['ঢাকা বাংলাদেশের রাজধানী।', 'চট্টগ্রাম বাংলাদেশের রাজধানী।', 'ঢাকা ভারতের রাজধানী।', 'ঢাকা বাংলাদেশের একটি গ্রাম।'], a:'ঢাকা বাংলাদেশের রাজধানী।', e:'Match the nouns, place words and tense carefully.', b:'noun, স্থানবাচক শব্দ ও tense মিলিয়ে অনুবাদ করো।' },
+      { p:'The Padma is a big river.', o:['পদ্মা একটি বড় নদী।', 'পদ্মা একটি ছোট নদী।', 'পদ্মা একটি বড় শহর।', 'পদ্মা একটি বড় পাহাড়।'], a:'পদ্মা একটি বড় নদী।', e:'Match the nouns, place words and tense carefully.', b:'noun, স্থানবাচক শব্দ ও tense মিলিয়ে অনুবাদ করো।' },
+      { p:'My school is near my house.', o:['আমার স্কুল আমার বাড়ির কাছে।', 'আমার স্কুল আমার বাড়ি থেকে অনেক দূরে।', 'আমার বাড়ি আমার স্কুলের কাছে নয়।', 'আমার স্কুলের বাড়ি কাছে।'], a:'আমার স্কুল আমার বাড়ির কাছে।', e:'Match the nouns, place words and tense carefully.', b:'noun, স্থানবাচক শব্দ ও tense মিলিয়ে অনুবাদ করো।' },
+      { p:'I study in class ten.', o:['আমি দশম শ্রেণিতে পড়ি।', 'আমি দশম শ্রেণিতে পড়ব।', 'আমি নবম শ্রেণিতে পড়ি।', 'আমি দশম শ্রেণিতে পড়েছিলাম।'], a:'আমি দশম শ্রেণিতে পড়ি।', e:'Match the nouns, place words and tense carefully.', b:'noun, স্থানবাচক শব্দ ও tense মিলিয়ে অনুবাদ করো।' },
+      { p:'There are thirty students in my class.', o:['আমার ক্লাসে ত্রিশজন ছাত্রছাত্রী আছে।', 'আমার ক্লাসে তিনজন ছাত্রছাত্রী আছে।', 'আমার ক্লাসে ত্রিশজন ছাত্রছাত্রী ছিল।', 'আমার স্কুলে ত্রিশজন ছাত্রছাত্রী আছে।'], a:'আমার ক্লাসে ত্রিশজন ছাত্রছাত্রী আছে।', e:'Match the nouns, place words and tense carefully.', b:'noun, স্থানবাচক শব্দ ও tense মিলিয়ে অনুবাদ করো।' },
+      { p:'The library opens at nine o\'clock.', o:['লাইব্রেরি নয়টায় খোলে।', 'লাইব্রেরি নয়টায় বন্ধ হয়।', 'লাইব্রেরি নয়টায় খুলবে।', 'লাইব্রেরি নয়টায় খুলেছিল।'], a:'লাইব্রেরি নয়টায় খোলে।', e:'Match the nouns, place words and tense carefully.', b:'noun, স্থানবাচক শব্দ ও tense মিলিয়ে অনুবাদ করো।' },
+      { p:'He is a very honest man.', o:['সে অত্যন্ত সৎ একজন মানুষ।', 'সে অত্যন্ত অসৎ একজন মানুষ।', 'সে একজন সৎ মানুষ ছিল।', 'সে অত্যন্ত বুদ্ধিমান একজন মানুষ।'], a:'সে অত্যন্ত সৎ একজন মানুষ।', e:'Match the nouns, place words and tense carefully.', b:'noun, স্থানবাচক শব্দ ও tense মিলিয়ে অনুবাদ করো।' },
+      { p:'The cat is sleeping under the table.', o:['বিড়ালটি টেবিলের নিচে ঘুমাচ্ছে।', 'বিড়ালটি টেবিলের উপর ঘুমাচ্ছে।', 'বিড়ালটি টেবিলের নিচে ঘুমায়।', 'কুকুরটি টেবিলের নিচে ঘুমাচ্ছে।'], a:'বিড়ালটি টেবিলের নিচে ঘুমাচ্ছে।', e:'Match the nouns, place words and tense carefully.', b:'noun, স্থানবাচক শব্দ ও tense মিলিয়ে অনুবাদ করো।' },
+      { p:'There is a book on the table.', o:['টেবিলের উপর একটি বই আছে।', 'টেবিলের নিচে একটি বই আছে।', 'টেবিলের উপর একটি বই ছিল।', 'টেবিলের উপর একটি কলম আছে।'], a:'টেবিলের উপর একটি বই আছে।', e:'Match the nouns, place words and tense carefully.', b:'noun, স্থানবাচক শব্দ ও tense মিলিয়ে অনুবাদ করো।' },
+      { p:'He lives in a village.', o:['সে একটি গ্রামে বাস করে।', 'সে একটি শহরে বাস করে।', 'সে একটি গ্রামে বাস করছে।', 'সে একটি গ্রামে বাস করত।'], a:'সে একটি গ্রামে বাস করে।', e:'Match the nouns, place words and tense carefully.', b:'noun, স্থানবাচক শব্দ ও tense মিলিয়ে অনুবাদ করো।' },
+      { p:'We should plant more trees.', o:['আমাদের আরও গাছ লাগানো উচিত।', 'আমাদের আরও গাছ কাটা উচিত।', 'আমরা আরও গাছ লাগিয়েছিলাম।', 'আমাদের গাছ লাগানো উচিত নয়।'], a:'আমাদের আরও গাছ লাগানো উচিত।', e:'Match the nouns, place words and tense carefully.', b:'noun, স্থানবাচক শব্দ ও tense মিলিয়ে অনুবাদ করো।' },
+      { p:'Exercise keeps us healthy.', o:['ব্যায়াম আমাদের সুস্থ রাখে।', 'ব্যায়াম আমাদের অসুস্থ করে।', 'ব্যায়াম আমাদের সুস্থ রেখেছিল।', 'ব্যায়াম আমাদের সুস্থ রাখবে না।'], a:'ব্যায়াম আমাদের সুস্থ রাখে।', e:'Match the nouns, place words and tense carefully.', b:'noun, স্থানবাচক শব্দ ও tense মিলিয়ে অনুবাদ করো।' },
     ],
   },
 
@@ -1664,7 +1946,7 @@ const QUESTION_BANK = {
       { p:'The fire was ___ by the firefighters.', o:['put out','put on','put in','put up'], a:'put out', e:'= extinguish.', b:'= নেভানো।' },
       { p:'I will ___ you at the station.', o:['see off','see in','see on','see through'], a:'see off', e:'= bid farewell.', b:'= বিদায়।' },
       { p:'They ___ a plan.', o:['worked out','worked in','worked on','worked up'], a:'worked out', e:'= devise.', b:'= তৈরি করা।' },
-      { p:'She ___ her mother.', o:['takes after','takes off','takes in','takes on'], a:'takes after', e:'= resemble.', b:'= মতো।' },
+      { p:'The plane ___ at six in the morning.', o:['takes off','takes after','takes in','takes up'], a:'takes off', e:'= leaves the ground.', b:'= আকাশে ওঠা।' },
       { p:'He was ___ in a small village.', o:['brought up','brought in','brought on','brought out'], a:'brought up', e:'= raise.', b:'= লালন-পালন।' },
       { p:'The meeting was ___ because of the storm.', o:['called off','called in','called on','called up'], a:'called off', e:'= cancel.', b:'= বাতিল।' },
       { p:'He ___ the money.', o:['paid back','paid in','paid off','paid out'], a:'paid back', e:'= return.', b:'= ফেরত।' },
@@ -1952,7 +2234,7 @@ const QUESTION_BANK = {
       { p:'This is a ___ (love) story.', o:['love','lovely','lovable','loving'], a:'lovely', e:'Adjective.', b:'Adjective।' },
       { p:'He ___ (success) in the exam.', o:['success','successful','succeeded','successfully'], a:'succeeded', e:'Verb.', b:'Verb।' },
       { p:'Her ___ (beautify) is natural.', o:['beautify','beauty','beautiful','beautifully'], a:'beauty', e:'Noun.', b:'Noun।' },
-      { p:'She spoke ___ (courage).', o:['courage','courageous','courageously','courageously'], a:'courageously', e:'Adverb.', b:'Adverb।' },
+      { p:'She spoke ___ (courage).', o:['courage','courageous','courageously','courageousness'], a:'courageously', e:'Adverb.', b:'Adverb।' },
       { p:'His ___ (brave) was rewarded.', o:['brave','bravery','bravely','braver'], a:'bravery', e:'Noun.', b:'Noun।' },
       { p:'This is a ___ (music) instrument.', o:['music','musical','musician','musically'], a:'musical', e:'Adjective.', b:'Adjective।' },
       { p:'He is a famous ___ (music).', o:['music','musical','musician','musically'], a:'musician', e:'Person noun.', b:'ব্যক্তি noun।' },
@@ -2244,7 +2526,7 @@ const QUESTION_BANK = {
       { p:'I appreciate your ___ me.', o:['help','helping','to help','helped'], a:'helping', e:'Appreciate + gerund.', b:'Appreciate + gerund।' },
       { p:'She considered ___ a new job.', o:['take','taking','to take','took'], a:'taking', e:'Consider + gerund.', b:'Consider + gerund।' },
       { p:'He mentioned ___ you yesterday.', o:['see','seeing','to see','saw'], a:'seeing', e:'Mention + gerund.', b:'Mention + gerund।' },
-      { p:'I recommend ___ this book.', o:['read','reading','to read','read'], a:'reading', e:'Recommend + gerund.', b:'Recommend + gerund।' },
+      { p:'I recommend ___ this book.', o:['read','reading','to read','be read'], a:'reading', e:'Recommend + gerund.', b:'Recommend + gerund।' },
       { p:'She avoided ___ him.', o:['meet','meeting','to meet','met'], a:'meeting', e:'Avoid + gerund.', b:'Avoid + gerund।' },
       { p:'He risked ___ his job.', o:['lose','losing','to lose','lost'], a:'losing', e:'Risk + gerund.', b:'Risk + gerund।' },
       { p:'I don\'t recall ___ him before.', o:['see','seeing','to see','saw'], a:'seeing', e:'Recall + gerund.', b:'Recall + gerund।' },
@@ -2440,6 +2722,436 @@ const QUESTION_BANK = {
 };
 
 /* ============================================================
+   PARAGRAPH BANK — 12 model paragraphs (SSC / HSC) + reading
+   exercises. Each paragraph feeds the "Paragraphs" mode and the
+   "Paragraph Reading" practice category (4 questions each).
+   ============================================================ */
+const PARAGRAPH_BANK = [
+  {
+    id: 'para-aim', title: 'Your Aim in Life', level: 'SSC',
+    text: 'Every student should have a clear aim in life, because a life without an aim is like a ship without a rudder. Such a ship drifts here and there and never reaches the shore. My aim in life is to become a doctor. I have chosen this noble profession because I want to serve the poor and the sick people of my country. In our villages, many people cannot get proper treatment due to poverty. Some of them walk for miles to reach a hospital, and some never reach it at all. I have seen my own neighbours suffer for this reason, and it has touched my heart deeply. I want to stand beside such people and ease their suffering. A doctor can save a life, and there is no greater joy than that. To fulfil my aim, I study hard every day and try to do well in all my exams. I give special attention to science and mathematics, and I also read books on health to widen my knowledge. I never waste my time in idle gossip or aimless games. My parents and teachers encourage me, and their advice gives me strength. I know the road is long and difficult, and I may face many obstacles on the way. But I will not lose heart. With honesty, patience and hard work, I am sure I will achieve my goal one day. Then I will open a small clinic in my village and treat poor patients free of cost.',
+    qs: [
+      { p: 'Why does the writer want to become a doctor?', o: ['To serve the poor and the sick', 'To earn a lot of money', 'To travel abroad', 'To please his teachers'], a: 'To serve the poor and the sick', e: 'He wants to serve poor and sick people.', b: 'সে গরিব ও অসুস্থ মানুষের সেবা করতে চায়।' },
+      { p: 'The word “noble” in the paragraph means ___.', o: ['honourable', 'costly', 'easy', 'ordinary'], a: 'honourable', e: 'Noble = honourable, worthy of respect.', b: 'Noble = মহৎ।' },
+      { p: 'In “I study hard every day”, the tense is ___.', o: ['present simple', 'present continuous', 'past simple', 'future simple'], a: 'present simple', e: 'A daily habit → present simple.', b: 'দৈনন্দিন অভ্যাস → present simple।' },
+      { p: 'A life without an aim is compared to ___.', o: ['a ship without a rudder', 'a bird without wings', 'a tree without leaves', 'a river without water'], a: 'a ship without a rudder', e: 'The first sentence uses this simile.', b: 'প্রথম বাক্যে এই তুলনা আছে।' },
+    ],
+  },
+  {
+    id: 'para-honesty', title: 'Honesty Is the Best Policy', level: 'SSC',
+    text: 'Honesty means telling the truth and doing the right thing even when nobody is watching. It is one of the greatest virtues a man can have. An honest person is respected by everyone, while a liar loses the trust of others. A dishonest man may gain something for a short time, but sooner or later his lies are caught. There is a famous story about a shepherd boy. Once he cried “Wolf!” just for fun, and the villagers ran to help him. He laughed at them and enjoyed the joke. He did the same thing a second time, and again the villagers came running. When a real wolf came one day, the boy shouted for help, but nobody believed him. The wolf killed many of his sheep, and he lost everything. This story teaches us that a liar is not believed even when he speaks the truth. Honesty may sometimes bring a little loss, but it always brings peace of mind in the end. An honest student does not cheat in the exam, and an honest trader does not cheat his customers. Such people sleep well at night because their conscience is clear. Even small lies, if repeated, can turn into a bad habit that is hard to break. Therefore, we should be honest in our words and deeds from childhood. Parents and teachers should set an example for children by speaking the truth themselves. If we follow this simple rule, our society will become a better place to live in.',
+    qs: [
+      { p: 'Why did nobody help the shepherd boy when the real wolf came?', o: ['They had lost trust in him', 'They were busy', 'They were afraid of the wolf', 'They did not hear him'], a: 'They had lost trust in him', e: 'He had lied to them before, so they did not believe him.', b: 'আগে মিথ্যা বলায় কেউ তাকে বিশ্বাস করেনি।' },
+      { p: 'The word “deeds” means ___.', o: ['actions', 'papers', 'dreams', 'words'], a: 'actions', e: 'Deeds = actions.', b: 'Deeds = কাজ।' },
+      { p: 'The opposite of “honest” is ___.', o: ['dishonest', 'honestly', 'honesty', 'honour'], a: 'dishonest', e: 'The prefix dis- gives the opposite.', b: 'dis- যোগে বিপরীত শব্দ হয়।' },
+      { p: 'According to the paragraph, honesty always brings ___.', o: ['peace of mind', 'a lot of money', 'fame', 'a big loss'], a: 'peace of mind', e: 'It always brings peace of mind in the end.', b: 'শেষে মনের শান্তি আসে।' },
+    ],
+  },
+  {
+    id: 'para-rainy', title: 'A Rainy Day', level: 'SSC',
+    text: 'A rainy day is a day of heavy rainfall when the sky is covered with dark clouds. On such a day, the sun does not show its face and the whole world looks gloomy. Last Friday it rained from dawn to dusk. I woke up early in the morning to the sound of thunder, and soon the rain began to pour down. The roads of our town were flooded, and many people could not go to work. Water entered the lanes, and small children enjoyed sailing paper boats in it. The school was closed, so I stayed at home and enjoyed hot khichuri with fried eggs. My mother also made some crispy pakoras in the afternoon. I spent the rest of the day reading a story book beside the window and watching the rain. Outside, farmers were happy because the rain was good for their crops. The dry fields became green again, and the birds sang in the trees. However, the day was very hard for rickshaw pullers and day labourers, since they could not earn anything. Many poor families who lived in low-lying areas also suffered a great deal, as water entered their small huts. Some of them had to leave their homes and take shelter elsewhere. In the evening the rain stopped, and a cool breeze began to blow over the town. A rainy day, therefore, brings joy to some and sorrow to others. It reminds us that we should always help those who are in trouble.',
+    qs: [
+      { p: 'Why were the farmers happy?', o: ['The rain was good for their crops', 'The school was closed', 'They ate khichuri', 'The roads were flooded'], a: 'The rain was good for their crops', e: 'Rain is good for crops.', b: 'বৃষ্টি ফসলের জন্য ভালো।' },
+      { p: 'The word “gloomy” means ___.', o: ['dark and sad', 'bright', 'noisy', 'crowded'], a: 'dark and sad', e: 'Gloomy = dark and dull.', b: 'Gloomy = অন্ধকার ও বিষণ্ণ।' },
+      { p: '“From dawn to dusk” means ___.', o: ['from morning to evening', 'from noon to midnight', 'for one hour', 'all night long'], a: 'from morning to evening', e: 'Dawn = early morning; dusk = evening.', b: 'Dawn = ভোর, dusk = সন্ধ্যা।' },
+      { p: 'Who suffered most on the rainy day?', o: ['Rickshaw pullers and day labourers', 'Teachers', 'Farmers', 'Students'], a: 'Rickshaw pullers and day labourers', e: 'They could not earn anything.', b: 'তারা কোনো আয় করতে পারেনি।' },
+    ],
+  },
+  {
+    id: 'para-time', title: 'The Importance of Time', level: 'SSC',
+    text: 'Time is the most valuable thing in our life. Once it is gone, it never comes back, no matter how much money we spend. The wise proverb says, “Time and tide wait for none.” A student who wastes time cannot do well in the exam, and a farmer who sows seeds late gets a poor harvest. Even a king cannot call back a single moment that has passed. Successful people always make a daily routine and follow it strictly. They get up early, finish their work on time and do not put off today’s task until tomorrow. Great scientists and leaders of the world became great because they used every hour in a useful way. On the other hand, those who waste time in idle talk and aimless games often repent later. When the exam comes near, they run after books in a panic, but it is too late. Then they regret the days they have lost. We can use our time well if we plan our day carefully. We should give some hours to study, some to rest and some to play, and we should keep a little time for helping our family. We should also avoid spending too many hours on television and the mobile phone. Another proverb says that a stitch in time saves nine. Time lost in youth can never be made up in old age. So, we should learn the value of time from an early age and make good use of every moment.',
+    qs: [
+      { p: 'What does “Time and tide wait for none” teach us?', o: ['Time never waits for anyone', 'Tide is stronger than time', 'We should wait for the right time', 'Rivers never stop flowing'], a: 'Time never waits for anyone', e: 'It means time does not wait for any person.', b: 'সময় কারো জন্য অপেক্ষা করে না।' },
+      { p: 'The phrasal verb “put off” means ___.', o: ['delay', 'finish', 'forget', 'start'], a: 'delay', e: 'Put off = delay.', b: 'Put off = পিছিয়ে দেওয়া।' },
+      { p: 'The word “repent” means to ___.', o: ['feel sorry for what one did', 'feel proud', 'feel sleepy', 'feel angry'], a: 'feel sorry for what one did', e: 'Repent = feel regret.', b: 'Repent = অনুতপ্ত হওয়া।' },
+      { p: 'Which sentence is true according to the paragraph?', o: ['A farmer who sows late gets a poor harvest.', 'Money can bring back lost time.', 'Idle talk makes people successful.', 'Time is less valuable than money.'], a: 'A farmer who sows late gets a poor harvest.', e: 'The paragraph says late sowing gives a poor harvest.', b: 'দেরিতে বীজ বুনলে ফলন কম হয়।' },
+    ],
+  },
+  {
+    id: 'para-mobile', title: 'Mobile Phone', level: 'SSC',
+    text: 'The mobile phone is one of the most useful inventions of modern times. Not long ago, people had to write letters and wait for days to hear from their loved ones. Today, with a mobile phone, we can talk to our friends and relatives at any time and from any place. It also helps us to send messages, take photographs, listen to music and use the internet. Students can use it to look up the meaning of difficult words or to watch online lessons. A farmer can check the price of his crops, and a businessman can run his shop from a distance. Moreover, it is very helpful in an emergency, because we can call a doctor or the police within a moment. Many people can also send money to their family through a mobile phone without going to a bank. However, too much use of a mobile phone can be harmful. It wastes our valuable time, harms our eyes and keeps us away from family and friends. Many young people sit with their phones for hours and forget to talk to the people sitting next to them. Playing games late at night also spoils their sleep and their studies. Some people use phones to spread false news or to annoy others, which is a bad misuse of this device. A mobile phone is like a sharp knife; it can be useful or dangerous according to the way we use it. So, we should use this wonderful device wisely and never become its slave.',
+    qs: [
+      { p: 'How can a mobile phone help students?', o: ['By helping them look up words and watch online lessons', 'By doing their homework', 'By making exams easy', 'By replacing their teachers'], a: 'By helping them look up words and watch online lessons', e: 'The paragraph names these two uses.', b: 'অনুচ্ছেদে এই দুটি ব্যবহারের কথা আছে।' },
+      { p: 'The word “emergency” means ___.', o: ['a sudden dangerous situation', 'a holiday', 'a party', 'a long journey'], a: 'a sudden dangerous situation', e: 'Emergency = urgent, dangerous situation.', b: 'Emergency = জরুরি অবস্থা।' },
+      { p: 'In “too much use … can be harmful”, “harmful” is a/an ___.', o: ['adjective', 'noun', 'verb', 'adverb'], a: 'adjective', e: 'It describes the noun “use”.', b: 'এটি noun “use”-কে বর্ণনা করে।' },
+      { p: 'What is the writer’s main advice?', o: ['Use the phone wisely', 'Never use a phone', 'Buy the newest phone', 'Use the phone all day'], a: 'Use the phone wisely', e: 'The last sentence advises wise use.', b: 'শেষ বাক্যে বুদ্ধিমানের মতো ব্যবহারের পরামর্শ আছে।' },
+    ],
+  },
+  {
+    id: 'para-pollution', title: 'Environmental Pollution', level: 'HSC',
+    text: 'Environmental pollution is one of the greatest problems of our time. It means the contamination of air, water and soil by harmful substances. Smoke from factories and vehicles pollutes the air, while waste from mills is often thrown into rivers and makes the water unsafe. Farmers sometimes use too much chemical fertiliser, which poisons the soil and the water beneath it. In cities like Dhaka, dust and smoke cause serious breathing problems, especially for children and the elderly. Loud horns and machines also create noise pollution, which disturbs our sleep and harms our hearing. Cutting down trees without planting new ones makes the situation worse, because trees clean the air and give us oxygen. Plastic bags are another great danger. They block drains, cause water-logging in the rainy season and harm the fish and animals that swallow them. To control pollution, the government must enforce strict laws, and factories should install waste-treatment plants. Those who break the laws should be punished. At the same time, every citizen can help by planting trees, avoiding plastic bags and keeping the surroundings clean. Schools can teach children to love nature from an early age. Newspapers and television can also make people aware of the danger. Even small steps taken by millions of people can bring a big change. If we fail to act now, our rivers will die, our air will become poisonous and our cities will become unfit to live in. Future generations will have to pay a heavy price.',
+    qs: [
+      { p: 'What does environmental pollution mean here?', o: ['Contamination of air, water and soil', 'Growth of too many trees', 'Shortage of food', 'Increase in rainfall'], a: 'Contamination of air, water and soil', e: 'The definition is given at the start.', b: 'দ্বিতীয় বাক্যে এই সংজ্ঞা আছে।' },
+      { p: 'The word “enforce” means ___.', o: ['make people obey', 'cancel', 'ignore', 'suggest'], a: 'make people obey', e: 'Enforce a law = make sure it is obeyed.', b: 'Enforce = কার্যকর করা।' },
+      { p: 'Which is NOT mentioned as a way to reduce pollution?', o: ['Banning all vehicles', 'Planting trees', 'Avoiding plastic bags', 'Installing waste-treatment plants'], a: 'Banning all vehicles', e: 'The paragraph never suggests banning all vehicles.', b: 'সব যানবাহন বন্ধের কথা বলা হয়নি।' },
+      { p: '“Future generations will have to pay a heavy price” means they will ___.', o: ['suffer because of our carelessness', 'become very rich', 'buy expensive things', 'pay only more taxes'], a: 'suffer because of our carelessness', e: 'The “price” is the harm we leave behind.', b: 'আমাদের অবহেলার ফল ভবিষ্যৎ প্রজন্ম ভোগ করবে।' },
+    ],
+  },
+  {
+    id: 'para-education', title: 'The Value of Education', level: 'HSC',
+    text: 'Education is the backbone of a nation. It does not only mean passing examinations and getting certificates; it means building character and developing the mind. An educated person can think clearly, solve problems and take wise decisions. He knows his rights and duties, and he respects the rights of others. Education also helps a country to grow, because educated citizens work as doctors, engineers, teachers and scientists. A nation with many skilled people can produce more, earn more and live better. In Bangladesh, the number of literate people has increased over the years, but there is still much to be done, especially in remote villages. Many poor children leave school early to work and help their families. Some schools lack good teachers, books and clean toilets. The government and the society must work together to remove these problems. Girls, in particular, should be encouraged to go to school, since an educated mother raises an educated family. She can teach her children good manners and take better care of their health. True education also teaches us to be kind, honest and helpful to others. A man who has a degree but has no good character cannot be called truly educated. Therefore, students should study not only for marks but also to become good human beings. Libraries, science clubs and debates also help students learn outside the classroom. Teachers play a key role in this work. If every child gets quality education, our nation will move forward and take its rightful place in the world.',
+    qs: [
+      { p: 'Education is called the backbone of a nation because it ___.', o: ['supports the progress of the country', 'is very expensive', 'is only for the rich', 'is easy to get'], a: 'supports the progress of the country', e: 'A backbone is the main support.', b: 'Backbone = প্রধান অবলম্বন।' },
+      { p: 'The word “remote” means ___.', o: ['far away from towns', 'very crowded', 'modern', 'rich'], a: 'far away from towns', e: 'Remote villages = distant villages.', b: 'Remote = দূরবর্তী।' },
+      { p: 'The noun form of “literate” is ___.', o: ['literacy', 'literally', 'literary', 'literature'], a: 'literacy', e: 'Literate → literacy.', b: 'Literate-এর noun = literacy।' },
+      { p: 'Why should girls be encouraged to go to school?', o: ['An educated mother raises an educated family', 'Girls are better than boys', 'Schools have no boys', 'It is a rule of the school'], a: 'An educated mother raises an educated family', e: 'The paragraph gives this reason.', b: 'অনুচ্ছেদে এই কারণ দেওয়া হয়েছে।' },
+    ],
+  },
+  {
+    id: 'para-digital', title: 'Digital Bangladesh', level: 'HSC',
+    text: 'Digital Bangladesh is a vision of using modern technology in every sector of the country. It aims to make education, health care, banking and government services easier and faster through computers and the internet. In the past, people had to run from one office to another and wait for hours to get a simple service. Today, they can pay bills, apply for services and transfer money using their mobile phones, without standing in long queues. This saves time, money and effort, and it also reduces corruption. Students can attend online classes and search for information within seconds. Even students of remote villages can learn from the best teachers through the internet. Farmers can get advice about crops and weather through their phones, and patients can talk to doctors without travelling to the city. Moreover, technology has created new jobs for young people as freelancers and software developers. Many of them earn money from home by working for clients abroad. This brings valuable foreign money into the country. However, there are some problems too. Many people in villages still have no computer or good internet connection, and some do not know how to use technology. We must also protect our personal data and teach people to use technology safely. Cyber crime and the spread of false information are also growing risks that need strict control. Training programmes in schools and villages can help people learn computer skills. If this vision is carried out properly, our country will become smarter and more prosperous.',
+    qs: [
+      { p: 'What is Digital Bangladesh?', o: ['A vision of using modern technology in every sector', 'A new city', 'A computer company', 'A school for computers'], a: 'A vision of using modern technology in every sector', e: 'See the first sentence.', b: 'প্রথম বাক্য দেখো।' },
+      { p: 'The word “prosperous” means ___.', o: ['successful and rich', 'poor', 'weak', 'quiet'], a: 'successful and rich', e: 'Prosperous = flourishing.', b: 'Prosperous = সমৃদ্ধ।' },
+      { p: 'A “queue” is a ___.', o: ['line of waiting people', 'kind of bill', 'mobile phone', 'computer program'], a: 'line of waiting people', e: 'Queue = a line of people waiting.', b: 'Queue = সারি।' },
+      { p: 'Which risk does the writer warn about?', o: ['Loss of personal data', 'Shortage of mobile phones', 'Too many schools', 'Poor roads'], a: 'Loss of personal data', e: 'We must protect our personal data.', b: 'ব্যক্তিগত তথ্য সুরক্ষার কথা বলা হয়েছে।' },
+    ],
+  },
+  {
+    id: 'para-bookfair', title: 'A Book Fair', level: 'SSC',
+    text: 'The Ekushey Book Fair is the biggest book fair in Bangladesh. It is held every February in Dhaka, near the Bangla Academy and the Suhrawardy Udyan, in memory of the language martyrs of 1952. The whole month of February is a time of memory and pride for the Bengali nation, and the book fair adds to its joy. Last year I visited the fair with my friends. We went there on a Friday afternoon, and the place was already crowded. The place was full of colourful stalls, and thousands of book lovers were moving from one stall to another. Many families had come with their children, and the children were choosing picture books with great excitement. Publishers had arranged new books on novels, poems, history and science. Some stalls offered a discount, so many visitors were buying armfuls of books. I bought a collection of poems and two story books for children. My friends bought books on science and cookery. Writers were also present at some stalls and signed copies for their readers. I even saw a famous poet talking to a group of young readers with a smile. After some time, we sat on the grass and had tea and snacks. I felt proud to see so many people showing love for books and the Bengali language. I returned home tired but happy. A book fair encourages the reading habit and brings writers and readers closer together. It also reminds us of the sacrifice made for our mother tongue.',
+    qs: [
+      { p: 'When is the Ekushey Book Fair held?', o: ['Every February', 'Every December', 'Every April', 'Every July'], a: 'Every February', e: 'It is held every February.', b: 'প্রতি ফেব্রুয়ারিতে অনুষ্ঠিত হয়।' },
+      { p: 'The fair is held in memory of ___.', o: ['the language martyrs of 1952', 'the flood of 1988', 'the first Bengali poet', 'a famous publisher'], a: 'the language martyrs of 1952', e: 'See the second sentence.', b: 'দ্বিতীয় বাক্য দেখো।' },
+      { p: 'The word “stall” means ___.', o: ['a small shop or stand', 'a big hall', 'a library card', 'a bus'], a: 'a small shop or stand', e: 'Stall = a small stand for selling things.', b: 'Stall = স্টল/ছোট দোকান।' },
+      { p: 'According to the writer, a book fair ___.', o: ['encourages the reading habit', 'sells only school books', 'is held only for writers', 'closes in a day'], a: 'encourages the reading habit', e: 'The concluding part says this.', b: 'শেষ বাক্যে এটি বলা আছে।' },
+    ],
+  },
+  {
+    id: 'para-exercise', title: 'Physical Exercise', level: 'SSC',
+    text: 'Physical exercise is essential for a healthy life. A person who exercises regularly stays strong, active and cheerful. Exercise improves blood circulation, strengthens the muscles and keeps the heart healthy. It also reduces stress and helps us to sleep well at night. A man who exercises every day seldom falls ill, and even if he does, he recovers quickly. Walking, running, swimming and playing football are some of the best forms of exercise. Walking needs no money or equipment, so anyone can do it, and a morning walk in fresh air is especially good. Doctors advise us to exercise for at least thirty minutes every day. Old people can walk slowly, while the young can run or play games. Children grow taller and stronger when they play outdoors with their friends. Games also teach us teamwork and discipline. Unfortunately, many students today spend most of their time in front of screens and neglect outdoor activities. They sit for hours with their phones or computers and eat too much junk food. As a result, they become lazy and fall ill easily. Some of them even suffer from weak eyesight and back pain at a young age. Regular exercise also builds self-confidence and helps us face difficulties in life. Yoga and simple stretching at home are also helpful for those who cannot go outside. Schools should therefore give more time to games and sports. We should make exercise a part of our daily routine because a healthy body leads to a healthy mind.',
+    qs: [
+      { p: 'How long do doctors advise us to exercise every day?', o: ['At least thirty minutes', 'Five minutes', 'Three hours', 'One hour on holidays only'], a: 'At least thirty minutes', e: 'Doctors advise at least thirty minutes daily.', b: 'ডাক্তাররা প্রতিদিন অন্তত ৩০ মিনিট ব্যায়ামের পরামর্শ দেন।' },
+      { p: 'The word “neglect” means ___.', o: ['pay no attention to', 'take care of', 'enjoy', 'praise'], a: 'pay no attention to', e: 'Neglect = ignore or fail to care for.', b: 'Neglect = অবহেলা করা।' },
+      { p: 'Which is NOT a benefit of exercise mentioned here?', o: ['Higher marks in every subject', 'Better sleep', 'Less stress', 'A healthy heart'], a: 'Higher marks in every subject', e: 'The paragraph never promises higher marks.', b: 'নম্বর বাড়ার কথা বলা হয়নি।' },
+      { p: 'Why do many students fall ill easily?', o: ['They neglect outdoor activities and spend time on screens', 'They eat too little', 'They study too much at night', 'They walk a lot'], a: 'They neglect outdoor activities and spend time on screens', e: 'See the “Unfortunately…” sentence.', b: '“Unfortunately…” বাক্যটি দেখো।' },
+    ],
+  },
+  {
+    id: 'para-early', title: 'Early Rising', level: 'SSC',
+    text: 'Early rising means getting up from bed early in the morning. It is a very good habit that makes a person healthy, wealthy and wise. The morning air is fresh and pure, and a walk in it keeps our body fit. At that hour the world is calm and quiet, and the birds begin to sing. The sky turns red in the east, and the sight of the rising sun fills our mind with joy. An early riser gets plenty of time to prepare lessons and finish household tasks without hurry. His mind is fresh, so he can learn things quickly and remember them for a long time. A well-known proverb praises this habit. On the contrary, those who get up late waste the best part of the day and feel lazy and dull. They often reach school or office late and have to run in a hurry. Their work remains unfinished, and they are scolded by teachers or bosses. Great and successful people of all ages have followed this habit throughout their lives. I try to wake up at five o’clock every morning. After prayer and a short walk, I sit down to study. I finish my hardest lessons before breakfast, when my mind is clear. Then I go to school without any worry. This habit has helped me a lot in my studies, and I advise everyone to follow it. If we get up early from our childhood, it will become a part of our nature.',
+    qs: [
+      { p: 'What are the benefits of early rising mentioned here?', o: ['Health, wealth and wisdom', 'Fame and power', 'Long sleep', 'More time for games only'], a: 'Health, wealth and wisdom', e: 'See the second sentence.', b: 'দ্বিতীয় বাক্য দেখো।' },
+      { p: 'The word “pure” means ___.', o: ['clean', 'dirty', 'hot', 'noisy'], a: 'clean', e: 'Pure air = clean air.', b: 'Pure = বিশুদ্ধ।' },
+      { p: '“On the contrary” introduces ___.', o: ['an opposite idea', 'an example', 'a result', 'a conclusion'], a: 'an opposite idea', e: 'It contrasts with the previous idea.', b: 'আগের ধারণার বিপরীত ধারণা আনে।' },
+      { p: 'At what time does the writer wake up?', o: ['At five o’clock', 'At six o’clock', 'At seven o’clock', 'At four o’clock'], a: 'At five o’clock', e: 'See “I try to wake up at five o’clock”.', b: '“five o’clock” অংশটি দেখো।' },
+    ],
+  },
+  {
+    id: 'para-social', title: 'Social Media', level: 'HSC',
+    text: 'Social media has become a major part of our daily life. Platforms such as Facebook and YouTube allow us to share photos, ideas and news with people across the world within seconds. A student living in a village can now watch lessons given by teachers of another country. Families who live far from each other can see and talk to one another every day. Students can join online study groups, and small businesses can reach new customers at a low cost. Many young women in our country run small online shops from their homes and earn a good income. Social media also helps people raise money quickly for the sick and the poor. However, social media has its dark side too. False news spreads very quickly and can mislead thousands of people. Sometimes a single rumour on the internet creates fear and even leads to violence. Many young users become addicted and spend hours scrolling instead of studying or sleeping. They compare their lives with others and feel unhappy. Cyberbullying also hurts the feelings of many teenagers, and some of them are afraid to go to school. To enjoy its benefits, we must check the truth of every piece of news before sharing it and set a time limit for using it. Teachers can also guide students to use these platforms for learning. Parents should also talk to their children about the safe use of the internet. Used wisely, social media is a blessing; used carelessly, it is a curse.',
+    qs: [
+      { p: 'How can small businesses benefit from social media?', o: ['They can reach new customers at a low cost', 'They can avoid all taxes', 'They can stop advertising', 'They can close their shops'], a: 'They can reach new customers at a low cost', e: 'The paragraph says they reach customers at a low cost.', b: 'কম খরচে নতুন ক্রেতার কাছে পৌঁছানো যায়।' },
+      { p: 'The word “addicted” means ___.', o: ['unable to stop doing something', 'very intelligent', 'very busy', 'careful'], a: 'unable to stop doing something', e: 'Addicted = dependent on a habit.', b: 'Addicted = আসক্ত।' },
+      { p: 'Which sentence best states the writer’s view?', o: ['Social media is useful if used wisely', 'Social media is completely useless', 'Social media should be banned', 'Social media is only for teenagers'], a: 'Social media is useful if used wisely', e: 'The last sentence sums up the view.', b: 'শেষ বাক্যে মূল মত আছে।' },
+      { p: 'The word “mislead” means to ___.', o: ['give a wrong idea to someone', 'guide correctly', 'teach well', 'warn in time'], a: 'give a wrong idea to someone', e: 'Mislead = lead in a wrong direction.', b: 'Mislead = ভুল পথে চালিত করা।' },
+    ],
+  },
+];
+
+const PARAGRAPH_QUESTIONS = PARAGRAPH_BANK.flatMap((para) =>
+  para.qs.map((q) => ({ ...q, ref: para.id }))
+);
+
+QUESTION_BANK.paragraphs = {
+  name: 'Paragraph Reading', icon: 'book', class: 'all',
+  lesson: {
+    rules: [
+      'Read the whole paragraph once for the main idea <code>before</code> you look at the questions.',
+      'Underline the <code>keywords</code> in the question, then find them in the text.',
+      'For vocabulary questions, use the sentences around the word to guess its meaning.',
+      'Beware of options that are true in real life but are <code>not mentioned</code> in the paragraph.',
+      'A good paragraph has a topic sentence, supporting sentences and a concluding sentence.',
+    ],
+    examples: [
+      '<strong>Topic sentence:</strong> Time is the most valuable thing in our life.',
+      '<strong>Supporting sentence:</strong> A student who wastes time cannot do well in the exam.',
+      '<strong>Concluding sentence:</strong> So, we should make good use of every moment.',
+    ],
+    bangla: 'আগে পুরো paragraph একবার পড়ো, তারপর প্রশ্নের keyword টেক্সটে খুঁজে নাও। যা paragraph-এ নেই, তা উত্তর নয়।',
+  },
+  questions: PARAGRAPH_QUESTIONS,
+};
+
+/* ============================================================
+   STORY BANK — 15 short stories (~150 words each) with a moral
+   and 3 reading questions each. Feeds the "Stories" mode and the
+   "Story Reading" practice category.
+   ============================================================ */
+const STORY_BANK = [
+  {
+    id: 'story-crow', title: 'The Thirsty Crow',
+    moral: 'Where there is a will, there is a way.', moralBn: 'যেখানে ইচ্ছা, সেখানেই উপায়।',
+    text: 'One hot summer day, a crow was flying over a dry field. He was very thirsty, but he could not find a single drop of water anywhere. He flew for miles under the burning sun, and his wings began to ache. At last he saw a pot lying under a tree. He sat on its edge and looked inside. There was a little water at the bottom, but his beak could not reach it. The crow was tired and sad, yet he did not give up. He looked around and saw many small stones on the ground. A bright idea came to his mind. He picked up the stones one by one and dropped them into the pot. Slowly, the water began to rise. After some time it came up to the top. The crow drank it happily and thanked his clever mind. Then he flew away with fresh strength.',
+    qs: [
+      { p: 'Why could the crow not drink the water at first?', o: ['His beak could not reach it', 'The water was dirty', 'The pot was covered', 'He was not thirsty'], a: 'His beak could not reach it', e: 'There was too little water at the bottom.', b: 'পাত্রের তলায় পানি কম ছিল।' },
+      { p: 'The phrase “give up” means ___.', o: ['stop trying', 'start again', 'fly away', 'sit down'], a: 'stop trying', e: 'Give up = stop trying.', b: 'Give up = হাল ছেড়ে দেওয়া।' },
+      { p: 'How did the crow make the water rise?', o: ['By dropping stones into the pot', 'By breaking the pot', 'By pushing the pot over', 'By calling other crows'], a: 'By dropping stones into the pot', e: 'The stones pushed the water up.', b: 'পাথর ফেলায় পানি ওপরে উঠল।' },
+    ],
+  },
+  {
+    id: 'story-hare', title: 'The Hare and the Tortoise',
+    moral: 'Slow and steady wins the race.', moralBn: 'ধীরে ও স্থির থেকে চললে জয় আসে।',
+    text: 'A hare was very proud of his speed. He often laughed at a slow tortoise and called him lazy. One day the tortoise said, “Let us have a race.” The hare laughed loudly and agreed. He was sure of an easy win. The animals of the forest gathered to watch. At the start, the hare ran like the wind and soon left the tortoise far behind. He looked back and saw nothing of his rival. “I have plenty of time,” he thought, and lay down under a tree for a short sleep. The tortoise kept walking slowly and steadily without stopping even once. When the hare woke up, the sun was low in the sky. He ran as fast as he could, but it was too late. The tortoise was already crossing the finishing line, and all the animals were cheering for him. The hare hung his head in shame.',
+    qs: [
+      { p: 'Why did the hare lose the race?', o: ['He slept and became careless', 'He fell into a ditch', 'He did not know the way', 'He was ill'], a: 'He slept and became careless', e: 'He thought he had plenty of time and slept.', b: 'সে ভেবেছিল হাতে অনেক সময় আছে, তাই ঘুমিয়ে পড়ল।' },
+      { p: 'The word “steadily” means ___.', o: ['without stopping or changing pace', 'very fast', 'with great noise', 'with fear'], a: 'without stopping or changing pace', e: 'Steadily = regularly, without a break.', b: 'Steadily = নিয়মিত, না থেমে।' },
+      { p: 'What did the animals do when the tortoise won?', o: ['They cheered for him', 'They laughed at him', 'They went home', 'They gave him food'], a: 'They cheered for him', e: 'All the animals were cheering.', b: 'সব প্রাণী তাকে উৎসাহ দিচ্ছিল।' },
+    ],
+  },
+  {
+    id: 'story-dog', title: 'The Greedy Dog',
+    moral: 'Greed brings loss.', moralBn: 'লোভে ক্ষতি হয়।',
+    text: 'A hungry dog found a big piece of meat near a butcher’s shop. He took it in his mouth and ran away happily. He wanted to eat it in a quiet place. His tail wagged with joy as he trotted along quickly. On the way, he had to cross a narrow wooden bridge over a stream. As he walked across, he looked down and saw another dog in the water. That dog also had a piece of meat in his mouth, and it looked even bigger. The greedy dog wanted both pieces. He barked angrily at the dog in the water to frighten him. But as soon as he opened his mouth, the meat fell into the stream and sank at once. The other dog disappeared too. He had seen only his own reflection in the water. Now the poor dog had nothing, and he went home hungry and sorry.',
+    qs: [
+      { p: 'Why did the dog bark at the dog in the water?', o: ['He wanted the other piece of meat too', 'He was afraid of the water', 'He wanted to play', 'He was calling his master'], a: 'He wanted the other piece of meat too', e: 'He was greedy for both pieces.', b: 'সে দুটি টুকরোই চেয়েছিল।' },
+      { p: 'The word “greedy” means ___.', o: ['wanting more than one needs', 'very kind', 'very weak', 'very sleepy'], a: 'wanting more than one needs', e: 'Greedy = wanting too much.', b: 'Greedy = লোভী।' },
+      { p: 'The “other dog” in the water was really ___.', o: ['his own reflection', 'a friend', 'a puppy', 'a stranger'], a: 'his own reflection', e: 'He saw only his own reflection.', b: 'সে নিজের প্রতিবিম্ব দেখেছিল।' },
+    ],
+  },
+  {
+    id: 'story-fox', title: 'The Fox and the Grapes',
+    moral: 'It is easy to despise what we cannot get.', moralBn: 'যা পাওয়া যায় না, তা তুচ্ছ করা সহজ।',
+    text: 'One summer afternoon, a hungry fox was walking through a farm. The sun was hot, and he had not eaten since morning. He saw a bunch of ripe, juicy grapes hanging from a high vine. His mouth began to water. “What a delicious lunch they will make,” he said. He jumped as high as he could, but the grapes were too far above him. He tried again and again. Each time he fell back on the ground with a thud. He ran, he jumped, and he even tried to climb the wall, but nothing worked. At last he was tired and out of breath. He looked at the grapes once more and turned away. “I do not want them anyway,” he said proudly. “They are surely sour, and only a fool would eat them.” Then he walked away with his nose in the air, pretending that he did not care.',
+    qs: [
+      { p: 'Why could the fox not get the grapes?', o: ['They hung too high', 'They were not ripe', 'The farmer was watching', 'He was not hungry'], a: 'They hung too high', e: 'The grapes were too far above him.', b: 'আঙুর অনেক উঁচুতে ছিল।' },
+      { p: 'The word “ripe” means ___.', o: ['fully grown and ready to eat', 'rotten', 'very small', 'still green'], a: 'fully grown and ready to eat', e: 'Ripe fruit is ready to eat.', b: 'Ripe = পাকা।' },
+      { p: 'Why did the fox say the grapes were sour?', o: ['He wanted to hide his failure', 'He had tasted them', 'Someone told him so', 'They smelled bad'], a: 'He wanted to hide his failure', e: 'He pretended that he did not care.', b: 'সে ব্যর্থতা লুকাতে চেয়েছিল।' },
+    ],
+  },
+  {
+    id: 'story-lion', title: 'The Lion and the Mouse',
+    moral: 'Even the small can help the great.', moralBn: 'ছোটরাও বড়দের উপকার করতে পারে।',
+    text: 'A lion was sleeping under a big tree when a little mouse ran over his body. The lion woke up in anger and caught the mouse with his huge paw. The mouse shook with fear. “Please let me go, O King,” cried the mouse. “One day I will help you.” The lion laughed at the idea, but he let the mouse go. A few days later, hunters caught the lion in a strong net. He roared loudly and tried to break free, but he could not. The mouse heard the roar and ran to the spot at once. He began to bite the ropes of the net with his sharp teeth. Soon the ropes broke, and the lion was free. “Thank you, little friend,” said the lion with a smile. “I was wrong to laugh at you. Now I know that even the smallest creature can be a great help.”',
+    qs: [
+      { p: 'Why did the lion let the mouse go?', o: ['The mouse promised to help him one day', 'The mouse was too big to eat', 'He was not hungry', 'The mouse gave him food'], a: 'The mouse promised to help him one day', e: 'The mouse said, “One day I will help you.”', b: 'ইঁদুর বলেছিল সে একদিন সাহায্য করবে।' },
+      { p: 'The word “roared” means ___.', o: ['made a loud, deep sound', 'whispered', 'ran away', 'jumped'], a: 'made a loud, deep sound', e: 'Lions roar.', b: 'Roar = গর্জন করা।' },
+      { p: 'How did the mouse free the lion?', o: ['By biting the ropes of the net', 'By calling the hunters', 'By digging a hole', 'By pushing the net away'], a: 'By biting the ropes of the net', e: 'He bit the ropes with his sharp teeth.', b: 'সে ধারালো দাঁত দিয়ে দড়ি কাটল।' },
+    ],
+  },
+  {
+    id: 'story-woodcutter', title: 'The Honest Woodcutter',
+    moral: 'Honesty is the best policy.', moralBn: 'সততাই সর্বোত্তম পন্থা।',
+    text: 'A poor woodcutter was cutting wood on the bank of a river when his axe slipped from his hand and fell into the deep water. He sat down and began to weep, for it was his only axe. Without it, he could not earn any bread for his poor and hungry children. Suddenly a fairy rose from the river. She asked about his trouble and then dived into the water. She came back with a golden axe. “Is this yours?” she asked. “No,” said the woodcutter. She dived again and brought a silver axe. “No, that is not mine either,” he replied. The third time she brought his own iron axe. “Yes, this is mine,” he said happily. The fairy was pleased with his honesty. “You are a truthful man,” she said. “Take all three axes as your reward.” The woodcutter thanked her and went home as a rich man.',
+    qs: [
+      { p: 'Why was the woodcutter weeping?', o: ['He lost his only axe', 'He was hungry', 'He was lost', 'He was ill'], a: 'He lost his only axe', e: 'His axe fell into the river.', b: 'তার একমাত্র কুড়াল নদীতে পড়ে গিয়েছিল।' },
+      { p: 'The word “weep” means ___.', o: ['cry', 'laugh', 'sleep', 'shout'], a: 'cry', e: 'Weep = cry.', b: 'Weep = কাঁদা।' },
+      { p: 'Why did the fairy give him all three axes?', o: ['She was pleased with his honesty', 'He asked for them', 'He paid her', 'She wanted to test another man'], a: 'She was pleased with his honesty', e: 'She rewarded his truthfulness.', b: 'সে তার সততায় খুশি হয়েছিল।' },
+    ],
+  },
+  {
+    id: 'story-ant', title: 'The Ant and the Grasshopper',
+    moral: 'Work today, rest tomorrow.', moralBn: 'আজ পরিশ্রম করো, কাল বিশ্রাম নাও।',
+    text: 'All summer long, a grasshopper sang and danced in the sunny fields. A little ant worked hard nearby, carrying grains of corn to her nest. She went busily back and forth, though the sun was hot and the load heavy. “Why do you work so hard?” asked the grasshopper. “Come and sing with me.” The ant replied, “I am storing food for the winter. You should do the same.” The grasshopper laughed and said, “Winter is far away. Let us enjoy today.” Soon the cold winter came, and snow covered the fields. The grasshopper could find no food anywhere. He was cold, hungry and weak. At last he went to the ant’s house and begged for a little food. The ant opened her door kindly and gave him some corn. “Next summer,” she said gently, “remember to work first and play later.” The grasshopper felt ashamed and promised to change.',
+    qs: [
+      { p: 'What was the ant doing all summer?', o: ['Storing food for the winter', 'Singing and dancing', 'Sleeping in her nest', 'Playing in the fields'], a: 'Storing food for the winter', e: 'She carried grains of corn to her nest.', b: 'সে শীতের জন্য খাবার জমাচ্ছিল।' },
+      { p: 'The verb “store” means ___.', o: ['keep for later use', 'throw away', 'sell', 'eat at once'], a: 'keep for later use', e: 'Store = save for later.', b: 'Store = জমা করা।' },
+      { p: 'What did the grasshopper learn?', o: ['To work first and play later', 'To sing louder', 'To fear the ant', 'To leave the fields'], a: 'To work first and play later', e: 'The ant advised him this.', b: 'আগে কাজ, পরে খেলা।' },
+    ],
+  },
+  {
+    id: 'story-goose', title: 'The Goose with the Golden Eggs',
+    moral: 'Greed destroys everything.', moralBn: 'লোভে সর্বনাশ হয়।',
+    text: 'A poor farmer had a goose that laid one golden egg every day. He sold the eggs in the market and soon became rich. He bought a big house, fine clothes and a lot of land for his wife and children. But as he grew richer, he also grew greedier. “Why should I wait for one egg a day?” he thought. “If I cut open the goose, I will find all the gold inside at once.” His wife told him not to be foolish, but he would not listen. He took a knife and killed the goose. To his great surprise, there was no gold inside. It was an ordinary goose like any other. The farmer sat down and wept in sorrow. He had lost his goose and his daily gold, all because of his greed. From that day on, he lived in poverty and often remembered his foolish mistake.',
+    qs: [
+      { p: 'How often did the goose lay a golden egg?', o: ['Every day', 'Every week', 'Every month', 'Once a year'], a: 'Every day', e: 'It laid one golden egg every day.', b: 'সে প্রতিদিন একটি সোনার ডিম পাড়ত।' },
+      { p: 'The word “ordinary” means ___.', o: ['normal, not special', 'golden', 'expensive', 'dangerous'], a: 'normal, not special', e: 'Ordinary = usual.', b: 'Ordinary = সাধারণ।' },
+      { p: 'Why did the farmer kill the goose?', o: ['He wanted all the gold at once', 'He was angry with it', 'His wife told him to', 'He needed meat'], a: 'He wanted all the gold at once', e: 'He thought all the gold was inside.', b: 'সে একবারে সব সোনা চেয়েছিল।' },
+    ],
+  },
+  {
+    id: 'story-bundle', title: 'Unity Is Strength',
+    moral: 'Unity is strength.', moralBn: 'একতাই বল।',
+    text: 'An old farmer had four sons who quarrelled all the time. He was very sad to see them fight with one another. Their neighbours often laughed at the poor family, and the old man felt great shame because of it. One day he called them to his bedside and gave them a bundle of sticks. “Break this bundle,” he said. Each son tried with all his strength, but nobody could break it. Then the father untied the bundle and gave one stick to each son. “Now break them,” he said. The sons broke the sticks easily with their fingers. The old man smiled. “My sons,” he said, “when you are together like the bundle, no enemy can harm you. But when you are divided, anyone can break you easily.” The sons felt ashamed of their quarrels. From that day they lived in peace and helped each other in every need.',
+    qs: [
+      { p: 'Why did the farmer give his sons a bundle of sticks?', o: ['To teach them the value of unity', 'To make a fire', 'To sell them', 'To test only their strength'], a: 'To teach them the value of unity', e: 'He wanted them to stop quarrelling.', b: 'সে তাদের ঝগড়া থামাতে চেয়েছিল।' },
+      { p: 'The word “quarrel” means ___.', o: ['fight with words', 'play together', 'sing', 'work'], a: 'fight with words', e: 'Quarrel = angry argument.', b: 'Quarrel = ঝগড়া।' },
+      { p: 'What happened when the sticks were separated?', o: ['They were broken easily', 'Nobody could break them', 'They caught fire', 'They were lost'], a: 'They were broken easily', e: 'Each son broke a single stick easily.', b: 'একটি করে কাঠি সহজেই ভাঙা গেল।' },
+    ],
+  },
+  {
+    id: 'story-treasure', title: 'The Farmer and His Sons',
+    moral: 'Hard work is the real treasure.', moralBn: 'কঠোর পরিশ্রমই আসল সম্পদ।',
+    text: 'A farmer had three sons who were lazy and did not like to work in the fields. They slept till noon and spent most of their days in idle talk and useless games. When he became old and weak, he called them and said, “My sons, there is a great treasure buried in our field. Dig for it after I am gone.” Soon after, the old man died. The sons took spades and dug up the whole field, but they found no treasure. They felt disappointed. However, the field was now soft and ready for sowing, so they planted wheat in it. That year the crop was excellent, and they earned a lot of money by selling it. Then they understood their father’s meaning. The real treasure was hard work. From that day the sons worked in the field every year and lived happily, and they thanked their wise father.',
+    qs: [
+      { p: 'What did the sons find when they dug the field?', o: ['No treasure', 'Gold coins', 'A box of silver', 'A map'], a: 'No treasure', e: 'They found no treasure.', b: 'তারা কোনো গুপ্তধন পেল না।' },
+      { p: 'The word “treasure” means ___.', o: ['a collection of valuable things', 'a farm tool', 'a kind of crop', 'a village'], a: 'a collection of valuable things', e: 'Treasure = riches.', b: 'Treasure = ধনসম্পদ।' },
+      { p: 'What was the real treasure, according to the story?', o: ['Hard work', 'Silver', 'The father’s house', 'A hidden well'], a: 'Hard work', e: 'The father meant hard work.', b: 'বাবা পরিশ্রমকেই বুঝিয়েছিলেন।' },
+    ],
+  },
+  {
+    id: 'story-mice', title: 'The Town Mouse and the Country Mouse',
+    moral: 'A simple life in peace is better than a rich life in fear.', moralBn: 'ভয়ের মধ্যে ধনী জীবনের চেয়ে শান্তিতে সরল জীবন ভালো।',
+    text: 'A country mouse once invited his friend from the town to dinner. He gave him simple food like corn, nuts and roots. The town mouse ate a little and said, “My dear friend, this food is poor. Come with me to the town, and I will show you a better life.” The country mouse agreed. In the town, they entered a big house with a rich dining room. There were cakes, cheese and fruits on the table. But just as they began to eat, a cat jumped into the room. Its eyes were bright and its claws were sharp. The mice ran for their lives and hid in a small hole. The country mouse trembled with fear. “Goodbye, friend,” he said when the cat left. “Your food is rich, but your life is full of danger. I prefer my simple food in peace.” Then he went back to his village.',
+    qs: [
+      { p: 'What food did the country mouse offer his friend?', o: ['Corn, nuts and roots', 'Cakes and cheese', 'Fish and rice', 'Bread and jam'], a: 'Corn, nuts and roots', e: 'He gave simple food.', b: 'সে সাধারণ খাবার দিয়েছিল।' },
+      { p: 'The word “tremble” means ___.', o: ['shake with fear', 'sleep deeply', 'jump with joy', 'shout loudly'], a: 'shake with fear', e: 'Tremble = shake.', b: 'Tremble = কাঁপা।' },
+      { p: 'Why did the country mouse return to his village?', o: ['Town life was full of danger', 'He disliked cheese', 'He lost his way', 'His friend told him to'], a: 'Town life was full of danger', e: 'The cat frightened him.', b: 'বিড়ালের ভয়ে সে ফিরে গেল।' },
+    ],
+  },
+  {
+    id: 'story-monkey', title: 'The Monkey and the Crocodile',
+    moral: 'Presence of mind saves us from danger.', moralBn: 'উপস্থিত বুদ্ধি বিপদ থেকে রক্ষা করে।',
+    text: 'A clever monkey lived on a rose-apple tree on the bank of a river. A crocodile became his friend, and the monkey gave him sweet fruits every day. The crocodile took some fruits to his wife. She loved them and said, “If the fruits are so sweet, the monkey’s heart must be sweeter. Bring it to me.” The crocodile was sad, but he obeyed his wife. He invited the monkey to ride on his back and visit his home. In the middle of the river, he told the monkey his plan. The monkey was frightened but still kept calm. “Oh, my friend,” he said, “why did you not tell me earlier? I have left my heart on the tree. Take me back, and I will bring it.” The foolish crocodile swam back. The monkey leapt onto the tree and laughed. “Foolish creature,” he cried, “no one lives without a heart!”',
+    qs: [
+      { p: 'What did the crocodile’s wife want?', o: ['The monkey’s heart', 'More fruits', 'A new house', 'The tree'], a: 'The monkey’s heart', e: 'She asked for the monkey’s heart.', b: 'সে বানরের হৃদয় চেয়েছিল।' },
+      { p: 'The phrase “kept calm” means ___.', o: ['did not panic', 'became angry', 'fell asleep', 'ran away'], a: 'did not panic', e: 'Calm = peaceful, not afraid.', b: 'Kept calm = শান্ত থাকা।' },
+      { p: 'How did the monkey escape?', o: ['By saying his heart was left on the tree', 'By jumping into the river', 'By fighting the crocodile', 'By calling for help'], a: 'By saying his heart was left on the tree', e: 'He tricked the crocodile cleverly.', b: 'সে বুদ্ধি করে কৌশল করল।' },
+    ],
+  },
+  {
+    id: 'story-wind', title: 'The Wind and the Sun',
+    moral: 'Kindness is stronger than force.', moralBn: 'শক্তির চেয়ে দয়া বেশি শক্তিশালী।',
+    text: 'The Wind and the Sun once argued about who was stronger. Each one boasted about his great power, and neither would listen to the other. “Let us test our power,” said the Sun. “See that traveller walking on the road? Whoever can make him take off his coat is the stronger.” The Wind agreed and began to blow with all his force. He blew harder and harder, but the traveller only held his coat tighter and walked on. At last the Wind gave up. Then the Sun came out from behind a cloud and shone with a gentle warmth. The traveller felt the heat and soon began to sweat. In a short time, he took off his coat and sat down under a tree to rest. The traveller smiled and enjoyed the cool shade. The Wind had to admit defeat. The Sun had won not by force but by kindness.',
+    qs: [
+      { p: 'What was the contest about?', o: ['Making the traveller take off his coat', 'Crossing a river', 'Moving a mountain', 'Reaching the sky first'], a: 'Making the traveller take off his coat', e: 'The one who succeeded was stronger.', b: 'যে কোট খোলাতে পারবে সে শক্তিশালী।' },
+      { p: 'The word “admit” means ___.', o: ['accept that something is true', 'refuse', 'forget', 'hide'], a: 'accept that something is true', e: 'Admit defeat = accept that one lost.', b: 'Admit = স্বীকার করা।' },
+      { p: 'Why did the traveller hold his coat tighter?', o: ['The Wind blew harder', 'He wanted to sell it', 'He was afraid of the Sun', 'It began to rain'], a: 'The Wind blew harder', e: 'Stronger wind made him hold on.', b: 'বাতাস জোরে বইছিল।' },
+    ],
+  },
+  {
+    id: 'story-spider', title: 'The King and the Spider',
+    moral: 'If at first you do not succeed, try, try again.', moralBn: 'বারবার চেষ্টা করলে সফলতা আসে।',
+    text: 'A king once lost a great battle and hid in a dark cave. He was tired, hungry and ready to give up all hope. Enemy soldiers were searching the hills, and he dared not light a fire. As he lay on the ground, he saw a spider trying to climb up the wall to its web. The spider fell down again and again, but it never gave up. It tried six times and failed each time. The king watched it with wonder. “If it tries once more, will it succeed?” he thought. On the seventh try, the spider reached its web safely. The king jumped up with new courage. “If a tiny spider can try so many times, why can’t I?” he said. He gathered his soldiers, made a new plan and fought again. This time he won back his kingdom, and he always remembered the lesson of the spider.',
+    qs: [
+      { p: 'How many times did the spider fail before it succeeded?', o: ['Six times', 'Three times', 'Ten times', 'Once'], a: 'Six times', e: 'It succeeded on the seventh try.', b: 'সপ্তম চেষ্টায় সে সফল হলো।' },
+      { p: 'The word “courage” means ___.', o: ['bravery', 'fear', 'laziness', 'anger'], a: 'bravery', e: 'Courage = bravery.', b: 'Courage = সাহস।' },
+      { p: 'What did the king do after watching the spider?', o: ['He made a new plan and fought again', 'He left the country', 'He went to sleep', 'He asked for peace'], a: 'He made a new plan and fought again', e: 'He gathered his soldiers.', b: 'সে সৈন্য জড়ো করে আবার যুদ্ধ করল।' },
+    ],
+  },
+  {
+    id: 'story-elephant', title: 'The Blind Men and the Elephant',
+    moral: 'Do not judge the whole from one part.', moralBn: 'একটি অংশ দেখে পুরোটার বিচার করা উচিত নয়।',
+    text: 'Four blind men once heard that an elephant had come to their village. None of them had ever seen one, so they went to touch it. They were curious and walked slowly towards the big animal, feeling the air with their hands. The first man touched its leg and said, “An elephant is like a tree.” The second held its tail and said, “No, it is like a rope.” The third touched its ear and cried, “You are both wrong. It is like a big fan.” The fourth felt its side and said, “It is a wall.” Soon they began to quarrel loudly, each sure that he was right. A wise man passing by stopped and listened. He smiled and said, “Each of you has touched only one part. If you put all the parts together, you will know the elephant.” The four men understood their mistake and felt ashamed.',
+    qs: [
+      { p: 'Why did the blind men quarrel?', o: ['Each felt a different part and thought he was right', 'They were hungry', 'The elephant frightened them', 'They wanted to ride it'], a: 'Each felt a different part and thought he was right', e: 'Each touched only one part.', b: 'প্রত্যেকে আলাদা অংশ ছুঁয়েছিল।' },
+      { p: 'The word “wise” means ___.', o: ['having good sense and knowledge', 'very rich', 'very young', 'very loud'], a: 'having good sense and knowledge', e: 'Wise = sensible.', b: 'Wise = জ্ঞানী।' },
+      { p: 'The man who touched the ear said an elephant is like ___.', o: ['a big fan', 'a rope', 'a tree', 'a wall'], a: 'a big fan', e: 'The third man said “a big fan”.', b: 'তৃতীয় ব্যক্তি বলল “বড় পাখা”।' },
+    ],
+  },
+];
+
+const STORY_QUESTIONS = STORY_BANK.flatMap((st) =>
+  st.qs.map((q) => ({ ...q, ref: st.id }))
+);
+
+QUESTION_BANK.stories = {
+  name: 'Story Reading', icon: 'trophy', class: 'all',
+  lesson: {
+    rules: [
+      'A story has <code>characters</code>, a <code>setting</code>, a problem and an ending.',
+      'Stories are told in the <code>past tense</code>: “A crow was flying…”, “He picked up the stones.”',
+      'Dialogue goes inside quotation marks, and each new speaker starts a new line.',
+      'The <code>moral</code> is the lesson of the story. Write it in one short sentence.',
+      'In exams, build a story from a given outline: begin → problem → turning point → ending → moral.',
+    ],
+    examples: [
+      '<strong>Beginning:</strong> One hot summer day, a crow was flying over a dry field.',
+      '<strong>Turning point:</strong> A bright idea came to his mind.',
+      '<strong>Moral:</strong> Where there is a will, there is a way.',
+    ],
+    bangla: 'গল্প সাধারণত past tense-এ লেখা হয়। শুরু → সমস্যা → মোড় → সমাপ্তি → শিক্ষা (moral) এই ক্রমে সাজাও।',
+  },
+  questions: STORY_QUESTIONS,
+};
+
+const READING_SOURCES = [...PARAGRAPH_BANK, ...STORY_BANK];
+
+/* ============================================================
+   Fair answer positions — categories whose correct answer sits in
+   the first slot most of the time get a stable (seeded) shuffle,
+   so the answer position is not predictable and never changes
+   between renders.
+   ============================================================ */
+function seededShuffle(arr, seed) {
+  const a = arr.slice();
+  let s = seed >>> 0;
+  const rnd = () => {
+    s = (s + 0x6D2B79F5) >>> 0;
+    let t = s;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rnd() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+Object.entries(QUESTION_BANK).forEach(([id, c]) => {
+  const firstSlot = c.questions.filter((q) => q.o[0] === q.a).length;
+  if (firstSlot / c.questions.length <= 0.7) return;
+  c.questions.forEach((q, i) => {
+    q.o = seededShuffle(q.o, (i + 1) * 2654435761 + id.length * 97);
+  });
+});
+
+/* ============================================================
+   Translation bank (Bangla → English). `ok` = accepted answers,
+   compared after lower-casing, removing punctuation and treating
+   she/he alike (the Bangla pronoun "সে" is gender-neutral).
+   ============================================================ */
+const TRANSLATION_BANK = [
+  { bn: 'সে প্রতিদিন সকালে হাঁটে।', model: 'He walks in the morning every day.', ok: ['he walks in the morning every day', 'he walks every morning', 'he walks every day in the morning', 'every morning he walks', 'he goes for a walk every morning', 'he takes a walk every morning'] },
+  { bn: 'আমি প্রতিদিন স্কুলে যাই।', model: 'I go to school every day.', ok: ['i go to school every day', 'i go to school daily', 'every day i go to school'] },
+  { bn: 'সে গতকাল ঢাকা গিয়েছিল।', model: 'He went to Dhaka yesterday.', ok: ['he went to dhaka yesterday', 'yesterday he went to dhaka'] },
+  { bn: 'আমরা এখন বই পড়ছি।', model: 'We are reading books now.', ok: ['we are reading books now', 'we are reading a book now', 'now we are reading books', 'now we are reading a book', 'we are reading books at the moment'] },
+  { bn: 'বৃষ্টি হচ্ছে বলে আমি বাড়িতে আছি।', model: 'I am at home because it is raining.', ok: ['i am at home because it is raining', 'i am staying at home because it is raining', 'i am staying home because it is raining', 'because it is raining i am at home', 'because it is raining i am staying at home'] },
+  { bn: 'সত্য কথা বলা উচিত।', model: 'We should speak the truth.', ok: ['we should speak the truth', 'we should tell the truth', 'one should speak the truth', 'one should tell the truth', 'the truth should be spoken', 'the truth should be told'] },
+  { bn: 'সে আমাকে একটি বই দিয়েছে।', model: 'He has given me a book.', ok: ['he has given me a book', 'he gave me a book', 'he has given a book to me', 'he gave a book to me'] },
+  { bn: 'তুমি কঠোর পরিশ্রম করলে সফল হবে।', model: 'If you work hard, you will succeed.', ok: ['if you work hard you will succeed', 'if you work hard you will be successful', 'you will succeed if you work hard', 'you will be successful if you work hard'] },
+];
+
+/* true when a string contains Bangla script (used for typography + direction chips) */
+const hasBn = (s) => /[\u0980-\u09FF]/.test(s || '');
+
+const normalizeAnswer = (s) =>
+  s.toLowerCase().replace(/[^a-z\s]/g, ' ').replace(/\bshe\b/g, 'he').replace(/\s+/g, ' ').trim();
+
+/* Topic title → practice category (used by "Board-style question sets") */
+const TOPIC_TO_CAT = [
+  [/without.*clue|no.*clue/i, 'gapNoClue'],
+  [/clue/i, 'gapClue'],
+  [/story|stories|moral/i, 'stories'],
+  [/comprehension|passage|reading|paragraph/i, 'paragraphs'],
+  [/rearrang/i, 'rearranging'],
+  [/translat/i, 'translation'],
+  [/transform/i, 'transformation'],
+  [/narrat|speech/i, 'narration'],
+  [/voice/i, 'voice'],
+  [/punctuat/i, 'punctuation'],
+  [/preposition/i, 'prepositions'],
+  [/article/i, 'articles'],
+  [/connector|conjunction/i, 'connectors'],
+  [/completing/i, 'completing'],
+  [/synonym/i, 'synonyms'],
+  [/antonym/i, 'antonyms'],
+  [/phrasal/i, 'phrasalVerbs'],
+  [/idiom/i, 'idioms'],
+  [/\bverbs?\b|tense/i, 'verbs'],
+  [/condition/i, 'conditionals'],
+  [/modal/i, 'modals'],
+  [/question\s*tag/i, 'questionTags'],
+];
+
+/* Type-aware fallbacks for the Writing bank (used when the API is empty) */
+const FALLBACK_WRITING = {
+  paragraph: PARAGRAPH_BANK.map((p) => ({ id: p.id, title: p.title })),
+  composition: [
+    { id: 'c1', title: 'A Journey by Train' },
+    { id: 'c2', title: 'The Padma Bridge' },
+    { id: 'c3', title: 'Importance of Reading Newspapers' },
+  ],
+  letter: [
+    { id: 'l1', title: 'A Letter to a Friend about SSC Results' },
+    { id: 'l2', title: 'An Application for Leave' },
+    { id: 'l3', title: 'A Letter to Your Father about Your Studies' },
+  ],
+};
+
+/* ============================================================
    Build TABS
    ============================================================ */
 const ALL_TABS = Object.entries(QUESTION_BANK).map(([id, cat]) => ({
@@ -2459,11 +3171,6 @@ const FALLBACK_TOPICS = [
   { id: 't1', title: 'Seen Comprehension', tag: 'Reading' },
   { id: 't2', title: 'Gap Filling with Clues', tag: 'Grammar' },
   { id: 't3', title: 'Rearranging Sentences', tag: 'Grammar' },
-];
-
-const FALLBACK_WRITING = [
-  { id: 'w1', title: 'Your Aim in Life' },
-  { id: 'w2', title: 'A Letter to a Friend about SSC Results' },
 ];
 
 const TOTAL_QUESTIONS = Object.values(QUESTION_BANK).reduce((s, c) => s + c.questions.length, 0);
@@ -2521,21 +3228,40 @@ export function Curriculum() {
   const [selected, setSelected] = useState(null);
   const [feel, setFeel] = useState(null);
   const [score, setScore] = useState({ correct: 0, total: 0 });
-  const [xpToast, setXpToast] = useState(null);
+  const [toast, setToast] = useState(null);
   const [catStats, setCatStats] = useState({});
+  const [translationIdx, setTranslationIdx] = useState(0);
   const [translationInput, setTranslationInput] = useState('');
   const [translationFeedback, setTranslationFeedback] = useState(null);
+  const [paraId, setParaId] = useState(PARAGRAPH_BANK[0].id);
+  const [paraFilter, setParaFilter] = useState('All');
+  const [storyId, setStoryId] = useState(STORY_BANK[0].id);
+
+  const mainRef = useRef(null);
+  const advanceTimer = useRef(null);
+  const toastTimer = useRef(null);
+
+  /* clear pending timers on unmount (they used to fire on a dead component) */
+  useEffect(() => () => {
+    clearTimeout(advanceTimer.current);
+    clearTimeout(toastTimer.current);
+  }, []);
 
   useEffect(() => {
+    let alive = true;
     curriculumApi.topics({ class: cls, paper, board })
-      .then((t) => setTopics(t || []))
-      .catch(() => setTopics([]));
+      .then((t) => { if (alive) setTopics(Array.isArray(t) ? t : []); })
+      .catch(() => { if (alive) setTopics([]); });
+    return () => { alive = false; };
   }, [cls, paper, board]);
 
   useEffect(() => {
+    let alive = true;
+    setWritingBank([]);
     curriculumApi.writingBank(writingType)
-      .then((w) => setWritingBank(w || []))
-      .catch(() => setWritingBank([]));
+      .then((w) => { if (alive) setWritingBank(Array.isArray(w) ? w : []); })
+      .catch(() => { if (alive) setWritingBank([]); });
+    return () => { alive = false; };
   }, [writingType]);
 
   const tabs = useMemo(() => ALL_TABS, []);
@@ -2553,9 +3279,25 @@ export function Curriculum() {
   const question = cat ? cat.questions[qIndex] : null;
   const totalForCat = cat ? cat.questions.length : 0;
 
-  const showXp = (amount) => {
-    setXpToast(amount);
-    setTimeout(() => setXpToast(null), 900);
+  const flash = (t, ms = 900) => {
+    clearTimeout(toastTimer.current);
+    setToast(t);
+    toastTimer.current = setTimeout(() => setToast(null), ms);
+  };
+
+  const scrollToMain = () => {
+    if (mainRef.current && mainRef.current.scrollIntoView) {
+      mainRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  /* single place that changes category/question and cancels any pending auto-advance */
+  const goTo = (id, index = 0) => {
+    clearTimeout(advanceTimer.current);
+    setCatId(id);
+    setQIndex(index);
+    setSelected(null);
+    setFeel(null);
   };
 
   const answer = (opt) => {
@@ -2568,42 +3310,81 @@ export function Curriculum() {
       const prev = st[catId] || { correct: 0, total: 0 };
       return { ...st, [catId]: { correct: prev.correct + (correct ? 1 : 0), total: prev.total + 1 } };
     });
-    if (correct) showXp(10);
-    setTimeout(() => {
+    if (correct) flash({ xp: 10 });
+    clearTimeout(advanceTimer.current);
+    advanceTimer.current = setTimeout(() => {
       setSelected(null);
       setFeel(null);
       setQIndex((i) => (i + 1 < totalForCat ? i + 1 : 0));
     }, 900);
   };
 
-  const switchCat = (id) => {
-    setCatId(id);
-    setQIndex(0);
-    setSelected(null);
-    setFeel(null);
+  const switchCat = (id) => goTo(id);
+
+  const startPracticeFromTopic = (t) => {
+    const hit = TOPIC_TO_CAT.find(([re]) => re.test(`${t.title || ''} ${t.tag || ''}`));
+    if (hit && QUESTION_BANK[hit[1]]) goTo(hit[1]);
+    setMode('practice');
+    scrollToMain();
   };
 
-  const startPracticeFromTopic = () => {
+  const openParagraph = (id) => {
+    setParaId(id);
+    setMode('paragraphs');
+    scrollToMain();
+  };
+
+  const practiceParagraph = (id) => {
+    const idx = QUESTION_BANK.paragraphs.questions.findIndex((q) => q.ref === id);
+    goTo('paragraphs', Math.max(idx, 0));
     setMode('practice');
+    scrollToMain();
+  };
+
+  const openStory = (id) => {
+    setStoryId(id);
+    setMode('stories');
+    scrollToMain();
+  };
+
+  const practiceStory = (id) => {
+    const idx = QUESTION_BANK.stories.questions.findIndex((q) => q.ref === id);
+    goTo('stories', Math.max(idx, 0));
+    setMode('practice');
+    scrollToMain();
   };
 
   const checkTranslation = () => {
-    const expected = 'He walks in the morning every day.';
-    const val = translationInput.trim();
+    const item = TRANSLATION_BANK[translationIdx];
+    const val = normalizeAnswer(translationInput);
     if (!val) {
       setTranslationFeedback({ type: 'bad', msg: 'Please type a translation first.' });
       return;
     }
-    setTranslationFeedback({
-      type: 'good',
-      msg: `Good attempt! A model answer: "${expected}"`,
-    });
+    if (item.ok.includes(val)) {
+      setTranslationFeedback({ type: 'good', msg: `Correct! Model answer: "${item.model}"` });
+      flash({ xp: 10 });
+    } else {
+      setTranslationFeedback({ type: 'bad', msg: `Not quite. Model answer: "${item.model}"` });
+    }
   };
 
-  const openWritingBank = (title) => {
-    showXp(0);
-    setXpToast(`📖 ${title}`);
-    setTimeout(() => setXpToast(null), 1400);
+  const nextTranslation = () => {
+    setTranslationIdx((i) => (i + 1) % TRANSLATION_BANK.length);
+    setTranslationInput('');
+    setTranslationFeedback(null);
+  };
+
+  const openWritingBank = (w) => {
+    const title = w.title || '';
+    const hit = writingType === 'paragraph'
+      && PARAGRAPH_BANK.find((p) => p.title.toLowerCase() === title.toLowerCase());
+    if (hit) {
+      openParagraph(hit.id);
+      flash({ note: `📖 ${hit.title}` }, 1400);
+      return;
+    }
+    flash({ note: `📖 ${title} — model answer coming soon` }, 1800);
   };
 
   const isWeakCat = (id) => {
@@ -2612,6 +3393,24 @@ export function Curriculum() {
   };
 
   const overallPct = score.total ? Math.round((score.correct / score.total) * 100) : 0;
+
+  const visibleParas = paraFilter === 'All' ? PARAGRAPH_BANK : PARAGRAPH_BANK.filter((p) => p.level === paraFilter);
+  const activePara = PARAGRAPH_BANK.find((p) => p.id === paraId) || PARAGRAPH_BANK[0];
+  const nextPara = visibleParas.length
+    ? visibleParas[(visibleParas.findIndex((p) => p.id === activePara.id) + 1) % visibleParas.length]
+    : activePara;
+  const activeStory = STORY_BANK.find((s) => s.id === storyId) || STORY_BANK[0];
+  const nextStory = STORY_BANK[(STORY_BANK.findIndex((s) => s.id === activeStory.id) + 1) % STORY_BANK.length];
+  const passage = question && question.ref ? READING_SOURCES.find((p) => p.id === question.ref) : null;
+  const trans = TRANSLATION_BANK[translationIdx];
+
+  const bankItems = (() => {
+    const base = FALLBACK_WRITING[writingType] || [];
+    if (!writingBank.length) return base;
+    if (writingType !== 'paragraph') return writingBank;
+    const seen = new Set(writingBank.map((w) => (w.title || '').toLowerCase()));
+    return [...writingBank, ...base.filter((x) => !seen.has(x.title.toLowerCase()))];
+  })();
 
   if (!cat || !question) {
     return (
@@ -2635,7 +3434,7 @@ export function Curriculum() {
           <p className="ec-cur-eyebrow">Curriculum</p>
           <h1 className="ec-page-title">English Grammar Mastery</h1>
           <p className="ec-page-sub">
-            SSC, HSC & General — {TOTAL_QUESTIONS}+ exercises across {tabs.length} categories.
+            SSC, HSC & General — {TOTAL_QUESTIONS} exercises across {tabs.length} categories, plus {PARAGRAPH_BANK.length} model paragraphs and {STORY_BANK.length} short stories.
           </p>
         </div>
       </div>
@@ -2643,7 +3442,7 @@ export function Curriculum() {
       <div className="ec-cur-hero">
         <div className="ec-cur-hero-copy">
           <span className="ec-cur-hero-badge">Bangladesh Board</span>
-          <h1>Grammar practice, <em>board-style</em></h1>
+          <h2>Grammar practice, <em>board-style</em></h2>
           <p>Every grammar rule, gap-filling type, translation pattern and writing form — lessons + practice for school and board exams.</p>
           <div className="ec-cur-hero-stats">
             <div className="ec-cur-hero-stat"><strong>{TOTAL_QUESTIONS}</strong><span>Exercises</span></div>
@@ -2672,6 +3471,22 @@ export function Curriculum() {
           aria-pressed={mode === 'lesson'}
         >
           <Icon name="book" /> Lessons
+        </button>
+        <button
+          type="button"
+          className={`ec-cur-mode${mode === 'paragraphs' ? ' ec-cur-mode--active' : ''}`}
+          onClick={() => setMode('paragraphs')}
+          aria-pressed={mode === 'paragraphs'}
+        >
+          <Icon name="chat" /> Paragraphs
+        </button>
+        <button
+          type="button"
+          className={`ec-cur-mode${mode === 'stories' ? ' ec-cur-mode--active' : ''}`}
+          onClick={() => setMode('stories')}
+          aria-pressed={mode === 'stories'}
+        >
+          <Icon name="trophy" /> Stories
         </button>
       </div>
 
@@ -2729,10 +3544,14 @@ export function Curriculum() {
         ))}
       </div>
 
-      {xpToast && <div className="ec-cur-xp-toast">+{xpToast} XP ✨</div>}
+      {toast && (
+        <div className="ec-cur-xp-toast" role="status">
+          {toast.xp != null ? `+${toast.xp} XP ✨` : toast.note}
+        </div>
+      )}
 
       <div className="ec-cur-grid">
-        <section>
+        <section ref={mainRef} style={{ scrollMarginTop: 12 }}>
           {mode === 'lesson' && cat.lesson && (
             <div className="ec-lesson">
               <div className="ec-lesson-head">
@@ -2771,6 +3590,110 @@ export function Curriculum() {
             </div>
           )}
 
+          {mode === 'paragraphs' && (
+            <div className="ec-lesson">
+              <div className="ec-lesson-head">
+                <h2 className="ec-lesson-title">Model paragraphs</h2>
+                <span className="ec-cur-chip">{visibleParas.length} paragraphs</span>
+              </div>
+              <div className="ec-cur-filter-group" style={{ marginBottom: 14 }}>
+                {['All', 'SSC', 'HSC'].map((f) => (
+                  <button
+                    type="button"
+                    key={f}
+                    className={`ec-cur-pill${paraFilter === f ? ' ec-cur-pill--active' : ''}`}
+                    onClick={() => setParaFilter(f)}
+                  >
+                    {f}
+                  </button>
+                ))}
+              </div>
+              <div className="ec-para-list">
+                {visibleParas.map((p) => (
+                  <button
+                    type="button"
+                    key={p.id}
+                    className={`ec-para-item${activePara.id === p.id ? ' ec-para-item--active' : ''}`}
+                    onClick={() => setParaId(p.id)}
+                  >
+                    <span className="ec-para-item-title">{p.title}</span>
+                    <span className="ec-cur-chip">{p.level}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {mode === 'paragraphs' && (
+            <div className="ec-cur-section">
+              <div className="ec-cur-section-head">
+                <h2 className="ec-cur-section-title">{activePara.title}</h2>
+                <span className="ec-cur-chip">{activePara.level} · {activePara.text.split(/\s+/).length} words</span>
+              </div>
+              <p className="ec-para-text">{activePara.text}</p>
+              <div className="ec-para-actions">
+                <button
+                  type="button"
+                  className="ec-cur-pill ec-cur-pill--active"
+                  onClick={() => practiceParagraph(activePara.id)}
+                >
+                  ▶ Practice this paragraph
+                </button>
+                <button type="button" className="ec-cur-pill" onClick={() => { setParaId(nextPara.id); scrollToMain(); }}>
+                  Next paragraph →
+                </button>
+              </div>
+            </div>
+          )}
+
+          {mode === 'stories' && (
+            <div className="ec-lesson">
+              <div className="ec-lesson-head">
+                <h2 className="ec-lesson-title">Short stories</h2>
+                <span className="ec-cur-chip">{STORY_BANK.length} stories</span>
+              </div>
+              <div className="ec-para-list">
+                {STORY_BANK.map((s) => (
+                  <button
+                    type="button"
+                    key={s.id}
+                    className={`ec-para-item${activeStory.id === s.id ? ' ec-para-item--active' : ''}`}
+                    onClick={() => setStoryId(s.id)}
+                  >
+                    <span className="ec-para-item-title">{s.title}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {mode === 'stories' && (
+            <div className="ec-cur-section">
+              <div className="ec-cur-section-head">
+                <h2 className="ec-cur-section-title">{activeStory.title}</h2>
+                <span className="ec-cur-chip">{activeStory.text.split(/\s+/).length} words</span>
+              </div>
+              <p className="ec-para-text">{activeStory.text}</p>
+              <div className="ec-lesson-block" style={{ marginBottom: 14 }}>
+                <h4>🌟 Moral</h4>
+                <ul><li>{activeStory.moral}</li></ul>
+              </div>
+              <div className="ec-lesson-bn" style={{ marginBottom: 14 }}>🇧🇩 {activeStory.moralBn}</div>
+              <div className="ec-para-actions">
+                <button
+                  type="button"
+                  className="ec-cur-pill ec-cur-pill--active"
+                  onClick={() => practiceStory(activeStory.id)}
+                >
+                  ▶ Practice this story
+                </button>
+                <button type="button" className="ec-cur-pill" onClick={() => { setStoryId(nextStory.id); scrollToMain(); }}>
+                  Next story →
+                </button>
+              </div>
+            </div>
+          )}
+
           {mode === 'practice' && (
             <div className="ec-cur-section">
               <div className="ec-quiz-top">
@@ -2780,12 +3703,25 @@ export function Curriculum() {
               <div className="ec-quiz-progress">
                 <div className="ec-quiz-progress-fill" style={{ width: `${((qIndex + 1) / totalForCat) * 100}%` }} />
               </div>
-              <p className="ec-quiz-question">{question.p}</p>
+              {passage && (
+                <details className="ec-passage" open key={passage.id}>
+                  <summary>📖 {passage.title}</summary>
+                  <p>{passage.text}</p>
+                </details>
+              )}
+              {catId === 'translation' && (
+                <span className={`ec-quiz-dir ${hasBn(question.p) ? 'ec-quiz-dir--bn' : 'ec-quiz-dir--en'}`}>
+                  {hasBn(question.p)
+                    ? 'বাংলা → English · Translate into English'
+                    : 'English → বাংলা · বাংলায় অনুবাদ করো'}
+                </span>
+              )}
+              <p className={`ec-quiz-question${catId === 'translation' ? ' ec-quiz-question--src' : ''}${hasBn(question.p) ? ' ec-bn' : ''}`}>{question.p}</p>
               <div className="ec-quiz-options">
                 {question.o.map((opt, i) => {
                   const isSelected = selected === opt;
                   const isCorrect = opt === question.a;
-                  const c = `ec-quiz-option${isSelected ? (isCorrect ? ' ec-quiz-option--correct ec-pop' : ' ec-quiz-option--incorrect') : ''}`;
+                  const c = `ec-quiz-option${hasBn(opt) ? ' ec-bn' : ''}${isSelected ? (isCorrect ? ' ec-quiz-option--correct ec-pop' : ' ec-quiz-option--incorrect') : ''}`;
                   return (
                     <button
                       type="button"
@@ -2799,7 +3735,7 @@ export function Curriculum() {
                   );
                 })}
               </div>
-              <div className={`ec-quiz-feedback${feel === 'good' ? ' ec-quiz-feedback--good' : feel === 'bad' ? ' ec-quiz-feedback--bad' : ''}`}>
+              <div role="status" aria-live="polite" className={`ec-quiz-feedback${feel === 'good' ? ' ec-quiz-feedback--good' : feel === 'bad' ? ' ec-quiz-feedback--bad' : ''}`}>
                 {feel === 'good' && '✨ Correct!'}
                 {feel === 'bad' && `Correct answer: ${question.a}`}
               </div>
@@ -2854,7 +3790,7 @@ export function Curriculum() {
                     type="button"
                     className="ec-cur-pill ec-cur-pill--active"
                     style={{ padding: '10px 16px', fontSize: 12, flexShrink: 0, minHeight: 44 }}
-                    onClick={startPracticeFromTopic}
+                    onClick={() => startPracticeFromTopic(t)}
                     aria-label={`Practice ${t.title}`}
                   >
                     Practice
@@ -2867,14 +3803,15 @@ export function Curriculum() {
           <div className="ec-cur-section ec-cur-translation">
             <div className="ec-cur-section-head">
               <h2 className="ec-cur-section-title">Translation practice</h2>
-              <span className="ec-cur-chip">Bangla → English</span>
+              <span className="ec-cur-chip">Bangla → English · {translationIdx + 1}/{TRANSLATION_BANK.length}</span>
             </div>
-            <p style={{ margin: 0, fontSize: 12.5, color: 'var(--lang-ink-soft)', fontWeight: 700 }}>
-              Translate the sentence below:
+            <p className="ec-cur-translation-label">
+              Translate the sentence below · নিচের বাক্যটি অনুবাদ করো
             </p>
-            <p className="bn">সে প্রতিদিন সকালে হাঁটে।</p>
+            <p className="bn">{trans.bn}</p>
             <textarea
               rows={2}
+              aria-label="English translation"
               placeholder="Type the English translation…"
               value={translationInput}
               onChange={(e) => { setTranslationInput(e.target.value); setTranslationFeedback(null); }}
@@ -2886,6 +3823,14 @@ export function Curriculum() {
               onClick={checkTranslation}
             >
               Check
+            </button>
+            <button
+              type="button"
+              className="ec-cur-pill"
+              style={{ marginTop: 12, marginLeft: 8, padding: '11px 20px', fontSize: 13, minHeight: 46 }}
+              onClick={nextTranslation}
+            >
+              Next →
             </button>
             {translationFeedback && (
               <div className={`ec-cur-translation-feedback ec-cur-translation-feedback--${translationFeedback.type}`}>
@@ -2948,12 +3893,12 @@ export function Curriculum() {
               ))}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {(writingBank.length ? writingBank : FALLBACK_WRITING).map((w) => (
+              {bankItems.map((w) => (
                 <button
                   type="button"
-                  key={w.id}
+                  key={w.id ?? w.title}
                   className="ec-cur-bank-item"
-                  onClick={() => openWritingBank(w.title)}
+                  onClick={() => openWritingBank(w)}
                 >
                   {w.title}
                 </button>
